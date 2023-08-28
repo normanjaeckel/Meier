@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Html exposing (..)
-import Html.Attributes exposing (attribute, class, href, id, placeholder, required, type_, value)
+import Html.Attributes exposing (attribute, class, id, placeholder, required, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
 
 
@@ -37,6 +37,8 @@ type Page
     = Overview (List CampaignRef)
     | CampaignPage Campaign
     | NewCampaign
+    | PupilPage Pupil
+    | NewPupils
 
 
 type alias CampaignRef =
@@ -98,6 +100,8 @@ type SwitchTo
     = SwitchToOverview
     | SwitchToNewCampaign
     | SwitchToPage Id
+    | SwitchToPupil Pupil
+    | SwitchToNewPupils
 
 
 type NewCampaignFormDataInput
@@ -137,6 +141,12 @@ update msg model =
                                     ]
                     }
 
+                SwitchToPupil pup ->
+                    { model | page = PupilPage pup }
+
+                SwitchToNewPupils ->
+                    { model | page = NewPupils }
+
         NewCampaignFormDataMsg i ->
             let
                 newData : NewCampaignFormData
@@ -161,41 +171,6 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ --navbar
-          --,
-          mainContainer model
-        ]
-
-
-navbar : Html Msg
-navbar =
-    nav [ classes "navbar navbar-expand-md navbar-dark fixed-top bg-dark mb-4" ]
-        [ div [ class "container-fluid" ]
-            [ a [ class "navbar-brand", href "#", onClick <| SwitchPage <| SwitchToOverview ] [ text "Start" ]
-            , button
-                [ class "navbar-toggler"
-                , type_ "button"
-                , attribute "data-bs-toggle" "collapse"
-                , attribute "data-bs-target" "#navbarCollapse"
-                , attribute "aria-controls" "navbarCollapse"
-                , attribute "aria-expanded" "false"
-                , attribute "aria-label" "Toggle navigation"
-                ]
-                [ span [ class "navbar-toggler-icon" ] []
-                ]
-            , div [ classes "collapse navbar-collapse", id "navbarCollapse" ]
-                [ ul [ classes "navbar-nav me-auto mb-2 mb-md-0" ]
-                    [ li [ class "nav-item" ] [ a [ classes "nav-link", href "#" ] [ text "Lorem ipsum" ] ]
-                    , li [ class "nav-item" ] [ a [ classes "nav-link", href "#" ] [ text "Dolor sit amet" ] ]
-                    ]
-                ]
-            ]
-        ]
-
-
-mainContainer : Model -> Html Msg
-mainContainer model =
     main_ []
         [ section [ class "section" ]
             (case model.page of
@@ -220,6 +195,12 @@ mainContainer model =
 
                 NewCampaign ->
                     newCampaignView model.newCampaignFormData
+
+                PupilPage pup ->
+                    pupilView pup
+
+                NewPupils ->
+                    newPupilsView
             )
         ]
 
@@ -227,7 +208,8 @@ mainContainer model =
 campaignView : Campaign -> List (Html Msg)
 campaignView c =
     [ h1 [ classes "title is-3" ] [ text c.ref.title ]
-    , div [] (c.days |> List.map dayView)
+    , div [ class "block" ] [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewPupils ] [ text "Neue Schüler/innen" ] ]
+    , div [ class "block" ] (c.days |> List.map dayView)
     ]
 
 
@@ -245,7 +227,7 @@ dayView d =
             else
                 [ div [ class "block" ]
                     [ h3 [ classes "subtitle is-5" ] [ text "Bisher nicht zugeordnete Schüler/innen" ]
-                    , ul [] (d.unassignedPupils |> List.map (\p -> li [] [ text <| pupilToStr p ]))
+                    , pupilUl d.unassignedPupils
                     ]
                 ]
     in
@@ -261,8 +243,17 @@ eventView e =
             p [] [ text "Keine Schüler/innen zugeordnet" ]
 
           else
-            ul [] (e.pupils |> List.map (\p -> li [] [ text <| pupilToStr p ]))
+            pupilUl e.pupils
         ]
+
+
+pupilUl : List Pupil -> Html Msg
+pupilUl pupList =
+    ul []
+        (pupList
+            |> List.map
+                (\pup -> li [] [ a [ onClick <| SwitchPage <| SwitchToPupil pup ] [ text <| pupilToStr pup ] ])
+        )
 
 
 newCampaignView : NewCampaignFormData -> List (Html Msg)
@@ -276,39 +267,57 @@ newCampaignView ncfd =
     , div [ class "columns" ]
         [ div [ classes "column is-half-tablet is-one-third-desktop is-one-quarter-widescreen" ]
             [ form [ onSubmit <| SwitchPage <| SwitchToOverview ]
-                [ div []
-                    [ div [ class "field" ]
-                        [ div [ class "control" ]
-                            [ input
-                                [ class "input"
-                                , type_ "text"
-                                , placeholder "Titel"
-                                , attribute "aria-label" "Titel"
-                                , required True
-                                , onInput (Title >> NewCampaignFormDataMsg)
-                                , value ncfd.title
-                                ]
-                                []
+                [ div [ class "field" ]
+                    [ div [ class "control" ]
+                        [ input
+                            [ class "input"
+                            , type_ "text"
+                            , placeholder "Titel"
+                            , attribute "aria-label" "Titel"
+                            , required True
+                            , onInput (Title >> NewCampaignFormDataMsg)
+                            , value ncfd.title
                             ]
+                            []
                         ]
-                    , div [ class "field" ]
-                        [ div [ class "control" ]
-                            [ input
-                                [ class "input"
-                                , type_ "number"
-                                , attribute "aria-label" labelNumOfDays
-                                , Html.Attributes.min "1"
-                                , onInput (String.toInt >> Maybe.withDefault 0 >> NumOfDays >> NewCampaignFormDataMsg)
-                                , value <| String.fromInt ncfd.numOfDays
-                                ]
-                                []
-                            ]
-                        , p [ class "help" ] [ text labelNumOfDays ]
-                        ]
-                    , div [ class "field" ]
-                        [ button [ classes "button is-primary", type_ "submit" ] [ text "Hinzufügen" ] ]
                     ]
+                , div [ class "field" ]
+                    [ div [ class "control" ]
+                        [ input
+                            [ class "input"
+                            , type_ "number"
+                            , attribute "aria-label" labelNumOfDays
+                            , Html.Attributes.min "1"
+                            , onInput (String.toInt >> Maybe.withDefault 0 >> NumOfDays >> NewCampaignFormDataMsg)
+                            , value <| String.fromInt ncfd.numOfDays
+                            ]
+                            []
+                        ]
+                    , p [ class "help" ] [ text labelNumOfDays ]
+                    ]
+                , div [ class "field" ]
+                    [ button [ classes "button is-primary", type_ "submit" ] [ text "Hinzufügen" ] ]
                 ]
+            ]
+        ]
+    ]
+
+
+pupilView : Pupil -> List (Html Msg)
+pupilView pup =
+    [ h1 [ classes "title is-3" ] [ text <| pupilToStr pup ]
+    , p [] [ text "Lorem ipsum ..." ]
+    ]
+
+
+newPupilsView : List (Html Msg)
+newPupilsView =
+    [ h1 [ classes "title is-3" ] [ text "Neue Schüler/innen hinzufügen" ]
+    , p [] [ text "Lorem ipsum" ]
+    , form []
+        [ div [ class "field" ] []
+        , div [ class "field" ]
+            [ button [ classes "button is-primary", type_ "submit" ] [ text "Hinzufügen" ]
             ]
         ]
     ]
