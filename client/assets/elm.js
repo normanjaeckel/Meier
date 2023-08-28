@@ -5365,31 +5365,31 @@ var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$eventView = function (e) {
 	return A2(
 		$elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('block')
+			]),
 		_List_fromArray(
 			[
 				A2(
 				$elm$html$Html$h3,
-				_List_Nil,
+				_List_fromArray(
+					[
+						$author$project$Main$classes('subtitle is-5')
+					]),
 				_List_fromArray(
 					[
 						$elm$html$Html$text(e.l)
 					])),
 				$elm$core$List$isEmpty(e.L) ? A2(
 				$elm$html$Html$p,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('ms-3')
-					]),
+				_List_Nil,
 				_List_fromArray(
 					[
 						$elm$html$Html$text('Keine Schüler/innen zugeordnet')
 					])) : A2(
 				$elm$html$Html$ul,
-				_List_fromArray(
-					[
-						$author$project$Main$classes('list-unstyled ms-3')
-					]),
+				_List_Nil,
 				A2(
 					$elm$core$List$map,
 					function (p) {
@@ -5407,58 +5407,64 @@ var $author$project$Main$eventView = function (e) {
 };
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
 var $author$project$Main$dayView = function (d) {
+	var unassignedPupils = $elm$core$List$isEmpty(d.P) ? _List_Nil : _List_fromArray(
+		[
+			A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('block')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$h3,
+					_List_fromArray(
+						[
+							$author$project$Main$classes('subtitle is-5')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Bisher nicht zugeordnete Schüler/innen')
+						])),
+					A2(
+					$elm$html$Html$ul,
+					_List_Nil,
+					A2(
+						$elm$core$List$map,
+						function (p) {
+							return A2(
+								$elm$html$Html$li,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										$author$project$Main$pupilToStr(p))
+									]));
+						},
+						d.P))
+				]))
+		]);
+	var events = A2($elm$core$List$map, $author$project$Main$eventView, d.X);
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('mt-md-5')
+				$elm$html$Html$Attributes$class('block')
 			]),
-		_List_fromArray(
-			[
-				A2(
+		A2(
+			$elm$core$List$cons,
+			A2(
 				$elm$html$Html$h2,
-				_List_Nil,
+				_List_fromArray(
+					[
+						$author$project$Main$classes('title is-5')
+					]),
 				_List_fromArray(
 					[
 						$elm$html$Html$text(d.l)
 					])),
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				A2($elm$core$List$map, $author$project$Main$eventView, d.X)),
-				$elm$core$List$isEmpty(d.P) ? A2($elm$html$Html$div, _List_Nil, _List_Nil) : A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$h3,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Bisher nicht zugeordnete Schüler/innen')
-							])),
-						A2(
-						$elm$html$Html$ul,
-						_List_fromArray(
-							[
-								$author$project$Main$classes('list-unstyled ms-3')
-							]),
-						A2(
-							$elm$core$List$map,
-							function (p) {
-								return A2(
-									$elm$html$Html$li,
-									_List_Nil,
-									_List_fromArray(
-										[
-											$elm$html$Html$text(
-											$author$project$Main$pupilToStr(p))
-										]));
-							},
-							d.P))
-					]))
-			]));
+			_Utils_ap(events, unassignedPupils)));
 };
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $author$project$Main$campaignView = function (c) {
@@ -5468,7 +5474,7 @@ var $author$project$Main$campaignView = function (c) {
 			$elm$html$Html$h1,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('mt-md-5')
+					$author$project$Main$classes('title is-3')
 				]),
 			_List_fromArray(
 				[
@@ -5590,18 +5596,19 @@ var $author$project$Main$newCampaignView = function (ncfd) {
 		[
 			A2(
 			$elm$html$Html$h1,
-			_List_Nil,
+			_List_fromArray(
+				[
+					$author$project$Main$classes('title is-3')
+				]),
 			_List_fromArray(
 				[
 					$elm$html$Html$text('Neue Kampagne hinzufügen')
 				])),
 			A2(
-			$elm$html$Html$form,
+			$elm$html$Html$div,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('mb-3'),
-					$elm$html$Html$Events$onSubmit(
-					$author$project$Main$SwitchPage($author$project$Main$SwitchToOverview))
+					$elm$html$Html$Attributes$class('columns')
 				]),
 			_List_fromArray(
 				[
@@ -5609,90 +5616,124 @@ var $author$project$Main$newCampaignView = function (ncfd) {
 					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							$author$project$Main$classes('row g-3')
+							$author$project$Main$classes('column is-half-tablet is-one-third-desktop is-one-quarter-widescreen')
 						]),
 					_List_fromArray(
 						[
 							A2(
-							$elm$html$Html$div,
+							$elm$html$Html$form,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('col-md-3')
+									$elm$html$Html$Events$onSubmit(
+									$author$project$Main$SwitchPage($author$project$Main$SwitchToOverview))
 								]),
 							_List_fromArray(
 								[
-									A2(
-									$elm$html$Html$input,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('form-control'),
-											$elm$html$Html$Attributes$type_('text'),
-											$elm$html$Html$Attributes$placeholder('Titel'),
-											A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Titel'),
-											$elm$html$Html$Attributes$required(true),
-											$elm$html$Html$Events$onInput(
-											A2($elm$core$Basics$composeR, $author$project$Main$Title, $author$project$Main$NewCampaignFormDataMsg)),
-											$elm$html$Html$Attributes$value(ncfd.l)
-										]),
-									_List_Nil)
-								])),
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('col-md-3')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$input,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('form-control'),
-											$elm$html$Html$Attributes$type_('number'),
-											$elm$html$Html$Attributes$min('1'),
-											A2($elm$html$Html$Attributes$attribute, 'aria-label', labelNumOfDays),
-											$elm$html$Html$Events$onInput(
-											A2(
-												$elm$core$Basics$composeR,
-												$elm$core$String$toInt,
-												A2(
-													$elm$core$Basics$composeR,
-													$elm$core$Maybe$withDefault(0),
-													A2($elm$core$Basics$composeR, $author$project$Main$NumOfDays, $author$project$Main$NewCampaignFormDataMsg)))),
-											$elm$html$Html$Attributes$value(
-											$elm$core$String$fromInt(ncfd.I))
-										]),
-									_List_Nil),
 									A2(
 									$elm$html$Html$div,
+									_List_Nil,
 									_List_fromArray(
 										[
-											$elm$html$Html$Attributes$class('form-text')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text(labelNumOfDays)
-										]))
-								])),
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('col-md-3')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$button,
-									_List_fromArray(
-										[
-											$author$project$Main$classes('btn btn-primary'),
-											$elm$html$Html$Attributes$type_('submit')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Hinzufügen')
+											A2(
+											$elm$html$Html$div,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('field')
+												]),
+											_List_fromArray(
+												[
+													A2(
+													$elm$html$Html$div,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('control')
+														]),
+													_List_fromArray(
+														[
+															A2(
+															$elm$html$Html$input,
+															_List_fromArray(
+																[
+																	$elm$html$Html$Attributes$class('input'),
+																	$elm$html$Html$Attributes$type_('text'),
+																	$elm$html$Html$Attributes$placeholder('Titel'),
+																	A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Titel'),
+																	$elm$html$Html$Attributes$required(true),
+																	$elm$html$Html$Events$onInput(
+																	A2($elm$core$Basics$composeR, $author$project$Main$Title, $author$project$Main$NewCampaignFormDataMsg)),
+																	$elm$html$Html$Attributes$value(ncfd.l)
+																]),
+															_List_Nil)
+														]))
+												])),
+											A2(
+											$elm$html$Html$div,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('field')
+												]),
+											_List_fromArray(
+												[
+													A2(
+													$elm$html$Html$div,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('control')
+														]),
+													_List_fromArray(
+														[
+															A2(
+															$elm$html$Html$input,
+															_List_fromArray(
+																[
+																	$elm$html$Html$Attributes$class('input'),
+																	$elm$html$Html$Attributes$type_('number'),
+																	A2($elm$html$Html$Attributes$attribute, 'aria-label', labelNumOfDays),
+																	$elm$html$Html$Attributes$min('1'),
+																	$elm$html$Html$Events$onInput(
+																	A2(
+																		$elm$core$Basics$composeR,
+																		$elm$core$String$toInt,
+																		A2(
+																			$elm$core$Basics$composeR,
+																			$elm$core$Maybe$withDefault(0),
+																			A2($elm$core$Basics$composeR, $author$project$Main$NumOfDays, $author$project$Main$NewCampaignFormDataMsg)))),
+																	$elm$html$Html$Attributes$value(
+																	$elm$core$String$fromInt(ncfd.I))
+																]),
+															_List_Nil)
+														])),
+													A2(
+													$elm$html$Html$p,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('help')
+														]),
+													_List_fromArray(
+														[
+															$elm$html$Html$text(labelNumOfDays)
+														]))
+												])),
+											A2(
+											$elm$html$Html$div,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('field')
+												]),
+											_List_fromArray(
+												[
+													A2(
+													$elm$html$Html$button,
+													_List_fromArray(
+														[
+															$author$project$Main$classes('button is-primary'),
+															$elm$html$Html$Attributes$type_('submit')
+														]),
+													_List_fromArray(
+														[
+															$elm$html$Html$text('Hinzufügen')
+														]))
+												]))
 										]))
 								]))
 						]))
@@ -5715,206 +5756,88 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
+var $elm$html$Html$section = _VirtualDom_node('section');
 var $author$project$Main$mainContainer = function (model) {
 	return A2(
 		$elm$html$Html$main_,
+		_List_Nil,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('container')
-			]),
-		function () {
-			var _v0 = model.x;
-			switch (_v0.$) {
-				case 0:
-					var campaigns = _v0.a;
-					return _List_fromArray(
-						[
-							A2(
-							$elm$html$Html$h1,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('mt-md-5')
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Überblick über alle Kampagnen')
-								])),
-							A2(
-							$elm$html$Html$div,
-							_List_fromArray(
-								[
-									$author$project$Main$classes('list-group mb-3')
-								]),
-							A2(
-								$elm$core$List$map,
-								function (c) {
-									return A2(
-										$elm$html$Html$button,
-										_List_fromArray(
-											[
-												$author$project$Main$classes('list-group-item list-group-item-action'),
-												$elm$html$Html$Attributes$type_('button'),
-												$elm$html$Html$Events$onClick(
-												$author$project$Main$SwitchPage(
-													$author$project$Main$SwitchToPage(c.aa)))
-											]),
-										_List_fromArray(
-											[
-												$elm$html$Html$text(c.l)
-											]));
-								},
-								campaigns)),
-							A2(
-							$elm$html$Html$button,
-							_List_fromArray(
-								[
-									$author$project$Main$classes('btn btn-primary'),
-									$elm$html$Html$Attributes$type_('button'),
-									$elm$html$Html$Events$onClick(
-									$author$project$Main$SwitchPage($author$project$Main$SwitchToNewCampaign))
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Neue Kampagne')
-								]))
-						]);
-				case 1:
-					var c = _v0.a;
-					return $author$project$Main$campaignView(c);
-				default:
-					return $author$project$Main$newCampaignView(model.C);
-			}
-		}());
-};
-var $elm$html$Html$a = _VirtualDom_node('a');
-var $elm$html$Html$Attributes$href = function (url) {
-	return A2(
-		$elm$html$Html$Attributes$stringProperty,
-		'href',
-		_VirtualDom_noJavaScriptUri(url));
-};
-var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
-var $elm$html$Html$nav = _VirtualDom_node('nav');
-var $elm$html$Html$span = _VirtualDom_node('span');
-var $author$project$Main$navbar = A2(
-	$elm$html$Html$nav,
-	_List_fromArray(
-		[
-			$author$project$Main$classes('navbar navbar-expand-md navbar-dark fixed-top bg-dark mb-4')
-		]),
-	_List_fromArray(
-		[
-			A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('container-fluid')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$a,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('navbar-brand'),
-							$elm$html$Html$Attributes$href('#'),
-							$elm$html$Html$Events$onClick(
-							$author$project$Main$SwitchPage($author$project$Main$SwitchToOverview))
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Start')
-						])),
-					A2(
-					$elm$html$Html$button,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('navbar-toggler'),
-							$elm$html$Html$Attributes$type_('button'),
-							A2($elm$html$Html$Attributes$attribute, 'data-bs-toggle', 'collapse'),
-							A2($elm$html$Html$Attributes$attribute, 'data-bs-target', '#navbarCollapse'),
-							A2($elm$html$Html$Attributes$attribute, 'aria-controls', 'navbarCollapse'),
-							A2($elm$html$Html$Attributes$attribute, 'aria-expanded', 'false'),
-							A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Toggle navigation')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$span,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('navbar-toggler-icon')
-								]),
-							_List_Nil)
-						])),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$author$project$Main$classes('collapse navbar-collapse'),
-							$elm$html$Html$Attributes$id('navbarCollapse')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$ul,
-							_List_fromArray(
-								[
-									$author$project$Main$classes('navbar-nav me-auto mb-2 mb-md-0')
-								]),
-							_List_fromArray(
+				A2(
+				$elm$html$Html$section,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('section')
+					]),
+				function () {
+					var _v0 = model.x;
+					switch (_v0.$) {
+						case 0:
+							var campaigns = _v0.a;
+							return _List_fromArray(
 								[
 									A2(
-									$elm$html$Html$li,
+									$elm$html$Html$h1,
 									_List_fromArray(
 										[
-											$elm$html$Html$Attributes$class('nav-item')
+											$author$project$Main$classes('title is-3')
 										]),
 									_List_fromArray(
 										[
-											A2(
-											$elm$html$Html$a,
-											_List_fromArray(
-												[
-													$author$project$Main$classes('nav-link'),
-													$elm$html$Html$Attributes$href('#')
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text('Lorem ipsum')
-												]))
+											$elm$html$Html$text('Überblick über alle Kampagnen')
 										])),
 									A2(
-									$elm$html$Html$li,
+									$elm$html$Html$div,
 									_List_fromArray(
 										[
-											$elm$html$Html$Attributes$class('nav-item')
+											$elm$html$Html$Attributes$class('buttons')
+										]),
+									A2(
+										$elm$core$List$map,
+										function (c) {
+											return A2(
+												$elm$html$Html$button,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('button'),
+														$elm$html$Html$Events$onClick(
+														$author$project$Main$SwitchPage(
+															$author$project$Main$SwitchToPage(c.aa)))
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text(c.l)
+													]));
+										},
+										campaigns)),
+									A2(
+									$elm$html$Html$button,
+									_List_fromArray(
+										[
+											$author$project$Main$classes('button is-primary'),
+											$elm$html$Html$Events$onClick(
+											$author$project$Main$SwitchPage($author$project$Main$SwitchToNewCampaign))
 										]),
 									_List_fromArray(
 										[
-											A2(
-											$elm$html$Html$a,
-											_List_fromArray(
-												[
-													$author$project$Main$classes('nav-link'),
-													$elm$html$Html$Attributes$href('#')
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text('Dolor sit amet')
-												]))
+											$elm$html$Html$text('Neue Kampagne')
 										]))
-								]))
-						]))
-				]))
-		]));
+								]);
+						case 1:
+							var c = _v0.a;
+							return $author$project$Main$campaignView(c);
+						default:
+							return $author$project$Main$newCampaignView(model.C);
+					}
+				}())
+			]));
+};
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
 		_List_fromArray(
 			[
-				$author$project$Main$navbar,
 				$author$project$Main$mainContainer(model)
 			]));
 };

@@ -162,8 +162,9 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ navbar
-        , mainContainer model
+        [ --navbar
+          --,
+          mainContainer model
         ]
 
 
@@ -195,65 +196,72 @@ navbar =
 
 mainContainer : Model -> Html Msg
 mainContainer model =
-    main_ [ class "container" ]
-        (case model.page of
-            Overview campaigns ->
-                [ h1 [ class "mt-md-5" ] [ text "Überblick über alle Kampagnen" ]
-                , div [ classes "list-group mb-3" ]
-                    (campaigns
-                        |> List.map
-                            (\c ->
-                                button
-                                    [ classes "list-group-item list-group-item-action"
-                                    , type_ "button"
-                                    , onClick <| SwitchPage <| SwitchToPage c.id
-                                    ]
-                                    [ text c.title ]
-                            )
-                    )
-                , button [ classes "btn btn-primary", type_ "button", onClick <| SwitchPage <| SwitchToNewCampaign ] [ text "Neue Kampagne" ]
-                ]
+    main_ []
+        [ section [ class "section" ]
+            (case model.page of
+                Overview campaigns ->
+                    [ h1 [ classes "title is-3" ] [ text "Überblick über alle Kampagnen" ]
+                    , div [ class "buttons" ]
+                        (campaigns
+                            |> List.map
+                                (\c ->
+                                    button
+                                        [ class "button"
+                                        , onClick <| SwitchPage <| SwitchToPage c.id
+                                        ]
+                                        [ text c.title ]
+                                )
+                        )
+                    , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewCampaign ] [ text "Neue Kampagne" ]
+                    ]
 
-            CampaignPage c ->
-                campaignView c
+                CampaignPage c ->
+                    campaignView c
 
-            NewCampaign ->
-                newCampaignView model.newCampaignFormData
-        )
+                NewCampaign ->
+                    newCampaignView model.newCampaignFormData
+            )
+        ]
 
 
 campaignView : Campaign -> List (Html Msg)
 campaignView c =
-    [ h1 [ class "mt-md-5" ] [ text c.ref.title ]
+    [ h1 [ classes "title is-3" ] [ text c.ref.title ]
     , div [] (c.days |> List.map dayView)
     ]
 
 
 dayView : Day -> Html Msg
 dayView d =
-    div [ class "mt-md-5" ]
-        [ h2 [] [ text d.title ]
-        , div [] (d.events |> List.map eventView)
-        , if List.isEmpty d.unassignedPupils then
-            div [] []
+    let
+        events : List (Html Msg)
+        events =
+            d.events |> List.map eventView
 
-          else
-            div []
-                [ h3 [] [ text "Bisher nicht zugeordnete Schüler/innen" ]
-                , ul [ classes "list-unstyled ms-3" ] (d.unassignedPupils |> List.map (\p -> li [] [ text <| pupilToStr p ]))
+        unassignedPupils =
+            if List.isEmpty d.unassignedPupils then
+                []
+
+            else
+                [ div [ class "block" ]
+                    [ h3 [ classes "subtitle is-5" ] [ text "Bisher nicht zugeordnete Schüler/innen" ]
+                    , ul [] (d.unassignedPupils |> List.map (\p -> li [] [ text <| pupilToStr p ]))
+                    ]
                 ]
-        ]
+    in
+    div [ class "block" ]
+        (h2 [ classes "title is-5" ] [ text d.title ] :: events ++ unassignedPupils)
 
 
 eventView : Event -> Html Msg
 eventView e =
-    div []
-        [ h3 [] [ text e.title ]
+    div [ class "block" ]
+        [ h3 [ classes "subtitle is-5" ] [ text e.title ]
         , if List.isEmpty e.pupils then
-            p [ class "ms-3" ] [ text "Keine Schüler/innen zugeordnet" ]
+            p [] [ text "Keine Schüler/innen zugeordnet" ]
 
           else
-            ul [ classes "list-unstyled ms-3" ] (e.pupils |> List.map (\p -> li [] [ text <| pupilToStr p ]))
+            ul [] (e.pupils |> List.map (\p -> li [] [ text <| pupilToStr p ]))
         ]
 
 
@@ -264,34 +272,43 @@ newCampaignView ncfd =
         labelNumOfDays =
             "Anzahl der Tage"
     in
-    [ h1 [] [ text "Neue Kampagne hinzufügen" ]
-    , form [ class "mb-3", onSubmit <| SwitchPage <| SwitchToOverview ]
-        [ div [ classes "row g-3" ]
-            [ div [ class "col-md-3" ]
-                [ input
-                    [ class "form-control"
-                    , type_ "text"
-                    , placeholder "Titel"
-                    , attribute "aria-label" "Titel"
-                    , required True
-                    , onInput (Title >> NewCampaignFormDataMsg)
-                    , value ncfd.title
+    [ h1 [ classes "title is-3" ] [ text "Neue Kampagne hinzufügen" ]
+    , div [ class "columns" ]
+        [ div [ classes "column is-half-tablet is-one-third-desktop is-one-quarter-widescreen" ]
+            [ form [ onSubmit <| SwitchPage <| SwitchToOverview ]
+                [ div []
+                    [ div [ class "field" ]
+                        [ div [ class "control" ]
+                            [ input
+                                [ class "input"
+                                , type_ "text"
+                                , placeholder "Titel"
+                                , attribute "aria-label" "Titel"
+                                , required True
+                                , onInput (Title >> NewCampaignFormDataMsg)
+                                , value ncfd.title
+                                ]
+                                []
+                            ]
+                        ]
+                    , div [ class "field" ]
+                        [ div [ class "control" ]
+                            [ input
+                                [ class "input"
+                                , type_ "number"
+                                , attribute "aria-label" labelNumOfDays
+                                , Html.Attributes.min "1"
+                                , onInput (String.toInt >> Maybe.withDefault 0 >> NumOfDays >> NewCampaignFormDataMsg)
+                                , value <| String.fromInt ncfd.numOfDays
+                                ]
+                                []
+                            ]
+                        , p [ class "help" ] [ text labelNumOfDays ]
+                        ]
+                    , div [ class "field" ]
+                        [ button [ classes "button is-primary", type_ "submit" ] [ text "Hinzufügen" ] ]
                     ]
-                    []
                 ]
-            , div [ class "col-md-3" ]
-                [ input
-                    [ class "form-control"
-                    , type_ "number"
-                    , Html.Attributes.min "1"
-                    , attribute "aria-label" labelNumOfDays
-                    , onInput (String.toInt >> Maybe.withDefault 0 >> NumOfDays >> NewCampaignFormDataMsg)
-                    , value <| String.fromInt ncfd.numOfDays
-                    ]
-                    []
-                , div [ class "form-text" ] [ text labelNumOfDays ]
-                ]
-            , div [ class "col-md-3" ] [ button [ classes "btn btn-primary", type_ "submit" ] [ text "Hinzufügen" ] ]
             ]
         ]
     ]
