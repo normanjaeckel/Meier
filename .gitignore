@@ -2,3 +2,4 @@
 
 .task/
 private/
+/server/db.jsonl
