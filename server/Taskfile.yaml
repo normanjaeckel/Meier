@@ -3,12 +3,26 @@
 version: '3'
 
 tasks:
+  copyClient:
+    desc: >-
+      Copies all public client files (index.html and all assets like JS and CSS)
+      to the Go package web so it can use go:embed there.
+    cmds:
+      - rm -rf web/files
+      - mkdir -p web/files
+      - cp ../client/index.html web/files/index.html
+      - cp -r ../client/assets web/files/
+    sources:
+      - ../client/index.html
+      - ../client/assets/**/*
+
   test:
     desc: Runs all tests.
     cmds:
       - go test ./...
     sources:
       - ./**/*.go
+      - web/files/**/*.*
 
   vet:
     desc: >-
@@ -34,6 +48,7 @@ tasks:
       - go build
     sources:
       - ./**/*.go
+      - web/files/**/*.*
     generates:
       - server
 
@@ -42,6 +57,7 @@ tasks:
       Compiles all Go files to our binary "server" after copying client files
       and running tests and checks.
     deps:
+      - copyClient
       - test
       - vet
       - staticcheck
