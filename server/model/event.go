@@ -134,7 +134,25 @@ func (e eventCampaignDelete) Execute(model Model, time time.Time) Model {
 		return model
 	}
 	model.campains[e.ID] = campaign{}
-	// TODO: Also delete all other campaign related stuff
+
+	for i := range model.days {
+		if model.days[i].campaignID == e.ID {
+			model.days[i].campaignID = 0
+		}
+	}
+
+	for i := range model.events {
+		if model.events[i].campaignID == e.ID {
+			model.events[i].campaignID = 0
+		}
+	}
+
+	for i := range model.pupils {
+		if model.pupils[i].campaignID == e.ID {
+			model.pupils[i].campaignID = 0
+		}
+	}
+
 	return model
 }
 
@@ -299,7 +317,11 @@ func (e eventEventUpdate) Validate(model Model) error {
 		return fmt.Errorf("event with id %d does not exist", e.ID)
 	}
 
-	// TODO: validate dayIDs
+	for _, dayID := range e.DayIDs {
+		if len(model.days) <= dayID || model.days[dayID].campaignID != model.events[e.ID].campaignID {
+			return fmt.Errorf("day %d is not in same campaign", dayID)
+		}
+	}
 
 	return nil
 }
@@ -315,7 +337,6 @@ func (e eventEventUpdate) Execute(model Model, time time.Time) Model {
 	}
 
 	if e.Capacity != 0 {
-		// TODO: How can you update to 0?
 		event.capacity = e.Capacity
 	}
 
@@ -324,7 +345,27 @@ func (e eventEventUpdate) Execute(model Model, time time.Time) Model {
 		event.maxSpecialPupils = e.MaxSpecialPupils
 	}
 
-	// TODO: update days.
+	if e.DayIDs != nil {
+		// Add new days
+		set := make(map[int]struct{}, len(e.DayIDs))
+		for _, dayID := range e.DayIDs {
+			set[dayID] = struct{}{}
+			if _, exist := model.days[e.ID].event[e.ID]; !exist {
+				model.days[dayID].event[e.ID] = []int{}
+			}
+		}
+
+		// Remove existing days
+		for dayID, day := range model.days {
+			if _, exist := day.event[e.ID]; !exist {
+				continue
+			}
+
+			if _, exist := set[dayID]; exist {
+				delete(model.days[dayID].event, e.ID)
+			}
+		}
+	}
 
 	model.events[e.ID] = event
 	return model
@@ -351,7 +392,10 @@ func (e eventEventDelete) Execute(model Model, time time.Time) Model {
 		return model
 	}
 	model.events[e.ID] = event{}
-	// TODO: Also remove event from days
+
+	for _, day := range model.days {
+		delete(day.event, e.ID)
+	}
 	return model
 }
 
