@@ -19,7 +19,7 @@ func TestRest(t *testing.T) {
 
 	t.Run("create campaign without title has to return an error", func(t *testing.T) {
 		err := db.Write(func(m model.Model) sticky.Event[model.Model] {
-			_, e := m.CampaignCreate("")
+			_, e := m.CampaignCreate("", nil)
 			return e
 		})
 
@@ -32,7 +32,7 @@ func TestRest(t *testing.T) {
 		var id int
 		err := db.Write(func(m model.Model) sticky.Event[model.Model] {
 			var e sticky.Event[model.Model]
-			id, e = m.CampaignCreate("my title")
+			id, e = m.CampaignCreate("my title", nil)
 			return e
 		})
 		if err != nil {
@@ -53,7 +53,7 @@ func TestRest(t *testing.T) {
 		var id int
 		err := db.Write(func(m model.Model) sticky.Event[model.Model] {
 			var e sticky.Event[model.Model]
-			id, e = m.CampaignCreate("my second title")
+			id, e = m.CampaignCreate("my second title", nil)
 			return e
 		})
 		if err != nil {
@@ -106,4 +106,57 @@ func TestRest(t *testing.T) {
 func lastLine(content string) string {
 	lines := strings.Split(strings.TrimSpace(content), "\n")
 	return lines[len(lines)-1]
+}
+
+func TestStandardData(t *testing.T) {
+	now := func() time.Time { return time.Time{} }
+	dbContent := sticky.NewMemoryDB(`
+	{"time":"2023-09-03 12:30:36","type":"campaign-create","payload":{"id":1,"title":"Herbstprojektwoche"}}
+	{"time":"2023-09-03 12:38:48","type":"day-create","payload":{"id":1,"campaign_id":1,"title":"Erster Tag (Dienstag)"}}
+	{"time":"2023-09-03 12:40:21","type":"day-create","payload":{"id":2,"campaign_id":1,"title":"Zweiter Tag (Mittwoch)"}}
+	{"time":"2023-09-03 12:42:07","type":"event-create","payload":{"id":1,"campaign_id":1,"title":"Kochen","capacity":12,"max_special_pupils":3}}
+	{"time":"2023-09-03 12:43:33","type":"event-create","payload":{"id":2,"campaign_id":1,"title":"Tanzen","capacity":16,"max_special_pupils":1}}
+	{"time":"2023-09-03 12:48:03","type":"pupil-create","payload":{"id":1,"campaign_id":1,"name":"Max Mustermann","class":"2b","special":false}}
+	`)
+	db, err := sticky.New(dbContent, model.Model{}, model.GetEvent, sticky.WithNow[model.Model](now))
+	if err != nil {
+		t.Fatalf("sticky.New: %v", err)
+	}
+
+	db.Read(func(m model.Model) {
+		campaign, err := m.Campaign(1)
+		if err != nil {
+			t.Fatalf("getting campaign: %v", err)
+		}
+
+		if campaign.Title != "Herbstprojektwoche" {
+			t.Errorf("Title == %s, expected Herbstprojektwoche", campaign.Title)
+		}
+
+		days, err := campaign.Days()
+		if err != nil {
+			t.Fatalf("getting days: %v", err)
+		}
+
+		if len(days) != 2 {
+			t.Errorf("got %d days, expected 2", len(days))
+		}
+
+		if days[0].Title != "Erster Tag (Dienstag)" {
+			t.Errorf("Day(1).Title == %s, expected Erster Tag (Dienstag)", days[0].Title)
+		}
+
+		if days[1].Title != "Zweiter Tag (Mittwoch)" {
+			t.Errorf("Day(2).Title == %s, expected Zweiter Tag (Mittwoch)", days[1].Title)
+		}
+
+		pupils, err := campaign.Pupils()
+		if err != nil {
+			t.Fatalf("getting pupils: %v", err)
+		}
+
+		if len(pupils) != 1 {
+			t.Errorf("got %d pupils, expected 1", len(pupils))
+		}
+	})
 }

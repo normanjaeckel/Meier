@@ -78,7 +78,7 @@ func (c CampaignResolver) Events() ([]EventResolver, error) {
 // Pupils returns the pupils.
 func (c CampaignResolver) Pupils() ([]PupilResolver, error) {
 	pupils := make([]PupilResolver, len(c.PupilIDs))
-	for i, id := range c.EventIDs {
+	for i, id := range c.PupilIDs {
 		pupil, err := c.m.Pupil(id)
 		if err != nil {
 			return nil, fmt.Errorf("getting pupil %d: %w", id, err)

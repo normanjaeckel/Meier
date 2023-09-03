@@ -1,5 +1,33 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
 type Query {
     campaign(id: ID!): Campaign!
+}
+
+type Mutation {
+    addCampaign(title: String!, days: [String!] = []): Campaign!
+    updateCampaign(id: ID!, title: String!): Campaign!
+    deleteCampaign(id: ID!): Boolean!
+
+    addDay(campaignID: ID!, title: String!): Day!
+    updateDay(id: ID!, title: String!): Day!
+    deleteDay(id: ID!): Boolean!
+
+    addEvent(campaignID: ID!, title: String!, dayIDs: [ID!]!, capacity: Int!, maxSpecialPupils: Int! = 0): Event!
+    updateEvent(id: ID!, title: String, dayIDs: [ID!], capacity: Int, maxSpecialPupils: Int): Event!
+    deleteDay(id: ID!): Boolean!
+
+    addPupil(campaignID: ID!, name: String!, class: String!, special: Boolean = false): Pupil!
+    updatePupil(id: ID!, name: String, class: String, special: Boolean): Pupil!
+    deletePupil(id: ID!): Boolean!
+
+    # assignPupil(pupilID: ID!, eventID: ID!, dayID: ID!): Day!
+    # assignAll(campaignID: ID!): Campaign!
+
+    # pupilChoice(pupilID: ID!, eventID: ID!, choices: [EventChoice!]!): Boolean!
 }
 
 type Campaign {
@@ -27,7 +55,7 @@ type Event {
     campaign: Campaign!
     title: String!
     capacity: Int!
-    max_special_pupils: Int!
+    maxSpecialPupils: Int!
 }
 
 type Pupil {
@@ -36,4 +64,15 @@ type Pupil {
     name: String!
     class: String!
     special: Boolean!
+}
+
+type EventChoice {
+    event: Event!
+    choice: Choice!
+}
+
+enum Choice {
+    RED
+    YELLOW
+    GREEN
 }

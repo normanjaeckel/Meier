@@ -47,9 +47,9 @@ func New() Model {
 }
 
 // CampaignCreate creates a new Mayer campaign.
-func (m Model) CampaignCreate(title string) (int, Event) {
+func (m Model) CampaignCreate(title string, days []string) (int, Event) {
 	nextID := nextID(m.campains)
-	return nextID, eventCampaignCreate{ID: nextID, Title: title}
+	return nextID, eventCampaignCreate{ID: nextID, Title: title, Days: days}
 }
 
 // CampaignUpdate updates an existing Meier campaign.
@@ -79,14 +79,21 @@ func (m Model) DayDelete(id int) Event {
 }
 
 // EventCreate creates a Meier event in a compaign.
-func (m Model) EventCreate(campaignID int, title string, capacity int, maxNumOfspecialPupils int) (int, Event) {
+func (m Model) EventCreate(campaignID int, title string, days []int, capacity int, maxNumOfspecialPupils int) (int, Event) {
 	nextID := nextID(m.events)
-	return nextID, eventEventCreate{ID: nextID, CampaignID: campaignID, Title: title, Capacity: capacity, MaxSpecialPupils: maxNumOfspecialPupils}
+	return nextID, eventEventCreate{
+		ID:               nextID,
+		CampaignID:       campaignID,
+		Title:            title,
+		Days:             days,
+		Capacity:         capacity,
+		MaxSpecialPupils: maxNumOfspecialPupils,
+	}
 }
 
 // EventUpdate updates a Meyer event in a compaign.
-func (m Model) EventUpdate(id int, title string, capacity int, maxNumOfspecialPupils int) Event {
-	return eventEventUpdate{ID: id, Title: title}
+func (m Model) EventUpdate(id int, title string, dayIDs []int, capacity int, maxNumOfspecialPupils int) Event {
+	return eventEventUpdate{ID: id, Title: title, DayIDs: dayIDs, Capacity: capacity, MaxSpecialPupils: maxNumOfspecialPupils}
 }
 
 // EventDelete deletes a Maier event in a compaign.
@@ -111,7 +118,7 @@ func (m Model) PupilDelete(id int) Event {
 }
 
 func (m Model) campainExist(id int) bool {
-	return len(m.campains) >= id && len(m.campains[id].title) > 0
+	return len(m.campains) > id && len(m.campains[id].title) > 0
 }
 
 // Campaign returns a meier campaign.
@@ -121,6 +128,7 @@ func (m Model) Campaign(id int) (CampaignResolver, error) {
 	}
 
 	campaign := m.campains[id]
+
 	var dayIDs []int
 	for i, day := range m.days {
 		if day.campaignID == id {
@@ -154,7 +162,7 @@ func (m Model) Campaign(id int) (CampaignResolver, error) {
 }
 
 func (m Model) dayExist(id int) bool {
-	return len(m.days) >= id && m.days[id].campaignID != 0
+	return len(m.days) > id && m.days[id].campaignID != 0
 }
 
 // Day returns a day
@@ -176,7 +184,7 @@ func (m Model) Day(id int) (DayResolver, error) {
 }
 
 func (m Model) eventExist(id int) bool {
-	return len(m.events) >= id && m.events[id].campaignID != 0
+	return len(m.events) > id && m.events[id].campaignID != 0
 }
 
 // Event returns an event.
@@ -199,12 +207,12 @@ func (m Model) Event(id int) (EventResolver, error) {
 }
 
 func (m Model) pupilExist(id int) bool {
-	return len(m.pupils) >= id && m.pupils[id].name != ""
+	return len(m.pupils) > id && m.pupils[id].campaignID != 0
 }
 
 // Pupil returns an pupil.
 func (m Model) Pupil(id int) (PupilResolver, error) {
-	if !m.eventExist(id) {
+	if !m.pupilExist(id) {
 		return PupilResolver{}, fmt.Errorf("pupil does not exist")
 	}
 
