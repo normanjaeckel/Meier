@@ -5,6 +5,50 @@ import (
 	"time"
 )
 
+// GetEvent returns an empty event for a name.
+func GetEvent(eventType string) Event {
+	switch eventType {
+	case eventCampaignCreate{}.Name():
+		return &eventCampaignCreate{}
+
+	case eventCampaignUpdate{}.Name():
+		return &eventCampaignUpdate{}
+
+	case eventCampaignDelete{}.Name():
+		return &eventCampaignDelete{}
+
+	case eventDayCreate{}.Name():
+		return &eventDayCreate{}
+
+	case eventDayUpdate{}.Name():
+		return &eventDayUpdate{}
+
+	case eventDayDelete{}.Name():
+		return &eventDayDelete{}
+
+	case eventEventCreate{}.Name():
+		return &eventDayCreate{}
+
+	case eventEventUpdate{}.Name():
+		return &eventEventUpdate{}
+
+	case eventEventDelete{}.Name():
+		return &eventEventDelete{}
+
+	case eventPupilCreate{}.Name():
+		return &eventPupilCreate{}
+
+	case eventPupilUpdate{}.Name():
+		return &eventPupilUpdate{}
+
+	case eventPupilDelete{}.Name():
+		return &eventPupilDelete{}
+
+	default:
+		return nil
+	}
+}
+
 type eventCampaignCreate struct {
 	ID    int    `json:"id"`
 	Title string `json:"title"`
@@ -15,7 +59,7 @@ func (e eventCampaignCreate) Name() string {
 }
 
 func (e eventCampaignCreate) Validate(model Model) error {
-	if len(model.campains) >= e.ID {
+	if len(model.campains) > e.ID {
 		return fmt.Errorf("ID %d is not unique", e.ID)
 	}
 
@@ -27,9 +71,9 @@ func (e eventCampaignCreate) Validate(model Model) error {
 
 func (e eventCampaignCreate) Execute(model Model, time time.Time) Model {
 	for len(model.campains) <= e.ID {
-		model.campains = append(model.campains, "")
+		model.campains = append(model.campains, campaign{})
 	}
-	model.campains[e.ID] = e.Title
+	model.campains[e.ID] = campaign{title: e.Title}
 	return model
 }
 
@@ -43,7 +87,7 @@ func (e eventCampaignUpdate) Name() string {
 }
 
 func (e eventCampaignUpdate) Validate(model Model) error {
-	if len(model.campains) < e.ID || model.campains[e.ID] == "" {
+	if len(model.campains) < e.ID || (model.campains[e.ID] == campaign{}) {
 		return fmt.Errorf("Campaign with id %d does not exist", e.ID)
 	}
 
@@ -57,7 +101,7 @@ func (e eventCampaignUpdate) Execute(model Model, time time.Time) Model {
 	if len(model.campains) < e.ID {
 		return model
 	}
-	model.campains[e.ID] = e.Title
+	model.campains[e.ID].title = e.Title
 	return model
 }
 
@@ -70,7 +114,7 @@ func (e eventCampaignDelete) Name() string {
 }
 
 func (e eventCampaignDelete) Validate(model Model) error {
-	if len(model.campains) < e.ID || model.campains[e.ID] == "" {
+	if len(model.campains) < e.ID || (model.campains[e.ID] == campaign{}) {
 		return fmt.Errorf("Campaign with id %d does not exist", e.ID)
 	}
 	return nil
@@ -80,7 +124,7 @@ func (e eventCampaignDelete) Execute(model Model, time time.Time) Model {
 	if len(model.campains) < e.ID {
 		return model
 	}
-	model.campains[e.ID] = ""
+	model.campains[e.ID] = campaign{}
 	// TODO: Also delete all other campaign related stuff
 	return model
 }
@@ -96,7 +140,7 @@ func (e eventDayCreate) Name() string {
 }
 
 func (e eventDayCreate) Validate(model Model) error {
-	if len(model.days) >= e.ID {
+	if len(model.days) > e.ID {
 		return fmt.Errorf("ID %d is not unique", e.ID)
 	}
 
@@ -191,7 +235,7 @@ func (e eventEventCreate) Name() string {
 }
 
 func (e eventEventCreate) Validate(model Model) error {
-	if len(model.events) >= e.ID {
+	if len(model.events) > e.ID {
 		return fmt.Errorf("ID %d is not unique", e.ID)
 	}
 
@@ -210,10 +254,10 @@ func (e eventEventCreate) Execute(model Model, time time.Time) Model {
 		model.events = append(model.events, event{})
 	}
 	model.events[e.ID] = event{
-		campaignID:            e.CampaignID,
-		title:                 e.Title,
-		capacity:              e.Capacity,
-		maxNumOfspecialPupils: e.MaxSpecialPupils,
+		campaignID:       e.CampaignID,
+		title:            e.Title,
+		capacity:         e.Capacity,
+		maxSpecialPupils: e.MaxSpecialPupils,
 	}
 	return model
 }
@@ -226,7 +270,7 @@ type eventEventUpdate struct {
 }
 
 func (e eventEventUpdate) Name() string {
-	return "day-update"
+	return "event-update"
 }
 
 func (e eventEventUpdate) Validate(model Model) error {
@@ -247,9 +291,9 @@ func (e eventEventUpdate) Execute(model Model, time time.Time) Model {
 	}
 
 	model.events[e.ID] = event{
-		title:                 e.Title,
-		capacity:              e.Capacity,
-		maxNumOfspecialPupils: e.MaxSpecialPupils,
+		title:            e.Title,
+		capacity:         e.Capacity,
+		maxSpecialPupils: e.MaxSpecialPupils,
 	}
 	return model
 }
@@ -275,5 +319,113 @@ func (e eventEventDelete) Execute(model Model, time time.Time) Model {
 		return model
 	}
 	model.events[e.ID] = event{}
+	return model
+}
+
+type eventPupilCreate struct {
+	ID         int    `json:"id"`
+	CampaignID int    `json:"campaign-id"`
+	PName      string `json:"name"`
+	Class      string `json:"class"`
+	Special    bool   `json:"special"`
+}
+
+func (e eventPupilCreate) Name() string {
+	return "pupil-create"
+}
+
+func (e eventPupilCreate) Validate(model Model) error {
+	if len(model.pupils) > e.ID {
+		return fmt.Errorf("ID %d is not unique", e.ID)
+	}
+
+	if len(e.PName) == 0 {
+		return fmt.Errorf("pupil name can not be empty")
+	}
+
+	if len(e.Class) == 0 {
+		return fmt.Errorf("pupil class can not be empty")
+	}
+
+	if len(model.campains) <= e.ID {
+		return fmt.Errorf("campaign %d does not exist", e.CampaignID)
+	}
+	return nil
+}
+
+func (e eventPupilCreate) Execute(model Model, time time.Time) Model {
+	for len(model.pupils) <= e.ID {
+		model.pupils = append(model.pupils, pupil{})
+	}
+	model.pupils[e.ID] = pupil{
+		campaignID: e.CampaignID,
+		name:       e.PName,
+		class:      e.Class,
+		special:    e.Special,
+	}
+	return model
+}
+
+type eventPupilUpdate struct {
+	ID      int    `json:"id"`
+	PName   string `json:"name"`
+	Class   string `json:"class"`
+	Special bool   `json:"special"`
+}
+
+func (e eventPupilUpdate) Name() string {
+	return "pupil-update"
+}
+
+func (e eventPupilUpdate) Validate(model Model) error {
+	if len(model.pupils) <= e.ID {
+		return fmt.Errorf("pupil with id %d does not exist", e.ID)
+	}
+
+	if len(e.PName) == 0 {
+		return fmt.Errorf("pupil name can not be empty")
+	}
+
+	if len(e.Class) == 0 {
+		return fmt.Errorf("pupil class can not be empty")
+	}
+
+	return nil
+}
+
+func (e eventPupilUpdate) Execute(model Model, time time.Time) Model {
+	if len(model.pupils) < e.ID {
+		return model
+	}
+
+	model.pupils[e.ID] = pupil{
+		name:    e.PName,
+		class:   e.Class,
+		special: e.Special,
+	}
+	return model
+}
+
+type eventPupilDelete struct {
+	ID int `json:"id"`
+}
+
+func (e eventPupilDelete) Name() string {
+	return "pupil-delete"
+}
+
+func (e eventPupilDelete) Validate(model Model) error {
+	if len(model.pupils) <= e.ID {
+		return fmt.Errorf("Pupil with ID %d does not exist", e.ID)
+	}
+
+	return nil
+}
+
+func (e eventPupilDelete) Execute(model Model, time time.Time) Model {
+	if len(model.pupils) < e.ID {
+		return model
+	}
+	model.pupils[e.ID] = pupil{}
 	return model
 }

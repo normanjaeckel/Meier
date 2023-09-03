@@ -1,0 +1,39 @@
+type Query {
+    campaign(id: ID!): Campaign!
+}
+
+type Campaign {
+    id: ID!
+    title: String!
+    days: [Day!]!
+    events: [Event!]!
+    pupils: [Pupil!]!
+}
+
+type Day {
+    id: ID!
+    campaign: Campaign!
+    title: String!
+    events: [EventPupil!]!
+}
+
+type EventPupil {
+    event: Event!
+    pupils: [Pupil!]!
+}
+
+type Event {
+    id: ID!
+    campaign: Campaign!
+    title: String!
+    capacity: Int!
+    max_special_pupils: Int!
+}
+
+type Pupil {
+    id: ID!
+    campaign: Campaign!
+    name: String!
+    class: String!
+    special: Boolean!
+}

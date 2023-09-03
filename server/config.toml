@@ -1,0 +1,4 @@
+web_listen_addr = ':8080'
+password_read = 'read'
+password_write = 'write'
+secred = 'XMfyDAwq'
