@@ -229,6 +229,11 @@ func (m Model) Pupil(id int) (PupilResolver, error) {
 	}, nil
 }
 
+// AssignPupil adds pupil to an event in a day.
+func (m Model) AssignPupil(pupilID, eventID, dayID int) Event {
+	return eventAssignPupil{PupilID: pupilID, EventID: eventID, DayID: dayID}
+}
+
 func nextID[T any](s []T) int {
 	n := len(s)
 	if n == 0 {

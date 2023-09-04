@@ -117,6 +117,8 @@ func TestStandardData(t *testing.T) {
 	{"time":"2023-09-03 12:42:07","type":"event-create","payload":{"id":1,"campaign_id":1,"title":"Kochen","capacity":12,"max_special_pupils":3}}
 	{"time":"2023-09-03 12:43:33","type":"event-create","payload":{"id":2,"campaign_id":1,"title":"Tanzen","capacity":16,"max_special_pupils":1}}
 	{"time":"2023-09-03 12:48:03","type":"pupil-create","payload":{"id":1,"campaign_id":1,"name":"Max Mustermann","class":"2b","special":false}}
+	{"time":"2023-09-04 07:45:53","type":"assign-pupil","payload":{"pupil_id":1,"day_id":1,"event_id":1}}
+	{"time":"2023-09-04 07:46:22","type":"assign-pupil","payload":{"pupil_id":1,"day_id":2,"event_id":2}}	
 	`)
 	db, err := sticky.New(dbContent, model.Model{}, model.GetEvent, sticky.WithNow[model.Model](now))
 	if err != nil {

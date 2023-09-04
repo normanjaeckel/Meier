@@ -44,6 +44,9 @@ func GetEvent(eventType string) Event {
 	case eventPupilDelete{}.Name():
 		return &eventPupilDelete{}
 
+	case eventAssignPupil{}.Name():
+		return &eventAssignPupil{}
+
 	default:
 		return nil
 	}
@@ -504,5 +507,43 @@ func (e eventPupilDelete) Execute(model Model, time time.Time) Model {
 		return model
 	}
 	model.pupils[e.ID] = pupil{}
+	return model
+}
+
+type eventAssignPupil struct {
+	PupilID int `json:"pupil_id"`
+	DayID   int `json:"day_id"`
+	EventID int `json:"event_id"`
+}
+
+func (e eventAssignPupil) Name() string {
+	return "assign-pupil"
+}
+
+func (e eventAssignPupil) Validate(model Model) error {
+	// All objects have to exist and be in the same campaign
+	if !(model.dayExist(e.DayID) && model.pupilExist(e.PupilID) && model.eventExist(e.EventID)) {
+		return fmt.Errorf("pupil, day and event have to exist")
+	}
+
+	pupil := model.pupils[e.PupilID]
+	day := model.days[e.DayID]
+	event := model.events[e.EventID]
+
+	if !model.campainExist(pupil.campaignID) {
+		return fmt.Errorf("campaign does not exist")
+	}
+
+	if !(pupil.campaignID == day.campaignID && pupil.campaignID == event.campaignID) {
+		return fmt.Errorf("pupil, day and event have to be in the same campaign")
+	}
+
+	return nil
+}
+
+func (e eventAssignPupil) Execute(model Model, time time.Time) Model {
+	day := model.days[e.DayID]
+	day.event[e.EventID] = append(day.event[e.EventID], e.PupilID)
+	model.days[e.DayID] = day
 	return model
 }

@@ -324,3 +324,26 @@ func (r *resolver) DeletePupil(
 
 	return true, nil
 }
+
+func (r *resolver) AssignPupil(
+	args struct {
+		PupilID model.ID
+		EventID model.ID
+		DayID   model.ID
+	},
+) (model.DayResolver, error) {
+	err := r.db.Write(func(m model.Model) sticky.Event[model.Model] {
+		return m.AssignPupil(int(args.PupilID), int(args.EventID), int(args.DayID))
+	})
+	if err != nil {
+		return model.DayResolver{}, fmt.Errorf("write: %w", err)
+	}
+
+	var day model.DayResolver
+	r.db.Read(func(m model.Model) {
+		// TODO: This contains a model outside of read. This could be a race condition.
+		day, err = m.Day(int(args.DayID))
+	})
+
+	return day, nil
+}
