@@ -24,7 +24,7 @@ type Mutation {
     updatePupil(id: ID!, name: String, class: String, special: Boolean): Pupil!
     deletePupil(id: ID!): Boolean!
 
-    # assignPupil(pupilID: ID!, eventID: ID!, dayID: ID!): Day!
+    assignPupil(pupilID: ID!, eventID: ID!, dayID: ID!): Day!
     # assignAll(campaignID: ID!): Campaign!
 
     # pupilChoice(pupilID: ID!, eventID: ID!, choices: [EventChoice!]!): Boolean!
