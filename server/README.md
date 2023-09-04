@@ -13,34 +13,45 @@ The data can be accessed from a campaign. For example with
 
 ```graphql
 {
-    campaign(id: 1) {
-        title
-        days {
-            id
-            title
-            events {
-                event {
-                    id
-                }
-                pupils {
-                    id
-                }
-            }
-        }
-        events {
-            id
-            title
-            capacity
-            maxSpecialPupils
+  campaign(id: 1) {
+    title
+    days {
+      id
+      title
+      events {
+        event {
+          id
+          title
         }
         pupils {
-            id
-            name
-            class
-            special
+          id
+          name
         }
+      }
     }
+    events {
+      id
+      title
+      capacity
+      maxSpecialPupils
+    }
+    pupils {
+      id
+      name
+      class
+      special
+      choices {
+        event {
+          id
+          title
+        }
+        choice
+      }
+    }
+  }
 }
+
+
 ```
 
 ## Writing data

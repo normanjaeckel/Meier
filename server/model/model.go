@@ -23,11 +23,18 @@ type event struct {
 	maxSpecialPupils int
 }
 
+// EventChoice is a choice for an event
+type EventChoice struct {
+	EventID int    `json:"event_id"`
+	Choice  Choice `json:"choice"`
+}
+
 type pupil struct {
 	campaignID int
 	name       string
 	class      string
 	special    bool
+	choices    []EventChoice
 }
 
 // Model represents the model of Maier
@@ -226,7 +233,21 @@ func (m Model) Pupil(id int) (PupilResolver, error) {
 		Name:       pupil.name,
 		Class:      pupil.class,
 		Special:    pupil.special,
+		choices:    pupil.choices,
 	}, nil
+}
+
+// AssignPupil adds pupil to an event in a day.
+func (m Model) AssignPupil(pupilID, eventID, dayID int) Event {
+	return eventAssignPupil{PupilID: pupilID, EventID: eventID, DayID: dayID}
+}
+
+// PupilChoice sets the choices of a pupil
+func (m Model) PupilChoice(pupilID int, choices []EventChoice) Event {
+	return eventPupilChoice{
+		PupilID: pupilID,
+		Choices: choices,
+	}
 }
 
 func nextID[T any](s []T) int {

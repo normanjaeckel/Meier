@@ -175,9 +175,37 @@ type PupilResolver struct {
 	Name       string
 	Class      string
 	Special    bool
+	choices    []EventChoice
 }
 
 // Campaign retuns a maier campaign
 func (p PupilResolver) Campaign() (CampaignResolver, error) {
 	return p.m.Campaign(int(p.ID))
+}
+
+// Choices returns the pupils choices.
+func (p PupilResolver) Choices() []EventChoiceResolver {
+	out := make([]EventChoiceResolver, len(p.choices))
+	for i, ec := range p.choices {
+		out[i] = EventChoiceResolver{
+			m:       p.m,
+			EventID: ec.EventID,
+			Choice:  ec.Choice,
+		}
+	}
+
+	return out
+}
+
+// EventChoiceResolver returns a corelation from event to choice.
+type EventChoiceResolver struct {
+	m Model
+
+	EventID int
+	Choice  Choice
+}
+
+// Event returns the event of choice.
+func (e EventChoiceResolver) Event() (EventResolver, error) {
+	return e.m.Event(e.EventID)
 }

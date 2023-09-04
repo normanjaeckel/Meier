@@ -1,5 +1,6 @@
 # Patterns of intentionally untracked files that Git should ignore
 
 .task/
-server
-db.jsonl
+/server
+/db.jsonl
+/config.toml
