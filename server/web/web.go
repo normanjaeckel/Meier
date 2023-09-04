@@ -2,8 +2,9 @@ package web
 
 import (
 	"context"
-	_ "embed" // for embedding
+	"embed"
 	"fmt"
+	"io/fs"
 	"log"
 	"net"
 	"net/http"
@@ -16,15 +17,22 @@ import (
 	"github.com/ostcar/timer/sticky"
 )
 
+const pathPrefixAssets = "/assets"
+
 //go:embed schema.graphql
 var schema string
 
+//go:embed files
+var publicFiles embed.FS
+
 // Run starts the webserver.
 func Run(ctx context.Context, s *sticky.Sticky[model.Model], cfg config.Config) error {
-	handler, err := registerHandlers(s, cfg)
+	parsedSchema, err := graphql.ParseSchema(schema, &resolver{db: s}, graphql.UseFieldResolvers())
 	if err != nil {
-		return fmt.Errorf("register handlers: %w", err)
+		return fmt.Errorf("parsing graphql schema: %w", err)
 	}
+
+	handler := registerHandlers(parsedSchema, cfg)
 
 	srv := &http.Server{
 		Addr:        cfg.WebListenAddr,
@@ -53,23 +61,18 @@ func Run(ctx context.Context, s *sticky.Sticky[model.Model], cfg config.Config) 
 	return <-wait
 }
 
-func registerHandlers(s *sticky.Sticky[model.Model], cfg config.Config) (http.Handler, error) {
+func registerHandlers(schema *graphql.Schema, cfg config.Config) http.Handler {
 	router := mux.NewRouter()
 	router.Use(loggingMiddleware)
 
-	// handleElmJS(router, files.Elm)
-	// handleIndex(router, files.Index)
-	// handleStatic(router, files.Static)
 	// handleAuth(router, cfg)
 
-	paredSchema, err := graphql.ParseSchema(schema, &resolver{db: s}, graphql.UseFieldResolvers())
-	if err != nil {
-		return nil, fmt.Errorf("parsing graphql schema: %w", err)
-	}
+	router.Handle("/query", &relay.Handler{Schema: schema})
 
-	router.Handle("/query", &relay.Handler{Schema: paredSchema})
+	// route anything else to the embeded files folder
+	router.PathPrefix("/").Handler(handleStatic())
 
-	return router, nil
+	return router
 }
 
 type responselogger struct {
@@ -88,4 +91,13 @@ func loggingMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(writer, r)
 		log.Printf("%s %d %s", r.Method, writer.code, r.RequestURI)
 	})
+}
+
+func handleStatic() http.Handler {
+	files, err := fs.Sub(publicFiles, "files")
+	if err != nil {
+		panic(err)
+	}
+
+	return http.FileServer(http.FS(files))
 }
