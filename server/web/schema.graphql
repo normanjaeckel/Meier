@@ -27,7 +27,7 @@ type Mutation {
     assignPupil(pupilID: ID!, eventID: ID!, dayID: ID!): Day!
     # assignAll(campaignID: ID!): Campaign!
 
-    # pupilChoice(pupilID: ID!, eventID: ID!, choices: [EventChoice!]!): Boolean!
+    pupilChoice(pupilID: ID!, choices: [EventChoiceInput!]!): Boolean!
 }
 
 type Campaign {
@@ -64,6 +64,12 @@ type Pupil {
     name: String!
     class: String!
     special: Boolean!
+    choices: [EventChoice!]!
+}
+
+input EventChoiceInput {
+    eventID: ID!
+    choice: Choice!
 }
 
 type EventChoice {

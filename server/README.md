@@ -40,9 +40,17 @@ The data can be accessed from a campaign. For example with
       name
       class
       special
+      choices {
+        event {
+          id
+          title
+        }
+        choice
+      }
     }
   }
 }
+
 
 ```
 

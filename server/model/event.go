@@ -47,6 +47,9 @@ func GetEvent(eventType string) Event {
 	case eventAssignPupil{}.Name():
 		return &eventAssignPupil{}
 
+	case eventPupilChoice{}.Name():
+		return &eventPupilChoice{}
+
 	default:
 		return nil
 	}
@@ -545,5 +548,37 @@ func (e eventAssignPupil) Execute(model Model, time time.Time) Model {
 	day := model.days[e.DayID]
 	day.event[e.EventID] = append(day.event[e.EventID], e.PupilID)
 	model.days[e.DayID] = day
+	return model
+}
+
+type eventPupilChoice struct {
+	PupilID int           `json:"pupil_id"`
+	Choices []EventChoice `json:"choices"`
+}
+
+func (e eventPupilChoice) Name() string {
+	return "pupil-choice"
+}
+
+func (e eventPupilChoice) Validate(model Model) error {
+	if !model.pupilExist(e.PupilID) {
+		return fmt.Errorf("pupil does not exist")
+	}
+
+	for _, c := range e.Choices {
+		if !model.eventExist(c.EventID) {
+			return fmt.Errorf("event %d does not exist", c.EventID)
+		}
+
+		if !c.Choice.valid() {
+			return fmt.Errorf("invalid choice for event %d", c.EventID)
+		}
+	}
+
+	return nil
+}
+
+func (e eventPupilChoice) Execute(model Model, time time.Time) Model {
+	model.pupils[e.PupilID].choices = e.Choices
 	return model
 }

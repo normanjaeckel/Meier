@@ -347,3 +347,28 @@ func (r *resolver) AssignPupil(
 
 	return day, nil
 }
+
+func (r *resolver) PupilChoice(
+	args struct {
+		PupilID model.ID
+		Choices []struct {
+			EventID model.ID
+			Choice  model.Choice
+		}
+	},
+) (bool, error) {
+	err := r.db.Write(func(m model.Model) sticky.Event[model.Model] {
+		choices := make([]model.EventChoice, len(args.Choices))
+		for i, c := range args.Choices {
+			choices[i].EventID = int(c.EventID)
+			choices[i].Choice = c.Choice
+		}
+
+		return m.PupilChoice(int(args.PupilID), choices)
+	})
+	if err != nil {
+		return false, fmt.Errorf("write: %w", err)
+	}
+
+	return true, nil
+}
