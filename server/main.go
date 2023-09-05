@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 	"os/signal"
 
@@ -15,7 +15,7 @@ import (
 
 func main() {
 	if err := run(); err != nil {
-		log.Printf("Error: %v", err)
+		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
 }
@@ -23,6 +23,8 @@ func main() {
 func run() error {
 	ctx, cancel := interruptContext()
 	defer cancel()
+
+	setlogger()
 
 	s, err := sticky.New(sticky.FileDB{File: "db.jsonl"}, model.New(), model.GetEvent)
 	if err != nil {
@@ -58,4 +60,11 @@ func interruptContext() (context.Context, context.CancelFunc) {
 		os.Exit(1)
 	}()
 	return ctx, cancel
+}
+
+func setlogger() {
+	level := new(slog.LevelVar)
+	level.UnmarshalText([]byte("DEBUG"))
+	h := slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: level})
+	slog.SetDefault(slog.New(h))
 }
