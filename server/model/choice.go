@@ -62,9 +62,16 @@ func (c Choice) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements the json interface.
 func (c *Choice) UnmarshalJSON(data []byte) error {
 	var stringChoice string
-	if err := json.Unmarshal(data, &stringChoice); err != nil {
-		return err
+	if err := json.Unmarshal(data, &stringChoice); err == nil {
+		c.fromString(stringChoice)
+		return nil
 	}
 
-	return c.fromString(stringChoice)
+	var intChoice int
+	if err := json.Unmarshal(data, &intChoice); err == nil {
+		(*c) = Choice(intChoice)
+		return nil
+	}
+
+	return fmt.Errorf("invalid value for choice `%s`", data)
 }

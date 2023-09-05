@@ -19,7 +19,7 @@ func TestRest(t *testing.T) {
 
 	t.Run("create campaign without title has to return an error", func(t *testing.T) {
 		err := db.Write(func(m model.Model) sticky.Event[model.Model] {
-			_, e := m.CampaignCreate("", nil)
+			_, e := m.CampaignCreate("", "", nil)
 			return e
 		})
 
@@ -32,7 +32,7 @@ func TestRest(t *testing.T) {
 		var id int
 		err := db.Write(func(m model.Model) sticky.Event[model.Model] {
 			var e sticky.Event[model.Model]
-			id, e = m.CampaignCreate("my title", nil)
+			id, e = m.CampaignCreate("my title", "pass", nil)
 			return e
 		})
 		if err != nil {
@@ -43,7 +43,7 @@ func TestRest(t *testing.T) {
 			t.Errorf("got id %d, expected 1", id)
 		}
 
-		expect := `{"time":"0001-01-01 00:00:00","type":"campaign-create","payload":{"id":1,"title":"my title"}}`
+		expect := `{"time":"0001-01-01 00:00:00","type":"campaign-create","payload":{"id":1,"title":"my title","login_token":"pass"}}`
 		if got := strings.TrimSpace(dbContent.Content); got != expect {
 			t.Errorf("got event %s, expected %s", got, expect)
 		}
@@ -53,7 +53,7 @@ func TestRest(t *testing.T) {
 		var id int
 		err := db.Write(func(m model.Model) sticky.Event[model.Model] {
 			var e sticky.Event[model.Model]
-			id, e = m.CampaignCreate("my second title", nil)
+			id, e = m.CampaignCreate("my second title", "pass", nil)
 			return e
 		})
 		if err != nil {
@@ -64,7 +64,7 @@ func TestRest(t *testing.T) {
 			t.Errorf("got id %d, expected 2", id)
 		}
 
-		expect := `{"time":"0001-01-01 00:00:00","type":"campaign-create","payload":{"id":2,"title":"my second title"}}`
+		expect := `{"time":"0001-01-01 00:00:00","type":"campaign-create","payload":{"id":2,"title":"my second title","login_token":"pass"}}`
 		if got := lastLine(dbContent.Content); got != expect {
 			t.Errorf("got event %s, expected %s", got, expect)
 		}
@@ -72,7 +72,7 @@ func TestRest(t *testing.T) {
 
 	t.Run("update campaign without title has to return an error", func(t *testing.T) {
 		err := db.Write(func(m model.Model) sticky.Event[model.Model] {
-			return m.CampaignUpdate(1, "")
+			return m.CampaignUpdate(1, "", "")
 		})
 		if err == nil {
 			t.Fatalf("got no error, expected one")
@@ -81,7 +81,7 @@ func TestRest(t *testing.T) {
 
 	t.Run("update campaign with title has to create an event", func(t *testing.T) {
 		err := db.Write(func(m model.Model) sticky.Event[model.Model] {
-			return m.CampaignUpdate(1, "new title")
+			return m.CampaignUpdate(1, "new title", "")
 		})
 		if err != nil {
 			t.Fatalf("write: %v", err)
@@ -95,7 +95,7 @@ func TestRest(t *testing.T) {
 
 	t.Run("update non existing campaign", func(t *testing.T) {
 		err := db.Write(func(m model.Model) sticky.Event[model.Model] {
-			return m.CampaignUpdate(404, "new title")
+			return m.CampaignUpdate(404, "new title", "pass")
 		})
 		if err == nil {
 			t.Error("write did not return an error, expected one")

@@ -1,7 +1,6 @@
 package web
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/normanjaeckel/Meier/server/model"
@@ -12,7 +11,7 @@ type resolver struct {
 	db *sticky.Sticky[model.Model]
 }
 
-func (r *resolver) Campaign(ctx context.Context, args struct{ ID int32 }) (model.CampaignResolver, error) {
+func (r *resolver) Campaign(args struct{ ID int32 }) (model.CampaignResolver, error) {
 	var campaign model.CampaignResolver
 	var err error
 	r.db.Read(func(m model.Model) {
@@ -23,15 +22,42 @@ func (r *resolver) Campaign(ctx context.Context, args struct{ ID int32 }) (model
 	return campaign, err
 }
 
+func (r *resolver) CampaignList() ([]model.CampaignResolver, error) {
+	var campaignList []model.CampaignResolver
+	var err error
+	r.db.Read(func(m model.Model) {
+		ids := m.CampaignIDs()
+		campaignList = make([]model.CampaignResolver, len(ids))
+		for i, id := range ids {
+			campaign, err := m.Campaign(int(id))
+			if err != nil {
+				err = fmt.Errorf("campaign %d: %w", id, err)
+				return
+			}
+
+			campaignList[i] = campaign
+		}
+	})
+
+	// TODO: This contains a model outside of read. This could be a race condition.
+	return campaignList, err
+}
+
 func (r *resolver) AddCampaign(
 	args struct {
-		Title string
-		Days  []string
+		Title      string
+		LoginToken *string
+		Days       []string
 	},
 ) (model.CampaignResolver, error) {
 	var newID int
 	err := r.db.Write(func(m model.Model) sticky.Event[model.Model] {
-		id, e := m.CampaignCreate(args.Title, args.Days)
+		loginToken := ""
+		if args.LoginToken != nil {
+			loginToken = *args.LoginToken
+		}
+
+		id, e := m.CampaignCreate(args.Title, loginToken, args.Days)
 		newID = id
 
 		return e
@@ -51,12 +77,23 @@ func (r *resolver) AddCampaign(
 
 func (r *resolver) UpdateCampaign(
 	args struct {
-		ID    int
-		Title string
+		ID         int
+		Title      *string
+		LoginToken *string
 	},
 ) (model.CampaignResolver, error) {
+	title := ""
+	if args.Title != nil {
+		title = *args.Title
+	}
+
+	loginToken := ""
+	if args.LoginToken != nil {
+		loginToken = *args.LoginToken
+	}
+
 	err := r.db.Write(func(m model.Model) sticky.Event[model.Model] {
-		return m.CampaignUpdate(args.ID, args.Title)
+		return m.CampaignUpdate(args.ID, title, loginToken)
 	})
 	if err != nil {
 		return model.CampaignResolver{}, fmt.Errorf("write: %w", err)
@@ -248,13 +285,19 @@ func (r *resolver) AddPupil(
 	args struct {
 		CampaignID model.ID
 		Name       string
+		LoginToken *string
 		Class      string
 		Special    bool
 	},
 ) (model.PupilResolver, error) {
+	loginToken := ""
+	if args.LoginToken != nil {
+		loginToken = *args.LoginToken
+	}
+
 	var newID int
 	err := r.db.Write(func(m model.Model) sticky.Event[model.Model] {
-		id, event := m.PupilCreate(int(args.CampaignID), args.Name, args.Class, args.Special)
+		id, event := m.PupilCreate(int(args.CampaignID), args.Name, loginToken, args.Class, args.Special)
 		newID = id
 		return event
 	})
@@ -273,16 +316,22 @@ func (r *resolver) AddPupil(
 
 func (r *resolver) UpdatePupil(
 	args struct {
-		ID      int
-		Name    *string
-		Class   *string
-		Special *bool
+		ID         int
+		Name       *string
+		LoginToken *string
+		Class      *string
+		Special    *bool
 	},
 ) (model.PupilResolver, error) {
 	err := r.db.Write(func(m model.Model) sticky.Event[model.Model] {
 		name := ""
 		if args.Name != nil {
 			name = *args.Name
+		}
+
+		loginToken := ""
+		if args.LoginToken != nil {
+			loginToken = *args.LoginToken
 		}
 
 		class := ""
@@ -295,7 +344,7 @@ func (r *resolver) UpdatePupil(
 			special = *args.Special
 		}
 
-		return m.PupilUpdate(args.ID, name, class, special)
+		return m.PupilUpdate(args.ID, name, loginToken, class, special)
 	})
 	if err != nil {
 		return model.PupilResolver{}, fmt.Errorf("write: %w", err)

@@ -56,9 +56,10 @@ func GetEvent(eventType string) Event {
 }
 
 type eventCampaignCreate struct {
-	ID    int      `json:"id"`
-	Title string   `json:"title"`
-	Days  []string `json:"days,omitempty"`
+	ID         int      `json:"id"`
+	Title      string   `json:"title"`
+	LoginToken string   `json:"login_token"`
+	Days       []string `json:"days,omitempty"`
 }
 
 func (e eventCampaignCreate) Name() string {
@@ -70,9 +71,14 @@ func (e eventCampaignCreate) Validate(model Model) error {
 		return fmt.Errorf("ID %d is not unique", e.ID)
 	}
 
-	if len(e.Title) == 0 {
+	if e.Title == "" {
 		return fmt.Errorf("campaign title can not be empty")
 	}
+
+	if e.LoginToken == "" {
+		return fmt.Errorf("login token has to be set")
+	}
+
 	return nil
 }
 
@@ -80,7 +86,10 @@ func (e eventCampaignCreate) Execute(model Model, time time.Time) Model {
 	for len(model.campains) <= e.ID {
 		model.campains = append(model.campains, campaign{})
 	}
-	model.campains[e.ID] = campaign{title: e.Title}
+	model.campains[e.ID] = campaign{
+		title:      e.Title,
+		loginToken: e.LoginToken,
+	}
 
 	for _, dayTitle := range e.Days {
 		model.days = append(model.days, day{
@@ -93,8 +102,9 @@ func (e eventCampaignCreate) Execute(model Model, time time.Time) Model {
 }
 
 type eventCampaignUpdate struct {
-	ID    int    `json:"id"`
-	Title string `json:"title"`
+	ID         int    `json:"id"`
+	Title      string `json:"title,omitempty"`
+	LoginToken string `json:"login_token,omitempty"`
 }
 
 func (e eventCampaignUpdate) Name() string {
@@ -106,8 +116,8 @@ func (e eventCampaignUpdate) Validate(model Model) error {
 		return fmt.Errorf("Campaign with id %d does not exist", e.ID)
 	}
 
-	if len(e.Title) == 0 {
-		return fmt.Errorf("campaign title can not be empty")
+	if e.Title == "" && e.LoginToken == "" {
+		return fmt.Errorf("title or loginToken has to be set")
 	}
 	return nil
 }
@@ -116,7 +126,15 @@ func (e eventCampaignUpdate) Execute(model Model, time time.Time) Model {
 	if len(model.campains) < e.ID {
 		return model
 	}
-	model.campains[e.ID].title = e.Title
+
+	if e.Title != "" {
+		model.campains[e.ID].title = e.Title
+	}
+
+	if e.LoginToken != "" {
+		model.campains[e.ID].loginToken = e.LoginToken
+	}
+
 	return model
 }
 
@@ -409,6 +427,7 @@ type eventPupilCreate struct {
 	ID         int    `json:"id"`
 	CampaignID int    `json:"campaign_id"`
 	PName      string `json:"name"`
+	LoginToken string `json:"login_token"`
 	Class      string `json:"class"`
 	Special    bool   `json:"special"`
 }
@@ -422,17 +441,22 @@ func (e eventPupilCreate) Validate(model Model) error {
 		return fmt.Errorf("ID %d is not unique", e.ID)
 	}
 
-	if len(e.PName) == 0 {
+	if e.PName == "" {
 		return fmt.Errorf("pupil name can not be empty")
 	}
 
-	if len(e.Class) == 0 {
+	if e.Class == "" {
 		return fmt.Errorf("pupil class can not be empty")
 	}
 
 	if len(model.campains) <= e.CampaignID {
 		return fmt.Errorf("campaign %d does not exist", e.CampaignID)
 	}
+
+	if e.LoginToken == "" {
+		return fmt.Errorf("login token has to be set")
+	}
+
 	return nil
 }
 
@@ -443,6 +467,7 @@ func (e eventPupilCreate) Execute(model Model, time time.Time) Model {
 	model.pupils[e.ID] = pupil{
 		campaignID: e.CampaignID,
 		name:       e.PName,
+		loginToken: e.LoginToken,
 		class:      e.Class,
 		special:    e.Special,
 	}
@@ -450,10 +475,11 @@ func (e eventPupilCreate) Execute(model Model, time time.Time) Model {
 }
 
 type eventPupilUpdate struct {
-	ID      int    `json:"id"`
-	PName   string `json:"name"`
-	Class   string `json:"class"`
-	Special bool   `json:"special"`
+	ID         int    `json:"id"`
+	PName      string `json:"name,omitempty"`
+	LoginToken string `json:"login_token,omitempty"`
+	Class      string `json:"class,omitempty"`
+	Special    bool   `json:"special"` // TODO: make this an maybe type
 }
 
 func (e eventPupilUpdate) Name() string {
@@ -465,12 +491,8 @@ func (e eventPupilUpdate) Validate(model Model) error {
 		return fmt.Errorf("pupil with id %d does not exist", e.ID)
 	}
 
-	if len(e.PName) == 0 {
-		return fmt.Errorf("pupil name can not be empty")
-	}
-
-	if len(e.Class) == 0 {
-		return fmt.Errorf("pupil class can not be empty")
+	if e.PName == "" && e.Class == "" && e.LoginToken == "" {
+		return fmt.Errorf("name, class or login_token has to be set")
 	}
 
 	return nil
@@ -481,11 +503,20 @@ func (e eventPupilUpdate) Execute(model Model, time time.Time) Model {
 		return model
 	}
 
-	model.pupils[e.ID] = pupil{
-		name:    e.PName,
-		class:   e.Class,
-		special: e.Special,
+	if e.PName != "" {
+		model.pupils[e.ID].name = e.PName
 	}
+
+	if e.Class != "" {
+		model.pupils[e.ID].class = e.Class
+	}
+
+	if e.LoginToken != "" {
+		model.pupils[e.ID].loginToken = e.LoginToken
+	}
+
+	model.pupils[e.ID].special = e.Special
+
 	return model
 }
 

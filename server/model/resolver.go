@@ -38,11 +38,12 @@ func (id ID) MarshalJSON() ([]byte, error) {
 type CampaignResolver struct {
 	m Model
 
-	ID       ID
-	Title    string
-	DayIDs   []int
-	EventIDs []int
-	PupilIDs []int
+	ID         ID
+	Title      string
+	LoginToken string
+	DayIDs     []int
+	EventIDs   []int
+	PupilIDs   []int
 }
 
 // Days returns the days.
@@ -173,6 +174,7 @@ type PupilResolver struct {
 	ID         ID
 	CampaignID int
 	Name       string
+	LoginToken string
 	Class      string
 	Special    bool
 	choices    []EventChoice
