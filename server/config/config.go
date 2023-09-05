@@ -24,7 +24,7 @@ func DefaultConfig() Config {
 	return Config{
 		WebListenAddr: ":8080",
 		LoginToken:    "admin",
-		Secred:        CreatePassword(8),
+		Secred:        CreatePassword(32),
 	}
 }
 

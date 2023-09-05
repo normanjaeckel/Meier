@@ -1,7 +1,6 @@
 package web
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/normanjaeckel/Meier/server/model"
@@ -12,7 +11,7 @@ type resolver struct {
 	db *sticky.Sticky[model.Model]
 }
 
-func (r *resolver) Campaign(ctx context.Context, args struct{ ID int32 }) (model.CampaignResolver, error) {
+func (r *resolver) Campaign(args struct{ ID int32 }) (model.CampaignResolver, error) {
 	var campaign model.CampaignResolver
 	var err error
 	r.db.Read(func(m model.Model) {
@@ -21,6 +20,27 @@ func (r *resolver) Campaign(ctx context.Context, args struct{ ID int32 }) (model
 	})
 
 	return campaign, err
+}
+
+func (r *resolver) CampaignList() ([]model.CampaignResolver, error) {
+	var campaignList []model.CampaignResolver
+	var err error
+	r.db.Read(func(m model.Model) {
+		ids := m.CampaignIDs()
+		campaignList = make([]model.CampaignResolver, len(ids))
+		for i, id := range ids {
+			campaign, err := m.Campaign(int(id))
+			if err != nil {
+				err = fmt.Errorf("campaign %d: %w", id, err)
+				return
+			}
+
+			campaignList[i] = campaign
+		}
+	})
+
+	// TODO: This contains a model outside of read. This could be a race condition.
+	return campaignList, err
 }
 
 func (r *resolver) AddCampaign(

@@ -5,6 +5,7 @@ schema {
 
 type Query {
     campaign(id: ID!): Campaign!
+    campaignList: [Campaign!]!
 }
 
 type Mutation {

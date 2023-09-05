@@ -141,6 +141,20 @@ func (m Model) campainExist(id int) bool {
 	return len(m.campains) > id && len(m.campains[id].title) > 0
 }
 
+// CampaignIDs returns the id of all existing campains.
+func (m Model) CampaignIDs() []int {
+	out := make([]int, 0, len(m.campains))
+	for id := range m.campains {
+		if !m.campainExist(id) {
+			continue
+		}
+
+		out = append(out, id)
+	}
+
+	return out
+}
+
 // Campaign returns a meier campaign.
 func (m Model) Campaign(id int) (CampaignResolver, error) {
 	if !m.campainExist(id) {
