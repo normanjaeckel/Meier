@@ -14,8 +14,7 @@ import (
 type Config struct {
 	WebListenAddr string `toml:"web_listen_addr"`
 
-	PasswordRead  string `toml:"password_read"`
-	PasswordWrite string `toml:"password_write"`
+	LoginToken string `toml:"login_token"`
 
 	Secred string `toml:"secred"`
 }
@@ -24,11 +23,8 @@ type Config struct {
 func DefaultConfig() Config {
 	return Config{
 		WebListenAddr: ":8080",
-
-		PasswordRead:  "read",
-		PasswordWrite: "write",
-
-		Secred: createPassword(),
+		LoginToken:    "admin",
+		Secred:        CreatePassword(8),
 	}
 }
 
@@ -72,11 +68,11 @@ func saveConfig(file string, config Config) (err error) {
 	return nil
 }
 
-func createPassword() string {
+// CreatePassword creates a random password string.
+func CreatePassword(length int) string {
 	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ" +
 		"abcdefghijklmnopqrstuvwxyzåäö" +
 		"0123456789")
-	length := 8
 	var b strings.Builder
 	for i := 0; i < length; i++ {
 		b.WriteRune(chars[rand.Intn(len(chars))])
