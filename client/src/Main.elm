@@ -1,12 +1,12 @@
 module Main exposing (main)
 
 import Browser
-import Dict
 import Html exposing (..)
 import Html.Attributes exposing (attribute, class, placeholder, required, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
 import Json.Decode as D
+import Json.Encode as E
 import Platform.Cmd as Cmd
 
 
@@ -18,6 +18,11 @@ main =
         , subscriptions = subscriptions
         , view = view
         }
+
+
+queryUrl : String
+queryUrl =
+    "/query"
 
 
 
@@ -34,14 +39,58 @@ type alias Model =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { connection = Loading
-      , data = { campaigns = Dict.empty }
+      , data = { campaigns = [] }
       , newCampaignFormData = NewCampaignFormData "" 2
       }
-    , Http.get
-        { url = "https://run.mocky.io/v3/c999159b-0433-405a-8f34-5652cae2f081"
+    , Http.post
+        { url = queryUrl
+        , body = Http.jsonBody <| E.object [ ( "query", E.string queryCampaignList ) ]
         , expect = Http.expectJson GotData dataDecoder
         }
     )
+
+
+queryCampaignList : String
+queryCampaignList =
+    """
+    {
+        campaignList {
+            id
+            title
+            days {
+                id
+                title
+                events {
+                    event {
+                        id
+                    }
+                    pupils {
+                        id
+                    }
+                }
+            }
+            events {
+                id
+                title
+                capacity
+                maxSpecialPupils
+            }
+            pupils {
+                id
+                name
+                class
+                special
+                choices {
+                    event {
+                        id
+                        title
+                    }
+                    choice
+                }
+            }
+        }
+    }
+    """
 
 
 type Connection
@@ -59,7 +108,7 @@ type Page
 
 
 type alias Data =
-    { campaigns : Dict.Dict CampaignId Campaign
+    { campaigns : List Campaign
     }
 
 
@@ -67,8 +116,8 @@ dataDecoder : D.Decoder Data
 dataDecoder =
     D.map Data
         (D.field
-            "campaigns"
-            (D.dict campaignDecoder |> dictKeyFromStringToComparable String.toInt)
+            "data"
+            (D.field "campaignList" <| D.list campaignDecoder)
         )
 
 
@@ -77,20 +126,22 @@ type alias CampaignId =
 
 
 type alias Campaign =
-    { title : String
-    , days : Dict.Dict DayId Day
-    , events : Dict.Dict EventId Event
-    , pupils : Dict.Dict PupilId Pupil
+    { id : CampaignId
+    , title : String
+    , days : List Day
+    , events : List Event
+    , pupils : List Pupil
     }
 
 
 campaignDecoder : D.Decoder Campaign
 campaignDecoder =
-    D.map4 Campaign
+    D.map5 Campaign
+        (D.field "id" D.int)
         (D.field "title" D.string)
-        (D.field "days" (D.dict dayDecoder |> dictKeyFromStringToComparable String.toInt))
-        (D.field "events" (D.dict eventDecoder |> dictKeyFromStringToComparable String.toInt))
-        (D.field "pupils" (D.dict pupilDecoder |> dictKeyFromStringToComparable String.toInt))
+        (D.field "days" (D.list dayDecoder))
+        (D.field "events" (D.list eventDecoder))
+        (D.field "pupils" (D.list pupilDecoder))
 
 
 type alias DayId =
@@ -98,16 +149,25 @@ type alias DayId =
 
 
 type alias Day =
-    { title : String
-    , events : Dict.Dict EventId (List PupilId)
+    { id : DayId
+    , title : String
+    , events : List ( EventId, List PupilId )
     }
 
 
 dayDecoder : D.Decoder Day
 dayDecoder =
-    D.map2 Day
+    D.map3 Day
+        (D.field "id" D.int)
         (D.field "title" D.string)
-        (D.field "events" (D.dict (D.list D.int) |> dictKeyFromStringToComparable String.toInt))
+        (D.field "events"
+            (D.list
+                (D.map2 Tuple.pair
+                    (D.field "event" (D.field "id" D.int))
+                    (D.field "pupils" (D.list <| D.field "id" D.int))
+                )
+            )
+        )
 
 
 type alias EventId =
@@ -115,14 +175,16 @@ type alias EventId =
 
 
 type alias Event =
-    { title : String
+    { id : EventId
+    , title : String
     , capacity : Int
     }
 
 
 eventDecoder : D.Decoder Event
 eventDecoder =
-    D.map2 Event
+    D.map3 Event
+        (D.field "id" D.int)
         (D.field "title" D.string)
         (D.field "capacity" D.int)
 
@@ -143,36 +205,8 @@ pupilDecoder =
     D.map3 Pupil
         (D.field "name" D.string)
         (D.field "class" D.string)
-        (D.field "isSpecial" D.bool)
-
-
-{-| This helper can transform a decoder so that we can use not only strings as
-key but any comparables.
--}
-dictKeyFromStringToComparable : (String -> Maybe comparable) -> D.Decoder (Dict.Dict String b) -> D.Decoder (Dict.Dict comparable b)
-dictKeyFromStringToComparable fn dec =
-    let
-        fn2 : ( String, b ) -> Maybe (List ( comparable, b )) -> Maybe (List ( comparable, b ))
-        fn2 ( k1, v ) acc1 =
-            acc1
-                |> Maybe.andThen
-                    (\acc2 ->
-                        k1 |> fn |> Maybe.andThen (\k2 -> ( k2, v ) :: acc2 |> Just)
-                    )
-    in
-    dec
-        |> D.andThen
-            (\d ->
-                case d |> Dict.toList |> List.foldl fn2 (Just []) of
-                    Nothing ->
-                        D.fail "invalid object id"
-
-                    Just l ->
-                        l
-                            |> List.reverse
-                            |> Dict.fromList
-                            |> D.succeed
-            )
+        -- TODO: Rename this to 'isSpecial'
+        (D.field "special" D.bool)
 
 
 type alias NewCampaignFormData =
@@ -191,15 +225,17 @@ pupilToStr p =
 
 
 type Msg
-    = SwitchPage SwitchTo
+    = GotData (Result Http.Error Data)
+    | SwitchPage SwitchTo
     | NewCampaignFormDataMsg NewCampaignFormDataInput
-    | GotData (Result Http.Error Data)
+    | SendNewCampaignForm
+    | GotNewCampaign (Result Http.Error Campaign)
 
 
 type SwitchTo
     = SwitchToOverview
     | SwitchToNewCampaign
-    | SwitchToPage CampaignId
+    | SwitchToPage Campaign
     | SwitchToPupil Pupil
     | SwitchToNewPupils
 
@@ -217,27 +253,8 @@ update msg model =
                 Ok data ->
                     ( { model | connection = Success Overview, data = data }, Cmd.none )
 
-                Err e ->
-                    let
-                        errMsg : String
-                        errMsg =
-                            case e of
-                                Http.BadUrl m ->
-                                    "bad url: " ++ m
-
-                                Http.Timeout ->
-                                    "timeout"
-
-                                Http.NetworkError ->
-                                    "network error"
-
-                                Http.BadStatus code ->
-                                    "bad status: " ++ String.fromInt code
-
-                                Http.BadBody m ->
-                                    "bad body: " ++ m
-                    in
-                    ( { model | connection = Failure errMsg }, Cmd.none )
+                Err err ->
+                    ( model |> parseError err, Cmd.none )
 
         SwitchPage s ->
             case s of
@@ -247,19 +264,8 @@ update msg model =
                 SwitchToNewCampaign ->
                     ( { model | connection = Success NewCampaign }, Cmd.none )
 
-                SwitchToPage _ ->
-                    ( { model
-                        | connection =
-                            Success <|
-                                CampaignPage <|
-                                    Campaign
-                                        "Eine Kampagne beispielhaft"
-                                        Dict.empty
-                                        Dict.empty
-                                        Dict.empty
-                      }
-                    , Cmd.none
-                    )
+                SwitchToPage c ->
+                    ( { model | connection = Success <| CampaignPage <| c }, Cmd.none )
 
                 SwitchToPupil pup ->
                     ( { model | connection = Success <| PupilPage pup }, Cmd.none )
@@ -283,6 +289,47 @@ update msg model =
                             { currentData | numOfDays = n }
             in
             ( { model | newCampaignFormData = newData }, Cmd.none )
+
+        SendNewCampaignForm ->
+            ( { model | connection = Loading }
+            , Http.post
+                { url = queryUrl
+                , body = Http.jsonBody <| E.object [ ( "mutation", E.string """{ addCampaign(title: "blub"){id} }""" ) ]
+                , expect = Http.expectJson GotNewCampaign campaignDecoder
+                }
+            )
+
+        GotNewCampaign res ->
+            case res of
+                Ok _ ->
+                    ( model, Cmd.none )
+
+                Err err ->
+                    ( model |> parseError err, Cmd.none )
+
+
+parseError : Http.Error -> Model -> Model
+parseError err model =
+    let
+        errMsg : String
+        errMsg =
+            case err of
+                Http.BadUrl m ->
+                    "bad url: " ++ m
+
+                Http.Timeout ->
+                    "timeout"
+
+                Http.NetworkError ->
+                    "network error"
+
+                Http.BadStatus code ->
+                    "bad status: " ++ String.fromInt code
+
+                Http.BadBody m ->
+                    "bad body: " ++ m
+    in
+    { model | connection = Failure errMsg }
 
 
 subscriptions : Model -> Sub Msg
@@ -311,12 +358,11 @@ view model =
                             [ h1 [ classes "title is-3" ] [ text "Überblick über alle Kampagnen" ]
                             , div [ class "buttons" ]
                                 (model.data.campaigns
-                                    |> Dict.toList
                                     |> List.map
-                                        (\( cId, c ) ->
+                                        (\c ->
                                             button
                                                 [ class "button"
-                                                , onClick <| SwitchPage <| SwitchToPage cId
+                                                , onClick <| SwitchPage <| SwitchToPage c
                                                 ]
                                                 [ text c.title ]
                                         )
@@ -341,9 +387,18 @@ view model =
 
 campaignView : Campaign -> List (Html Msg)
 campaignView c =
-    [ h1 [ classes "title is-3" ] [ text "dummy title" ]
-    , div [ class "block" ] [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewPupils ] [ text "Neue Schüler/innen" ] ]
-    , div [ class "block" ] (c.days |> Dict.values |> List.map dayView)
+    [ h1 [ classes "title is-3" ] [ text c.title ]
+    , div [ class "block" ] (c.days |> List.map dayView)
+    , div [ class "block" ]
+        (h2 [ classes "title is-5" ] [ text "Alle Angebote" ]
+            :: (c.events |> List.map eventView)
+            ++ [ button [ classes "button is-primary" ] [ text "Neues Angebot" ] ]
+        )
+    , div [ class "block" ]
+        [ h2 [ classes "title is-5" ] [ text "Alle Schüler/innen" ]
+        , c.pupils |> pupilUl
+        , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewPupils ] [ text "Neue Schüler/innen" ]
+        ]
     ]
 
 
@@ -370,16 +425,10 @@ dayView d =
         (h2 [ classes "title is-5" ] [ text d.title ] :: events ++ unassignedPupils)
 
 
-
--- eventView : Event -> Html Msg
--- eventView e =
---     div [ class "block" ]
---         [ h3 [ classes "subtitle is-5" ] [ text e.title ]
---         , if List.isEmpty e.pupils then
---             p [] [ text "Keine Schüler/innen zugeordnet" ]
---           else
---             pupilUl e.pupils
---         ]
+eventView : Event -> Html Msg
+eventView e =
+    div [ class "block" ]
+        [ h3 [ classes "subtitle is-5" ] [ text e.title ] ]
 
 
 pupilUl : List Pupil -> Html Msg
@@ -401,7 +450,7 @@ newCampaignView ncfd =
     [ h1 [ classes "title is-3" ] [ text "Neue Kampagne hinzufügen" ]
     , div [ class "columns" ]
         [ div [ classes "column is-half-tablet is-one-third-desktop is-one-quarter-widescreen" ]
-            [ form [ onSubmit <| SwitchPage <| SwitchToOverview ]
+            [ form [ onSubmit <| SendNewCampaignForm ]
                 [ div [ class "field" ]
                     [ div [ class "control" ]
                         [ input
