@@ -4,7 +4,7 @@ on:
   - pull_request
 
 jobs:
-  run-default-task:
+  run-build-task:
     runs-on: ubuntu-latest
     steps:
 
