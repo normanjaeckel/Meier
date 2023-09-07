@@ -25,5 +25,8 @@ jobs:
       - name: What is here
         run: ls -al
 
+      - name: And the path
+        run: echo $PATH
+
       - name: Run default task as defined in Taskfile.yaml
         run: task
