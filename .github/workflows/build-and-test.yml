@@ -3,10 +3,20 @@ name: Build client and server and run all tests and checks
 run-name : New push by ${{ github.actor }}
 
 on:
-  -push
+  - pull_request
+  - push
 
 jobs:
   run-default-task:
     steps:
-      - uses: actions/checkout@v3
-      - run: task
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21.0'
+
+      - name: Run default task as defined in Taskfile.yaml
+        run: task
