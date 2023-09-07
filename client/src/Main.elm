@@ -79,7 +79,7 @@ queryCampaignList =
                 id
                 name
                 class
-                special
+                isSpecial
                 choices {
                     event {
                         id
@@ -206,7 +206,7 @@ pupilDecoder =
         (D.field "name" D.string)
         (D.field "class" D.string)
         -- TODO: Rename this to 'isSpecial'
-        (D.field "special" D.bool)
+        (D.field "isSpecial" D.bool)
 
 
 type alias NewCampaignFormData =
@@ -294,7 +294,7 @@ update msg model =
             ( { model | connection = Loading }
             , Http.post
                 { url = queryUrl
-                , body = Http.jsonBody <| E.object [ ( "mutation", E.string """{ addCampaign(title: "blub"){id} }""" ) ]
+                , body = Http.jsonBody <| E.object [ ( "query", E.string """{ mutation addCampaign(title: "blub"){id} }""" ) ]
                 , expect = Http.expectJson GotNewCampaign campaignDecoder
                 }
             )

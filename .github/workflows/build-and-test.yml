@@ -1,12 +1,30 @@
 name: Build client and server and run all tests and checks
 
-run-name : New push by ${{ github.actor }}
-
 on:
-  -push
+  - pull_request
 
 jobs:
   run-default-task:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - run: task
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go (https://go.dev)
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21.0'
+
+      - name: Install Taskfile (https://taskfile.dev)
+        run: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
+
+      - name: Install Elm (https://elm-lang.org/)
+        run: |
+          curl -L -o elm.gz https://github.com/elm/compiler/releases/download/0.19.1/binary-for-linux-64-bit.gz
+          gunzip elm.gz
+          chmod +x elm
+          mv elm ~/.local/bin
+
+      - name: Run build task as defined in Taskfile.yaml
+        run: task build

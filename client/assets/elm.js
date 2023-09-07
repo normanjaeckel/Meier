@@ -5398,7 +5398,7 @@ var $author$project$Main$pupilDecoder = A4(
 	$author$project$Main$Pupil,
 	A2($elm$json$Json$Decode$field, 'name', $elm$json$Json$Decode$string),
 	A2($elm$json$Json$Decode$field, 'class', $elm$json$Json$Decode$string),
-	A2($elm$json$Json$Decode$field, 'special', $elm$json$Json$Decode$bool));
+	A2($elm$json$Json$Decode$field, 'isSpecial', $elm$json$Json$Decode$bool));
 var $author$project$Main$campaignDecoder = A6(
 	$elm$json$Json$Decode$map5,
 	$author$project$Main$Campaign,
@@ -6231,7 +6231,7 @@ var $elm$http$Http$post = function (r) {
 	return $elm$http$Http$request(
 		{T: r.T, _: r._, ab: _List_Nil, aQ: 'POST', a_: $elm$core$Maybe$Nothing, ay: $elm$core$Maybe$Nothing, az: r.az});
 };
-var $author$project$Main$queryCampaignList = '\n    {\n        campaignList {\n            id\n            title\n            days {\n                id\n                title\n                events {\n                    event {\n                        id\n                    }\n                    pupils {\n                        id\n                    }\n                }\n            }\n            events {\n                id\n                title\n                capacity\n                maxSpecialPupils\n            }\n            pupils {\n                id\n                name\n                class\n                special\n                choices {\n                    event {\n                        id\n                        title\n                    }\n                    choice\n                }\n            }\n        }\n    }\n    ';
+var $author$project$Main$queryCampaignList = '\n    {\n        campaignList {\n            id\n            title\n            days {\n                id\n                title\n                events {\n                    event {\n                        id\n                    }\n                    pupils {\n                        id\n                    }\n                }\n            }\n            events {\n                id\n                title\n                capacity\n                maxSpecialPupils\n            }\n            pupils {\n                id\n                name\n                class\n                isSpecial\n                choices {\n                    event {\n                        id\n                        title\n                    }\n                    choice\n                }\n            }\n        }\n    }\n    ';
 var $author$project$Main$queryUrl = '/query';
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $author$project$Main$init = function (_v0) {
@@ -6407,8 +6407,8 @@ var $author$project$Main$update = F2(
 									_List_fromArray(
 										[
 											_Utils_Tuple2(
-											'mutation',
-											$elm$json$Json$Encode$string('{ addCampaign(title: "blub"){id} }'))
+											'query',
+											$elm$json$Json$Encode$string('{ mutation addCampaign(title: "blub"){id} }'))
 										]))),
 							_: A2($elm$http$Http$expectJson, $author$project$Main$GotNewCampaign, $author$project$Main$campaignDecoder),
 							az: $author$project$Main$queryUrl

@@ -17,3 +17,9 @@ tasks:
     cmds:
       - task: client:build
       - task: server:run
+
+  build:
+    desc: Runs the tasks client:build and server:build.
+    cmds:
+      - task: client:build
+      - task: server:build
