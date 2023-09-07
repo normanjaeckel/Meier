@@ -60,7 +60,7 @@ tasks:
       - copyClient
       - test
       - vet
-      #- staticcheck
+      - staticcheck
     cmds:
       - task: goBuild
 

@@ -4,7 +4,7 @@ on:
   - pull_request
 
 jobs:
-  run-default-task:
+  run-build-task:
     runs-on: ubuntu-latest
     steps:
 
@@ -25,6 +25,9 @@ jobs:
           gunzip elm.gz
           chmod +x elm
           mv elm ~/.local/bin
+
+      - name: Install Staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
 
       - name: Run build task as defined in Taskfile.yaml
         run: task build
