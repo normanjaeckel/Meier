@@ -18,7 +18,8 @@ jobs:
           go-version: '1.21.0'
 
       - name: Install Taskfile (https://taskfile.dev)
-        run: go install github.com/go-task/task/v3/cmd/task@latest
+        run: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
+
 
       - name: Run default task as defined in Taskfile.yaml
         run: task
