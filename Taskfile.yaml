@@ -13,7 +13,7 @@ includes:
 
 tasks:
   default:
-    desc: Runs the tasks client:build and server:build.
+    desc: Runs the tasks client:build and server:run.
     cmds:
       - task: client:build
-      - task: server:build
+      - task: server:run

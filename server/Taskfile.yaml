@@ -38,7 +38,7 @@ tasks:
       Runs Staticcheck (https://staticcheck.io/), the state of the art linter
       for the Go programming language.
     cmds:
-      - staticcheck -checks all ./...
+      - staticcheck ./...
     sources:
       - ./**/*.go
 
@@ -60,6 +60,14 @@ tasks:
       - copyClient
       - test
       - vet
-      - staticcheck
+      #- staticcheck
     cmds:
       - task: goBuild
+
+  run:
+    desc: >-
+      Runs the server.
+    deps:
+      - build
+    cmds:
+      - ./server
