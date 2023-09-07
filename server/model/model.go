@@ -259,7 +259,7 @@ func (m Model) Pupil(id int) (PupilResolver, error) {
 		CampaignID: pupil.campaignID,
 		Name:       pupil.name,
 		Class:      pupil.class,
-		Special:    pupil.special,
+		IsSpecial:  pupil.special,
 		choices:    pupil.choices,
 	}, nil
 }

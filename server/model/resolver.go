@@ -176,7 +176,7 @@ type PupilResolver struct {
 	Name       string
 	LoginToken string
 	Class      string
-	Special    bool
+	IsSpecial  bool
 	choices    []EventChoice
 }
 
