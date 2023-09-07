@@ -19,14 +19,12 @@ jobs:
       - name: Install Taskfile (https://taskfile.dev)
         run: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
 
-      - name: Where we are
-        run: pwd
-
-      - name: What is here
-        run: ls -al
-
-      - name: And the path
-        run: echo $PATH
+      - name: Install Elm (https://elm-lang.org/)
+        run: |
+          curl -L -o elm.gz https://github.com/elm/compiler/releases/download/0.19.1/binary-for-linux-64-bit.gz
+          gunzip elm.gz
+          chmod +x elm
+          mv elm ~/.local/bin
 
       - name: Run default task as defined in Taskfile.yaml
         run: task
