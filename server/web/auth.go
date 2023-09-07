@@ -21,7 +21,7 @@ const (
 type authPayload struct {
 	jwt.RegisteredClaims
 	Role string `json:"role"`
-	ID   int    `json:"id,omitemtpy"`
+	ID   int    `json:"id,omitempty"`
 }
 
 func setAuthToken(w http.ResponseWriter, role string, id int, cfg config.Config) error {
@@ -44,45 +44,45 @@ func setAuthToken(w http.ResponseWriter, role string, id int, cfg config.Config)
 	return nil
 }
 
-func checkClaim(tokenString string, secred []byte, role string, id int) (bool, error) {
-	var claim authPayload
+// func checkClaim(tokenString string, secred []byte, role string, id int) (bool, error) {
+// 	var claim authPayload
 
-	_, err := jwt.ParseWithClaims(tokenString, &claim, func(token *jwt.Token) (interface{}, error) {
-		return secred, nil
-	})
-	if err != nil {
-		return false, fmt.Errorf("parsing token: %w", err)
-	}
+// 	_, err := jwt.ParseWithClaims(tokenString, &claim, func(token *jwt.Token) (interface{}, error) {
+// 		return secred, nil
+// 	})
+// 	if err != nil {
+// 		return false, fmt.Errorf("parsing token: %w", err)
+// 	}
 
-	return claim.Role == role && (claim.ID == 0 || claim.ID == id), nil
-}
+// 	return claim.Role == role && (claim.ID == 0 || claim.ID == id), nil
+// }
 
-func isAdmin(r *http.Request, cfg config.Config) bool {
-	c, err := r.Cookie(authCookieName)
-	if err != nil {
-		return false
-	}
+// func isAdmin(r *http.Request, cfg config.Config) bool {
+// 	c, err := r.Cookie(authCookieName)
+// 	if err != nil {
+// 		return false
+// 	}
 
-	v, _ := checkClaim(c.Value, []byte(cfg.Secred), roleAdmin, 0)
-	return v
-}
+// 	v, _ := checkClaim(c.Value, []byte(cfg.Secred), roleAdmin, 0)
+// 	return v
+// }
 
-func isReader(r *http.Request, cfg config.Config, id int) bool {
-	c, err := r.Cookie(authCookieName)
-	if err != nil {
-		return false
-	}
+// func isReader(r *http.Request, cfg config.Config, id int) bool {
+// 	c, err := r.Cookie(authCookieName)
+// 	if err != nil {
+// 		return false
+// 	}
 
-	v, _ := checkClaim(c.Value, []byte(cfg.Secred), roleReader, id)
-	return v
-}
+// 	v, _ := checkClaim(c.Value, []byte(cfg.Secred), roleReader, id)
+// 	return v
+// }
 
-func isPupil(r *http.Request, cfg config.Config, id int) bool {
-	c, err := r.Cookie(authCookieName)
-	if err != nil {
-		return false
-	}
+// func isPupil(r *http.Request, cfg config.Config, id int) bool {
+// 	c, err := r.Cookie(authCookieName)
+// 	if err != nil {
+// 		return false
+// 	}
 
-	v, _ := checkClaim(c.Value, []byte(cfg.Secred), rolePupil, id)
-	return v
-}
+// 	v, _ := checkClaim(c.Value, []byte(cfg.Secred), rolePupil, id)
+// 	return v
+// }

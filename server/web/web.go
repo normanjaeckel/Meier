@@ -20,8 +20,6 @@ import (
 	"github.com/ostcar/timer/sticky"
 )
 
-const pathPrefixAssets = "/assets"
-
 //go:embed schema.graphql
 var schema string
 
@@ -69,12 +67,25 @@ func registerHandlers(schema *graphql.Schema, cfg config.Config, s *sticky.Stick
 	router.Use(loggingMiddleware)
 
 	router.Handle("/auth", handleLogin(cfg, s))
-	router.Handle("/query", &relay.Handler{Schema: schema})
+	router.Handle("/query", corsMiddleware(&relay.Handler{Schema: schema}))
 
 	// route anything else to the embeded files folder
 	router.PathPrefix("/").Handler(handleStatic())
 
 	return router
+}
+
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST,OPTIONS")
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }
 
 type responselogger struct {

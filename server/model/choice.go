@@ -30,7 +30,7 @@ func (c Choice) String() string { return choices[c] }
 
 func (c *Choice) fromString(in string) error {
 	for i, choice := range choices {
-		if strings.ToLower(choice) == strings.ToLower(in) {
+		if strings.EqualFold(choice, in) {
 			(*c) = Choice(i)
 			return nil
 		}

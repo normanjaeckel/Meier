@@ -29,7 +29,8 @@ func (r *resolver) CampaignList() ([]model.CampaignResolver, error) {
 		ids := m.CampaignIDs()
 		campaignList = make([]model.CampaignResolver, len(ids))
 		for i, id := range ids {
-			campaign, err := m.Campaign(int(id))
+			var campaign model.CampaignResolver
+			campaign, err = m.Campaign(int(id))
 			if err != nil {
 				err = fmt.Errorf("campaign %d: %w", id, err)
 				return
