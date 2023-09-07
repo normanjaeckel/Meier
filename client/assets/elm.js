@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.P.D === region.X.D)
+	if (region.N.B === region.T.B)
 	{
-		return 'on line ' + region.P.D;
+		return 'on line ' + region.N.B;
 	}
-	return 'on lines ' + region.P.D + ' through ' + region.X.D;
+	return 'on lines ' + region.N.B + ' through ' + region.T.B;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aN,
-		impl.a_,
-		impl.aY,
+		impl.aK,
+		impl.aZ,
+		impl.aX,
 		function() { return function() {} }
 	);
 });
@@ -2719,9 +2719,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		q: func(record.q),
-		Q: record.Q,
-		N: record.N
+		p: func(record.p),
+		O: record.O,
+		L: record.L
 	}
 });
 
@@ -2989,11 +2989,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.q;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.Q;
+		var message = !tag ? value : tag < 3 ? value.a : value.p;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.O;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.N) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.L) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3943,9 +3943,9 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aN,
-		impl.a_,
-		impl.aY,
+		impl.aK,
+		impl.aZ,
+		impl.aX,
 		function(sendToApp, initialModel) {
 			var view = impl.a$;
 			/**/
@@ -3979,11 +3979,11 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aN,
-		impl.a_,
-		impl.aY,
+		impl.aK,
+		impl.aZ,
+		impl.aX,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.O && impl.O(sendToApp)
+			var divertHrefToApp = impl.M && impl.M(sendToApp)
 			var view = impl.a$;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -3992,12 +3992,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.S);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.az);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.k) && (_VirtualDom_doc.title = title = doc.k);
+				(title !== doc.P) && (_VirtualDom_doc.title = title = doc.P);
 			});
 		}
 	);
@@ -4053,12 +4053,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aQ;
-	var onUrlRequest = impl.aR;
+	var onUrlChange = impl.aO;
+	var onUrlRequest = impl.aP;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		O: function(sendToApp)
+		M: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4074,9 +4074,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.am === next.am
-							&& curr.ac === next.ac
-							&& curr.aj.a === next.aj.a
+							&& curr.ah === next.ah
+							&& curr.Z === next.Z
+							&& curr.ae.a === next.ae.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4084,13 +4084,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aN: function(flags)
+		aK: function(flags)
 		{
-			return A3(impl.aN, flags, _Browser_getUrl(), key);
+			return A3(impl.aK, flags, _Browser_getUrl(), key);
 		},
 		a$: impl.a$,
-		a_: impl.a_,
-		aY: impl.aY
+		aZ: impl.aZ,
+		aX: impl.aX
 	});
 }
 
@@ -4156,17 +4156,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aL: 'hidden', aH: 'visibilitychange' }
+		? { aI: 'hidden', aB: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aL: 'mozHidden', aH: 'mozvisibilitychange' }
+		? { aI: 'mozHidden', aB: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aL: 'msHidden', aH: 'msvisibilitychange' }
+		? { aI: 'msHidden', aB: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aL: 'webkitHidden', aH: 'webkitvisibilitychange' }
-		: { aL: 'hidden', aH: 'visibilitychange' };
+		? { aI: 'webkitHidden', aB: 'webkitvisibilitychange' }
+		: { aI: 'hidden', aB: 'visibilitychange' };
 }
 
 
@@ -4247,12 +4247,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		at: _Browser_getScene(),
-		az: {
-			aB: _Browser_window.pageXOffset,
-			aC: _Browser_window.pageYOffset,
-			aA: _Browser_doc.documentElement.clientWidth,
-			ab: _Browser_doc.documentElement.clientHeight
+		an: _Browser_getScene(),
+		as: {
+			au: _Browser_window.pageXOffset,
+			av: _Browser_window.pageYOffset,
+			at: _Browser_doc.documentElement.clientWidth,
+			Y: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4262,8 +4262,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		aA: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		ab: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		at: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		Y: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4286,15 +4286,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			at: {
-				aA: node.scrollWidth,
-				ab: node.scrollHeight
+			an: {
+				at: node.scrollWidth,
+				Y: node.scrollHeight
 			},
-			az: {
-				aB: node.scrollLeft,
-				aC: node.scrollTop,
-				aA: node.clientWidth,
-				ab: node.clientHeight
+			as: {
+				au: node.scrollLeft,
+				av: node.scrollTop,
+				at: node.clientWidth,
+				Y: node.clientHeight
 			}
 		};
 	});
@@ -4324,18 +4324,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			at: _Browser_getScene(),
-			az: {
-				aB: x,
-				aC: y,
-				aA: _Browser_doc.documentElement.clientWidth,
-				ab: _Browser_doc.documentElement.clientHeight
+			an: _Browser_getScene(),
+			as: {
+				au: x,
+				av: y,
+				at: _Browser_doc.documentElement.clientWidth,
+				Y: _Browser_doc.documentElement.clientHeight
 			},
-			aJ: {
-				aB: x + rect.left,
-				aC: y + rect.top,
-				aA: rect.width,
-				ab: rect.height
+			aF: {
+				au: x + rect.left,
+				av: y + rect.top,
+				at: rect.width,
+				Y: rect.height
 			}
 		};
 	});
@@ -4380,25 +4380,25 @@ var _Http_toTask = F3(function(router, toTask, request)
 	return _Scheduler_binding(function(callback)
 	{
 		function done(response) {
-			callback(toTask(request.Z.a(response)));
+			callback(toTask(request.aG.a(response)));
 		}
 
 		var xhr = new XMLHttpRequest();
 		xhr.addEventListener('error', function() { done($elm$http$Http$NetworkError_); });
 		xhr.addEventListener('timeout', function() { done($elm$http$Http$Timeout_); });
-		xhr.addEventListener('load', function() { done(_Http_toResponse(request.Z.b, xhr)); });
-		$elm$core$Maybe$isJust(request.ax) && _Http_track(router, xhr, request.ax.a);
+		xhr.addEventListener('load', function() { done(_Http_toResponse(request.aG.b, xhr)); });
+		$elm$core$Maybe$isJust(request.ar) && _Http_track(router, xhr, request.ar.a);
 
 		try {
-			xhr.open(request.aP, request.ay, true);
+			xhr.open(request.aM, request.a_, true);
 		} catch (e) {
-			return done($elm$http$Http$BadUrl_(request.ay));
+			return done($elm$http$Http$BadUrl_(request.a_));
 		}
 
 		_Http_configureRequest(xhr, request);
 
-		request.S.a && xhr.setRequestHeader('Content-Type', request.S.a);
-		xhr.send(request.S.b);
+		request.az.a && xhr.setRequestHeader('Content-Type', request.az.a);
+		xhr.send(request.az.b);
 
 		return function() { xhr.c = true; xhr.abort(); };
 	});
@@ -4409,13 +4409,13 @@ var _Http_toTask = F3(function(router, toTask, request)
 
 function _Http_configureRequest(xhr, request)
 {
-	for (var headers = request.aa; headers.b; headers = headers.b) // WHILE_CONS
+	for (var headers = request.X; headers.b; headers = headers.b) // WHILE_CONS
 	{
 		xhr.setRequestHeader(headers.a.a, headers.a.b);
 	}
-	xhr.timeout = request.aZ.a || 0;
-	xhr.responseType = request.Z.d;
-	xhr.withCredentials = request.aE;
+	xhr.timeout = request.aY.a || 0;
+	xhr.responseType = request.aG.d;
+	xhr.withCredentials = request.ax;
 }
 
 
@@ -4436,10 +4436,10 @@ function _Http_toResponse(toBody, xhr)
 function _Http_toMetadata(xhr)
 {
 	return {
-		ay: xhr.responseURL,
-		aW: xhr.status,
-		aX: xhr.statusText,
-		aa: _Http_parseHeaders(xhr.getAllResponseHeaders())
+		a_: xhr.responseURL,
+		aV: xhr.status,
+		aW: xhr.statusText,
+		X: _Http_parseHeaders(xhr.getAllResponseHeaders())
 	};
 }
 
@@ -4534,15 +4534,15 @@ function _Http_track(router, xhr, tracker)
 	xhr.upload.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Sending({
-			aV: event.loaded,
-			au: event.total
+			aU: event.loaded,
+			ao: event.total
 		}))));
 	});
 	xhr.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Receiving({
-			aT: event.loaded,
-			au: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
+			aS: event.loaded,
+			ao: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
 		}))));
 	});
 }var $elm$core$Basics$EQ = 1;
@@ -5049,7 +5049,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {_: fragment, ac: host, ah: path, aj: port_, am: protocol, ao: query};
+		return {W: fragment, Z: host, ac: path, ae: port_, ah: protocol, ai: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5332,17 +5332,13 @@ var $author$project$Main$GotData = function (a) {
 	return {$: 0, a: a};
 };
 var $author$project$Main$Loading = {$: 0};
-var $author$project$Main$NewCampaignFormData = F2(
-	function (title, numOfDays) {
-		return {L: numOfDays, k: title};
-	});
-var $author$project$Main$Campaign = F5(
+var $author$project$Data$Campaign = F5(
 	function (id, title, days, events, pupils) {
-		return {W: days, I: events, J: id, an: pupils, k: title};
+		return {aD: days, V: events, H: id, aR: pupils, P: title};
 	});
-var $author$project$Main$Day = F3(
+var $author$project$Data$Day = F3(
 	function (id, title, events) {
-		return {I: events, J: id, k: title};
+		return {V: events, H: id, P: title};
 	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$int = _Json_decodeInt;
@@ -5353,9 +5349,9 @@ var $elm$core$Tuple$pair = F2(
 		return _Utils_Tuple2(a, b);
 	});
 var $elm$json$Json$Decode$string = _Json_decodeString;
-var $author$project$Main$dayDecoder = A4(
+var $author$project$Data$dayDecoder = A4(
 	$elm$json$Json$Decode$map3,
-	$author$project$Main$Day,
+	$author$project$Data$Day,
 	A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$int),
 	A2($elm$json$Json$Decode$field, 'title', $elm$json$Json$Decode$string),
 	A2(
@@ -5374,52 +5370,52 @@ var $author$project$Main$dayDecoder = A4(
 					'pupils',
 					$elm$json$Json$Decode$list(
 						A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$int)))))));
-var $author$project$Main$Event = F3(
+var $author$project$Data$Event = F3(
 	function (id, title, capacity) {
-		return {aG: capacity, J: id, k: title};
+		return {aA: capacity, H: id, P: title};
 	});
-var $author$project$Main$eventDecoder = A4(
+var $author$project$Data$eventDecoder = A4(
 	$elm$json$Json$Decode$map3,
-	$author$project$Main$Event,
+	$author$project$Data$Event,
 	A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$int),
 	A2($elm$json$Json$Decode$field, 'title', $elm$json$Json$Decode$string),
 	A2($elm$json$Json$Decode$field, 'capacity', $elm$json$Json$Decode$int));
 var $elm$json$Json$Decode$map5 = _Json_map5;
-var $author$project$Main$Pupil = F3(
+var $author$project$Data$Pupil = F3(
 	function (name, _class, isSpecial) {
-		return {U: _class, aO: isSpecial, af: name};
+		return {aC: _class, aL: isSpecial, aN: name};
 	});
 var $elm$json$Json$Decode$bool = _Json_decodeBool;
-var $author$project$Main$pupilDecoder = A4(
+var $author$project$Data$pupilDecoder = A4(
 	$elm$json$Json$Decode$map3,
-	$author$project$Main$Pupil,
+	$author$project$Data$Pupil,
 	A2($elm$json$Json$Decode$field, 'name', $elm$json$Json$Decode$string),
 	A2($elm$json$Json$Decode$field, 'class', $elm$json$Json$Decode$string),
 	A2($elm$json$Json$Decode$field, 'isSpecial', $elm$json$Json$Decode$bool));
-var $author$project$Main$campaignDecoder = A6(
+var $author$project$Data$campaignDecoder = A6(
 	$elm$json$Json$Decode$map5,
-	$author$project$Main$Campaign,
+	$author$project$Data$Campaign,
 	A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$int),
 	A2($elm$json$Json$Decode$field, 'title', $elm$json$Json$Decode$string),
 	A2(
 		$elm$json$Json$Decode$field,
 		'days',
-		$elm$json$Json$Decode$list($author$project$Main$dayDecoder)),
+		$elm$json$Json$Decode$list($author$project$Data$dayDecoder)),
 	A2(
 		$elm$json$Json$Decode$field,
 		'events',
-		$elm$json$Json$Decode$list($author$project$Main$eventDecoder)),
+		$elm$json$Json$Decode$list($author$project$Data$eventDecoder)),
 	A2(
 		$elm$json$Json$Decode$field,
 		'pupils',
-		$elm$json$Json$Decode$list($author$project$Main$pupilDecoder)));
+		$elm$json$Json$Decode$list($author$project$Data$pupilDecoder)));
 var $author$project$Main$dataDecoder = A2(
 	$elm$json$Json$Decode$field,
 	'data',
 	A2(
 		$elm$json$Json$Decode$field,
 		'campaignList',
-		$elm$json$Json$Decode$list($author$project$Main$campaignDecoder)));
+		$elm$json$Json$Decode$list($author$project$Data$campaignDecoder)));
 var $elm$json$Json$Decode$decodeString = _Json_runOnString;
 var $elm$http$Http$BadStatus_ = F2(
 	function (a, b) {
@@ -6012,7 +6008,7 @@ var $elm$http$Http$resolve = F2(
 			case 3:
 				var metadata = response.a;
 				return $elm$core$Result$Err(
-					$elm$http$Http$BadStatus(metadata.aW));
+					$elm$http$Http$BadStatus(metadata.aV));
 			default:
 				var body = response.b;
 				return A2(
@@ -6034,6 +6030,11 @@ var $elm$http$Http$expectJson = F2(
 						A2($elm$json$Json$Decode$decodeString, decoder, string));
 				}));
 	});
+var $author$project$NewCampaign$Model = F2(
+	function (title, numOfDays) {
+		return {J: numOfDays, P: title};
+	});
+var $author$project$NewCampaign$init = A2($author$project$NewCampaign$Model, '', 2);
 var $elm$http$Http$jsonBody = function (value) {
 	return A2(
 		_Http_pair,
@@ -6058,7 +6059,7 @@ var $elm$http$Http$Request = function (a) {
 };
 var $elm$http$Http$State = F2(
 	function (reqs, subs) {
-		return {aq: reqs, av: subs};
+		return {ak: reqs, ap: subs};
 	});
 var $elm$http$Http$init = $elm$core$Task$succeed(
 	A2($elm$http$Http$State, $elm$core$Dict$empty, _List_Nil));
@@ -6102,7 +6103,7 @@ var $elm$http$Http$updateReqs = F3(
 					return A2(
 						$elm$core$Task$andThen,
 						function (pid) {
-							var _v4 = req.ax;
+							var _v4 = req.ar;
 							if (_v4.$ === 1) {
 								return A3($elm$http$Http$updateReqs, router, otherCmds, reqs);
 							} else {
@@ -6132,7 +6133,7 @@ var $elm$http$Http$onEffects = F4(
 				return $elm$core$Task$succeed(
 					A2($elm$http$Http$State, reqs, subs));
 			},
-			A3($elm$http$Http$updateReqs, router, cmds, state.aq));
+			A3($elm$http$Http$updateReqs, router, cmds, state.ak));
 	});
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
@@ -6175,7 +6176,7 @@ var $elm$http$Http$onSelfMsg = F3(
 				A2(
 					$elm$core$List$filterMap,
 					A3($elm$http$Http$maybeSend, router, tracker, progress),
-					state.av)));
+					state.ap)));
 	});
 var $elm$http$Http$Cancel = function (a) {
 	return {$: 0, a: a};
@@ -6189,14 +6190,14 @@ var $elm$http$Http$cmdMap = F2(
 			var r = cmd.a;
 			return $elm$http$Http$Request(
 				{
-					aE: r.aE,
-					S: r.S,
-					Z: A2(_Http_mapExpect, func, r.Z),
-					aa: r.aa,
-					aP: r.aP,
-					aZ: r.aZ,
 					ax: r.ax,
-					ay: r.ay
+					az: r.az,
+					aG: A2(_Http_mapExpect, func, r.aG),
+					X: r.X,
+					aM: r.aM,
+					aY: r.aY,
+					ar: r.ar,
+					a_: r.a_
 				});
 		}
 	});
@@ -6219,30 +6220,26 @@ var $elm$http$Http$subscription = _Platform_leaf('Http');
 var $elm$http$Http$request = function (r) {
 	return $elm$http$Http$command(
 		$elm$http$Http$Request(
-			{aE: false, S: r.S, Z: r.Z, aa: r.aa, aP: r.aP, aZ: r.aZ, ax: r.ax, ay: r.ay}));
+			{ax: false, az: r.az, aG: r.aG, X: r.X, aM: r.aM, aY: r.aY, ar: r.ar, a_: r.a_}));
 };
 var $elm$http$Http$post = function (r) {
 	return $elm$http$Http$request(
-		{S: r.S, Z: r.Z, aa: _List_Nil, aP: 'POST', aZ: $elm$core$Maybe$Nothing, ax: $elm$core$Maybe$Nothing, ay: r.ay});
+		{az: r.az, aG: r.aG, X: _List_Nil, aM: 'POST', aY: $elm$core$Maybe$Nothing, ar: $elm$core$Maybe$Nothing, a_: r.a_});
 };
-var $author$project$Main$queryCampaign = '\n    {\n        id\n        title\n        days {\n            id\n            title\n            events {\n                event {\n                    id\n                }\n                pupils {\n                    id\n                }\n            }\n        }\n        events {\n            id\n            title\n            capacity\n            maxSpecialPupils\n        }\n        pupils {\n            id\n            name\n            class\n            isSpecial\n            choices {\n                event {\n                    id\n                    title\n                }\n                choice\n            }\n        }\n    }\n    ';
+var $author$project$Data$queryCampaign = '\n    {\n        id\n        title\n        days {\n            id\n            title\n            events {\n                event {\n                    id\n                }\n                pupils {\n                    id\n                }\n            }\n        }\n        events {\n            id\n            title\n            capacity\n            maxSpecialPupils\n        }\n        pupils {\n            id\n            name\n            class\n            isSpecial\n            choices {\n                event {\n                    id\n                    title\n                }\n                choice\n            }\n        }\n    }\n    ';
 var $author$project$Main$queryCampaignList = A2(
 	$elm$core$String$join,
 	' ',
 	_List_fromArray(
-		['{', 'campaignList', $author$project$Main$queryCampaign, '}']));
-var $author$project$Main$queryUrl = '/query';
+		['{', 'campaignList', $author$project$Data$queryCampaign, '}']));
+var $author$project$Shared$queryUrl = '/query';
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		{
-			x: _List_Nil,
-			g: $author$project$Main$Loading,
-			z: A2($author$project$Main$NewCampaignFormData, '', 2)
-		},
+		{w: _List_Nil, f: $author$project$Main$Loading, C: $author$project$NewCampaign$init},
 		$elm$http$Http$post(
 			{
-				S: $elm$http$Http$jsonBody(
+				az: $elm$http$Http$jsonBody(
 					$elm$json$Json$Encode$object(
 						_List_fromArray(
 							[
@@ -6250,8 +6247,8 @@ var $author$project$Main$init = function (_v0) {
 								'query',
 								$elm$json$Json$Encode$string($author$project$Main$queryCampaignList))
 							]))),
-				Z: A2($elm$http$Http$expectJson, $author$project$Main$GotData, $author$project$Main$dataDecoder),
-				ay: $author$project$Main$queryUrl
+				aG: A2($elm$http$Http$expectJson, $author$project$Main$GotData, $author$project$Main$dataDecoder),
+				a_: $author$project$Shared$queryUrl
 			}));
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -6262,10 +6259,13 @@ var $author$project$Main$subscriptions = function (_v0) {
 var $author$project$Main$CampaignPage = function (a) {
 	return {$: 1, a: a};
 };
-var $author$project$Main$GotNewCampaign = function (a) {
-	return {$: 4, a: a};
+var $author$project$Main$Failure = function (a) {
+	return {$: 1, a: a};
 };
-var $author$project$Main$NewCampaign = {$: 2};
+var $author$project$Main$NewCampaignMsg = function (a) {
+	return {$: 2, a: a};
+};
+var $author$project$Main$NewCampaignPage = {$: 2};
 var $author$project$Main$NewPupils = {$: 4};
 var $author$project$Main$Overview = {$: 0};
 var $author$project$Main$PupilPage = function (a) {
@@ -6274,127 +6274,59 @@ var $author$project$Main$PupilPage = function (a) {
 var $author$project$Main$Success = function (a) {
 	return {$: 2, a: a};
 };
+var $elm$core$Platform$Cmd$map = _Platform_map;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Main$Failure = function (a) {
+var $author$project$Shared$parseError = function (err) {
+	switch (err.$) {
+		case 0:
+			var m = err.a;
+			return 'bad url: ' + m;
+		case 1:
+			return 'timeout';
+		case 2:
+			return 'network error';
+		case 3:
+			var code = err.a;
+			return 'bad status: ' + $elm$core$String$fromInt(code);
+		default:
+			var m = err.a;
+			return 'bad body: ' + m;
+	}
+};
+var $author$project$NewCampaign$Done = function (a) {
+	return {$: 2, a: a};
+};
+var $author$project$NewCampaign$Error = function (a) {
+	return {$: 3, a: a};
+};
+var $author$project$NewCampaign$GotNewCampaign = function (a) {
+	return {$: 2, a: a};
+};
+var $author$project$NewCampaign$Loading = function (a) {
 	return {$: 1, a: a};
 };
-var $author$project$Main$parseError = F2(
-	function (err, model) {
-		var errMsg = function () {
-			switch (err.$) {
-				case 0:
-					var m = err.a;
-					return 'bad url: ' + m;
-				case 1:
-					return 'timeout';
-				case 2:
-					return 'network error';
-				case 3:
-					var code = err.a;
-					return 'bad status: ' + $elm$core$String$fromInt(code);
-				default:
-					var m = err.a;
-					return 'bad body: ' + m;
-			}
-		}();
-		return _Utils_update(
-			model,
-			{
-				g: $author$project$Main$Failure(errMsg)
-			});
-	});
-var $author$project$Main$update = F2(
+var $author$project$NewCampaign$None = {$: 0};
+var $author$project$NewCampaign$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 0:
-				var res = msg.a;
-				if (!res.$) {
-					var campaigns = res.a;
-					return _Utils_Tuple2(
-						_Utils_update(
+				var newData = msg.a;
+				var updatedModel = function () {
+					if (!newData.$) {
+						var t = newData.a;
+						return _Utils_update(
 							model,
-							{
-								x: campaigns,
-								g: $author$project$Main$Success($author$project$Main$Overview)
-							}),
-						$elm$core$Platform$Cmd$none);
-				} else {
-					var err = res.a;
-					return _Utils_Tuple2(
-						A2($author$project$Main$parseError, err, model),
-						$elm$core$Platform$Cmd$none);
-				}
-			case 1:
-				var s = msg.a;
-				switch (s.$) {
-					case 0:
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									g: $author$project$Main$Success($author$project$Main$Overview)
-								}),
-							$elm$core$Platform$Cmd$none);
-					case 1:
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									g: $author$project$Main$Success($author$project$Main$NewCampaign)
-								}),
-							$elm$core$Platform$Cmd$none);
-					case 2:
-						var c = s.a;
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									g: $author$project$Main$Success(
-										$author$project$Main$CampaignPage(c))
-								}),
-							$elm$core$Platform$Cmd$none);
-					case 3:
-						var pup = s.a;
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									g: $author$project$Main$Success(
-										$author$project$Main$PupilPage(pup))
-								}),
-							$elm$core$Platform$Cmd$none);
-					default:
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									g: $author$project$Main$Success($author$project$Main$NewPupils)
-								}),
-							$elm$core$Platform$Cmd$none);
-				}
-			case 2:
-				var i = msg.a;
-				var newData = function () {
-					var currentData = model.z;
-					if (!i.$) {
-						var t = i.a;
-						return _Utils_update(
-							currentData,
-							{k: t});
+							{P: t});
 					} else {
-						var n = i.a;
+						var n = newData.a;
 						return _Utils_update(
-							currentData,
-							{L: n});
+							model,
+							{J: n});
 					}
 				}();
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{z: newData}),
-					$elm$core$Platform$Cmd$none);
-			case 3:
+				return _Utils_Tuple2(updatedModel, $author$project$NewCampaign$None);
+			case 1:
 				var mutationQuery = A2(
 					$elm$core$String$join,
 					' ',
@@ -6408,52 +6340,162 @@ var $author$project$Main$update = F2(
 							A2(
 							$elm$json$Json$Encode$encode,
 							0,
-							$elm$json$Json$Encode$string(model.z.k)),
+							$elm$json$Json$Encode$string(model.P)),
 							')',
-							$author$project$Main$queryCampaign,
+							$author$project$Data$queryCampaign,
 							'}'
 						]));
 				var addCampaignDecoder = A2(
 					$elm$json$Json$Decode$field,
 					'data',
-					A2($elm$json$Json$Decode$field, 'addCampaign', $author$project$Main$campaignDecoder));
+					A2($elm$json$Json$Decode$field, 'addCampaign', $author$project$Data$campaignDecoder));
 				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{g: $author$project$Main$Loading}),
-					$elm$http$Http$post(
-						{
-							S: $elm$http$Http$jsonBody(
-								$elm$json$Json$Encode$object(
-									_List_fromArray(
-										[
-											_Utils_Tuple2(
-											'query',
-											$elm$json$Json$Encode$string(mutationQuery))
-										]))),
-							Z: A2($elm$http$Http$expectJson, $author$project$Main$GotNewCampaign, addCampaignDecoder),
-							ay: $author$project$Main$queryUrl
-						}));
+					model,
+					$author$project$NewCampaign$Loading(
+						$elm$http$Http$post(
+							{
+								az: $elm$http$Http$jsonBody(
+									$elm$json$Json$Encode$object(
+										_List_fromArray(
+											[
+												_Utils_Tuple2(
+												'query',
+												$elm$json$Json$Encode$string(mutationQuery))
+											]))),
+								aG: A2($elm$http$Http$expectJson, $author$project$NewCampaign$GotNewCampaign, addCampaignDecoder),
+								a_: $author$project$Shared$queryUrl
+							})));
 			default:
 				var res = msg.a;
 				if (!res.$) {
-					var c = res.a;
+					var camp = res.a;
+					return _Utils_Tuple2(
+						model,
+						$author$project$NewCampaign$Done(camp));
+				} else {
+					var err = res.a;
+					return _Utils_Tuple2(
+						model,
+						$author$project$NewCampaign$Error(
+							$author$project$Shared$parseError(err)));
+				}
+		}
+	});
+var $author$project$Main$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 0:
+				var res = msg.a;
+				if (!res.$) {
+					var campaigns = res.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								x: _Utils_ap(
-									model.x,
-									_List_fromArray(
-										[c])),
-								g: $author$project$Main$Success($author$project$Main$Overview)
+								w: campaigns,
+								f: $author$project$Main$Success($author$project$Main$Overview)
 							}),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					var err = res.a;
 					return _Utils_Tuple2(
-						A2($author$project$Main$parseError, err, model),
+						_Utils_update(
+							model,
+							{
+								f: $author$project$Main$Failure(
+									$author$project$Shared$parseError(err))
+							}),
 						$elm$core$Platform$Cmd$none);
+				}
+			case 1:
+				var s = msg.a;
+				switch (s.$) {
+					case 0:
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									f: $author$project$Main$Success($author$project$Main$Overview)
+								}),
+							$elm$core$Platform$Cmd$none);
+					case 1:
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									f: $author$project$Main$Success($author$project$Main$NewCampaignPage)
+								}),
+							$elm$core$Platform$Cmd$none);
+					case 2:
+						var c = s.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									f: $author$project$Main$Success(
+										$author$project$Main$CampaignPage(c))
+								}),
+							$elm$core$Platform$Cmd$none);
+					case 3:
+						var pup = s.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									f: $author$project$Main$Success(
+										$author$project$Main$PupilPage(pup))
+								}),
+							$elm$core$Platform$Cmd$none);
+					default:
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									f: $author$project$Main$Success($author$project$Main$NewPupils)
+								}),
+							$elm$core$Platform$Cmd$none);
+				}
+			default:
+				var innerMsg = msg.a;
+				var _v3 = A2($author$project$NewCampaign$update, innerMsg, model.C);
+				var innerModel = _v3.a;
+				var effect = _v3.b;
+				switch (effect.$) {
+					case 0:
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{C: innerModel}),
+							$elm$core$Platform$Cmd$none);
+					case 1:
+						var innerCmd = effect.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{f: $author$project$Main$Loading}),
+							A2($elm$core$Platform$Cmd$map, $author$project$Main$NewCampaignMsg, innerCmd));
+					case 2:
+						var c = effect.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									w: _Utils_ap(
+										model.w,
+										_List_fromArray(
+											[c])),
+									f: $author$project$Main$Success($author$project$Main$Overview)
+								}),
+							$elm$core$Platform$Cmd$none);
+					default:
+						var err = effect.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									f: $author$project$Main$Failure(err)
+								}),
+							$elm$core$Platform$Cmd$none);
 				}
 		}
 	});
@@ -6499,7 +6541,7 @@ var $elm$html$Html$Attributes$classList = function (classes) {
 				$elm$core$Tuple$first,
 				A2($elm$core$List$filter, $elm$core$Tuple$second, classes))));
 };
-var $author$project$Main$classes = function (s) {
+var $author$project$Shared$classes = function (s) {
 	var cl = A2(
 		$elm$core$List$map,
 		function (c) {
@@ -6541,7 +6583,7 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		$elm$json$Json$Decode$succeed(msg));
 };
 var $author$project$Main$pupilToStr = function (p) {
-	return p.af + (' (Klasse ' + (p.U + ')'));
+	return p.aN + (' (Klasse ' + (p.aC + ')'));
 };
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
@@ -6590,7 +6632,7 @@ var $author$project$Main$dayView = function (d) {
 					$elm$html$Html$h3,
 					_List_fromArray(
 						[
-							$author$project$Main$classes('subtitle is-5')
+							$author$project$Shared$classes('subtitle is-5')
 						]),
 					_List_fromArray(
 						[
@@ -6612,11 +6654,11 @@ var $author$project$Main$dayView = function (d) {
 				$elm$html$Html$h2,
 				_List_fromArray(
 					[
-						$author$project$Main$classes('title is-5')
+						$author$project$Shared$classes('title is-5')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(d.k)
+						$elm$html$Html$text(d.P)
 					])),
 			_Utils_ap(events, unassignedPupils)));
 };
@@ -6633,11 +6675,11 @@ var $author$project$Main$eventView = function (e) {
 				$elm$html$Html$h3,
 				_List_fromArray(
 					[
-						$author$project$Main$classes('subtitle is-5')
+						$author$project$Shared$classes('subtitle is-5')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(e.k)
+						$elm$html$Html$text(e.P)
 					]))
 			]));
 };
@@ -6649,11 +6691,11 @@ var $author$project$Main$campaignView = function (c) {
 			$elm$html$Html$h1,
 			_List_fromArray(
 				[
-					$author$project$Main$classes('title is-3')
+					$author$project$Shared$classes('title is-3')
 				]),
 			_List_fromArray(
 				[
-					$elm$html$Html$text(c.k)
+					$elm$html$Html$text(c.P)
 				])),
 			A2(
 			$elm$html$Html$div,
@@ -6661,7 +6703,7 @@ var $author$project$Main$campaignView = function (c) {
 				[
 					$elm$html$Html$Attributes$class('block')
 				]),
-			A2($elm$core$List$map, $author$project$Main$dayView, c.W)),
+			A2($elm$core$List$map, $author$project$Main$dayView, c.aD)),
 			A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -6674,21 +6716,21 @@ var $author$project$Main$campaignView = function (c) {
 					$elm$html$Html$h2,
 					_List_fromArray(
 						[
-							$author$project$Main$classes('title is-5')
+							$author$project$Shared$classes('title is-5')
 						]),
 					_List_fromArray(
 						[
 							$elm$html$Html$text('Alle Angebote')
 						])),
 				_Utils_ap(
-					A2($elm$core$List$map, $author$project$Main$eventView, c.I),
+					A2($elm$core$List$map, $author$project$Main$eventView, c.V),
 					_List_fromArray(
 						[
 							A2(
 							$elm$html$Html$button,
 							_List_fromArray(
 								[
-									$author$project$Main$classes('button is-primary')
+									$author$project$Shared$classes('button is-primary')
 								]),
 							_List_fromArray(
 								[
@@ -6707,18 +6749,18 @@ var $author$project$Main$campaignView = function (c) {
 					$elm$html$Html$h2,
 					_List_fromArray(
 						[
-							$author$project$Main$classes('title is-5')
+							$author$project$Shared$classes('title is-5')
 						]),
 					_List_fromArray(
 						[
 							$elm$html$Html$text('Alle Schüler/innen')
 						])),
-					$author$project$Main$pupilUl(c.an),
+					$author$project$Main$pupilUl(c.aR),
 					A2(
 					$elm$html$Html$button,
 					_List_fromArray(
 						[
-							$author$project$Main$classes('button is-primary'),
+							$author$project$Shared$classes('button is-primary'),
 							$elm$html$Html$Events$onClick(
 							$author$project$Main$SwitchPage($author$project$Main$SwitchToNewPupils))
 						]),
@@ -6730,14 +6772,96 @@ var $author$project$Main$campaignView = function (c) {
 		]);
 };
 var $elm$html$Html$main_ = _VirtualDom_node('main');
-var $author$project$Main$NewCampaignFormDataMsg = function (a) {
-	return {$: 2, a: a};
+var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
+var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
+var $elm$html$Html$form = _VirtualDom_node('form');
+var $elm$html$Html$p = _VirtualDom_node('p');
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $author$project$Main$newPupilsView = _List_fromArray(
+	[
+		A2(
+		$elm$html$Html$h1,
+		_List_fromArray(
+			[
+				$author$project$Shared$classes('title is-3')
+			]),
+		_List_fromArray(
+			[
+				$elm$html$Html$text('Neue Schüler/innen hinzufügen')
+			])),
+		A2(
+		$elm$html$Html$p,
+		_List_Nil,
+		_List_fromArray(
+			[
+				$elm$html$Html$text('Lorem ipsum')
+			])),
+		A2(
+		$elm$html$Html$form,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('field')
+					]),
+				_List_Nil),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('field')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$author$project$Shared$classes('button is-primary'),
+								$elm$html$Html$Attributes$type_('submit')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Hinzufügen')
+							]))
+					]))
+			]))
+	]);
+var $author$project$Main$pupilView = function (pup) {
+	return _List_fromArray(
+		[
+			A2(
+			$elm$html$Html$h1,
+			_List_fromArray(
+				[
+					$author$project$Shared$classes('title is-3')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(
+					$author$project$Main$pupilToStr(pup))
+				])),
+			A2(
+			$elm$html$Html$p,
+			_List_Nil,
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Lorem ipsum ...')
+				]))
+		]);
 };
-var $author$project$Main$NumOfDays = function (a) {
+var $elm$html$Html$section = _VirtualDom_node('section');
+var $author$project$NewCampaign$NewCampaignFormDataMsg = function (a) {
+	return {$: 0, a: a};
+};
+var $author$project$NewCampaign$NumOfDays = function (a) {
 	return {$: 1, a: a};
 };
-var $author$project$Main$SendNewCampaignForm = {$: 3};
-var $author$project$Main$Title = function (a) {
+var $author$project$NewCampaign$SendNewCampaignForm = {$: 1};
+var $author$project$NewCampaign$Title = function (a) {
 	return {$: 0, a: a};
 };
 var $elm$virtual_dom$VirtualDom$attribute = F2(
@@ -6748,7 +6872,6 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 			_VirtualDom_noJavaScriptOrHtmlUri(value));
 	});
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
-var $elm$html$Html$form = _VirtualDom_node('form');
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$Attributes$min = $elm$html$Html$Attributes$stringProperty('min');
 var $elm$html$Html$Events$alwaysStop = function (x) {
@@ -6804,7 +6927,6 @@ var $elm$html$Html$Events$onSubmit = function (msg) {
 			$elm$html$Html$Events$alwaysPreventDefault,
 			$elm$json$Json$Decode$succeed(msg)));
 };
-var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
 var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$Attributes$boolProperty = F2(
@@ -6815,7 +6937,6 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 			$elm$json$Json$Encode$bool(bool));
 	});
 var $elm$html$Html$Attributes$required = $elm$html$Html$Attributes$boolProperty('required');
-var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $elm$core$Maybe$withDefault = F2(
 	function (_default, maybe) {
@@ -6826,7 +6947,7 @@ var $elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var $author$project$Main$newCampaignView = function (ncfd) {
+var $author$project$NewCampaign$view = function (ncfd) {
 	var labelNumOfDays = 'Anzahl der Tage';
 	return _List_fromArray(
 		[
@@ -6834,7 +6955,7 @@ var $author$project$Main$newCampaignView = function (ncfd) {
 			$elm$html$Html$h1,
 			_List_fromArray(
 				[
-					$author$project$Main$classes('title is-3')
+					$author$project$Shared$classes('title is-3')
 				]),
 			_List_fromArray(
 				[
@@ -6852,7 +6973,7 @@ var $author$project$Main$newCampaignView = function (ncfd) {
 					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							$author$project$Main$classes('column is-half-tablet is-one-third-desktop is-one-quarter-widescreen')
+							$author$project$Shared$classes('column is-half-tablet is-one-third-desktop is-one-quarter-widescreen')
 						]),
 					_List_fromArray(
 						[
@@ -6860,7 +6981,7 @@ var $author$project$Main$newCampaignView = function (ncfd) {
 							$elm$html$Html$form,
 							_List_fromArray(
 								[
-									$elm$html$Html$Events$onSubmit($author$project$Main$SendNewCampaignForm)
+									$elm$html$Html$Events$onSubmit($author$project$NewCampaign$SendNewCampaignForm)
 								]),
 							_List_fromArray(
 								[
@@ -6890,8 +7011,8 @@ var $author$project$Main$newCampaignView = function (ncfd) {
 															A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Titel'),
 															$elm$html$Html$Attributes$required(true),
 															$elm$html$Html$Events$onInput(
-															A2($elm$core$Basics$composeR, $author$project$Main$Title, $author$project$Main$NewCampaignFormDataMsg)),
-															$elm$html$Html$Attributes$value(ncfd.k)
+															A2($elm$core$Basics$composeR, $author$project$NewCampaign$Title, $author$project$NewCampaign$NewCampaignFormDataMsg)),
+															$elm$html$Html$Attributes$value(ncfd.P)
 														]),
 													_List_Nil)
 												]))
@@ -6927,9 +7048,9 @@ var $author$project$Main$newCampaignView = function (ncfd) {
 																A2(
 																	$elm$core$Basics$composeR,
 																	$elm$core$Maybe$withDefault(0),
-																	A2($elm$core$Basics$composeR, $author$project$Main$NumOfDays, $author$project$Main$NewCampaignFormDataMsg)))),
+																	A2($elm$core$Basics$composeR, $author$project$NewCampaign$NumOfDays, $author$project$NewCampaign$NewCampaignFormDataMsg)))),
 															$elm$html$Html$Attributes$value(
-															$elm$core$String$fromInt(ncfd.L))
+															$elm$core$String$fromInt(ncfd.J))
 														]),
 													_List_Nil)
 												])),
@@ -6956,7 +7077,7 @@ var $author$project$Main$newCampaignView = function (ncfd) {
 											$elm$html$Html$button,
 											_List_fromArray(
 												[
-													$author$project$Main$classes('button is-primary'),
+													$author$project$Shared$classes('button is-primary'),
 													$elm$html$Html$Attributes$type_('submit')
 												]),
 											_List_fromArray(
@@ -6969,83 +7090,6 @@ var $author$project$Main$newCampaignView = function (ncfd) {
 				]))
 		]);
 };
-var $author$project$Main$newPupilsView = _List_fromArray(
-	[
-		A2(
-		$elm$html$Html$h1,
-		_List_fromArray(
-			[
-				$author$project$Main$classes('title is-3')
-			]),
-		_List_fromArray(
-			[
-				$elm$html$Html$text('Neue Schüler/innen hinzufügen')
-			])),
-		A2(
-		$elm$html$Html$p,
-		_List_Nil,
-		_List_fromArray(
-			[
-				$elm$html$Html$text('Lorem ipsum')
-			])),
-		A2(
-		$elm$html$Html$form,
-		_List_Nil,
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('field')
-					]),
-				_List_Nil),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('field')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$author$project$Main$classes('button is-primary'),
-								$elm$html$Html$Attributes$type_('submit')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Hinzufügen')
-							]))
-					]))
-			]))
-	]);
-var $author$project$Main$pupilView = function (pup) {
-	return _List_fromArray(
-		[
-			A2(
-			$elm$html$Html$h1,
-			_List_fromArray(
-				[
-					$author$project$Main$classes('title is-3')
-				]),
-			_List_fromArray(
-				[
-					$elm$html$Html$text(
-					$author$project$Main$pupilToStr(pup))
-				])),
-			A2(
-			$elm$html$Html$p,
-			_List_Nil,
-			_List_fromArray(
-				[
-					$elm$html$Html$text('Lorem ipsum ...')
-				]))
-		]);
-};
-var $elm$html$Html$section = _VirtualDom_node('section');
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$main_,
@@ -7059,7 +7103,7 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$Attributes$class('section')
 					]),
 				function () {
-					var _v0 = model.g;
+					var _v0 = model.f;
 					switch (_v0.$) {
 						case 0:
 							return _List_fromArray(
@@ -7082,7 +7126,7 @@ var $author$project$Main$view = function (model) {
 											$elm$html$Html$h1,
 											_List_fromArray(
 												[
-													$author$project$Main$classes('title is-3')
+													$author$project$Shared$classes('title is-3')
 												]),
 											_List_fromArray(
 												[
@@ -7108,15 +7152,15 @@ var $author$project$Main$view = function (model) {
 															]),
 														_List_fromArray(
 															[
-																$elm$html$Html$text(c.k)
+																$elm$html$Html$text(c.P)
 															]));
 												},
-												model.x)),
+												model.w)),
 											A2(
 											$elm$html$Html$button,
 											_List_fromArray(
 												[
-													$author$project$Main$classes('button is-primary'),
+													$author$project$Shared$classes('button is-primary'),
 													$elm$html$Html$Events$onClick(
 													$author$project$Main$SwitchPage($author$project$Main$SwitchToNewCampaign))
 												]),
@@ -7129,7 +7173,10 @@ var $author$project$Main$view = function (model) {
 									var c = p.a;
 									return $author$project$Main$campaignView(c);
 								case 2:
-									return $author$project$Main$newCampaignView(model.z);
+									return A2(
+										$elm$core$List$map,
+										$elm$html$Html$map($author$project$Main$NewCampaignMsg),
+										$author$project$NewCampaign$view(model.C));
 								case 3:
 									var pup = p.a;
 									return $author$project$Main$pupilView(pup);
@@ -7141,6 +7188,6 @@ var $author$project$Main$view = function (model) {
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
-	{aN: $author$project$Main$init, aY: $author$project$Main$subscriptions, a_: $author$project$Main$update, a$: $author$project$Main$view});
+	{aK: $author$project$Main$init, aX: $author$project$Main$subscriptions, aZ: $author$project$Main$update, a$: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

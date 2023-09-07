@@ -1,13 +1,15 @@
 module Main exposing (main)
 
 import Browser
+import Data exposing (Campaign, Day, Event, Pupil)
 import Html exposing (..)
-import Html.Attributes exposing (attribute, class, placeholder, required, type_, value)
-import Html.Events exposing (onClick, onInput, onSubmit)
+import Html.Attributes exposing (class, type_)
+import Html.Events exposing (onClick)
 import Http
 import Json.Decode as D
 import Json.Encode as E
-import Platform.Cmd as Cmd
+import NewCampaign
+import Shared exposing (classes, parseError)
 
 
 main : Program () Model Msg
@@ -20,11 +22,6 @@ main =
         }
 
 
-queryUrl : String
-queryUrl =
-    "/query"
-
-
 
 -- MODEL
 
@@ -32,7 +29,7 @@ queryUrl =
 type alias Model =
     { connection : Connection
     , campaigns : List Campaign
-    , newCampaignFormData : NewCampaignFormData
+    , newCampaign : NewCampaign.Model
     }
 
 
@@ -40,10 +37,10 @@ init : () -> ( Model, Cmd Msg )
 init _ =
     ( { connection = Loading
       , campaigns = []
-      , newCampaignFormData = NewCampaignFormData "" 2
+      , newCampaign = NewCampaign.init
       }
     , Http.post
-        { url = queryUrl
+        { url = Shared.queryUrl
         , body = Http.jsonBody <| E.object [ ( "query", E.string queryCampaignList ) ]
         , expect = Http.expectJson GotData dataDecoder
         }
@@ -52,48 +49,7 @@ init _ =
 
 queryCampaignList : String
 queryCampaignList =
-    String.join " " [ "{", "campaignList", queryCampaign, "}" ]
-
-
-queryCampaign : String
-queryCampaign =
-    """
-    {
-        id
-        title
-        days {
-            id
-            title
-            events {
-                event {
-                    id
-                }
-                pupils {
-                    id
-                }
-            }
-        }
-        events {
-            id
-            title
-            capacity
-            maxSpecialPupils
-        }
-        pupils {
-            id
-            name
-            class
-            isSpecial
-            choices {
-                event {
-                    id
-                    title
-                }
-                choice
-            }
-        }
-    }
-    """
+    String.join " " [ "{", "campaignList", Data.queryCampaign, "}" ]
 
 
 type Connection
@@ -105,7 +61,7 @@ type Connection
 type Page
     = Overview
     | CampaignPage Campaign
-    | NewCampaign
+    | NewCampaignPage
     | PupilPage Pupil
     | NewPupils
 
@@ -114,100 +70,7 @@ dataDecoder : D.Decoder (List Campaign)
 dataDecoder =
     D.field
         "data"
-        (D.field "campaignList" <| D.list campaignDecoder)
-
-
-type alias CampaignId =
-    Int
-
-
-type alias Campaign =
-    { id : CampaignId
-    , title : String
-    , days : List Day
-    , events : List Event
-    , pupils : List Pupil
-    }
-
-
-campaignDecoder : D.Decoder Campaign
-campaignDecoder =
-    D.map5 Campaign
-        (D.field "id" D.int)
-        (D.field "title" D.string)
-        (D.field "days" (D.list dayDecoder))
-        (D.field "events" (D.list eventDecoder))
-        (D.field "pupils" (D.list pupilDecoder))
-
-
-type alias DayId =
-    Int
-
-
-type alias Day =
-    { id : DayId
-    , title : String
-    , events : List ( EventId, List PupilId )
-    }
-
-
-dayDecoder : D.Decoder Day
-dayDecoder =
-    D.map3 Day
-        (D.field "id" D.int)
-        (D.field "title" D.string)
-        (D.field "events"
-            (D.list
-                (D.map2 Tuple.pair
-                    (D.field "event" (D.field "id" D.int))
-                    (D.field "pupils" (D.list <| D.field "id" D.int))
-                )
-            )
-        )
-
-
-type alias EventId =
-    Int
-
-
-type alias Event =
-    { id : EventId
-    , title : String
-    , capacity : Int
-    }
-
-
-eventDecoder : D.Decoder Event
-eventDecoder =
-    D.map3 Event
-        (D.field "id" D.int)
-        (D.field "title" D.string)
-        (D.field "capacity" D.int)
-
-
-type alias PupilId =
-    Int
-
-
-type alias Pupil =
-    { name : String
-    , class : String
-    , isSpecial : Bool
-    }
-
-
-pupilDecoder : D.Decoder Pupil
-pupilDecoder =
-    D.map3 Pupil
-        (D.field "name" D.string)
-        (D.field "class" D.string)
-        (D.field "isSpecial" D.bool)
-
-
-type alias NewCampaignFormData =
-    { title : String
-    , numOfDays : Int
-    }
+        (D.field "campaignList" <| D.list Data.campaignDecoder)
 
 
 pupilToStr : Pupil -> String
@@ -222,9 +85,7 @@ pupilToStr p =
 type Msg
     = GotData (Result Http.Error (List Campaign))
     | SwitchPage SwitchTo
-    | NewCampaignFormDataMsg NewCampaignFormDataInput
-    | SendNewCampaignForm
-    | GotNewCampaign (Result Http.Error Campaign)
+    | NewCampaignMsg NewCampaign.Msg
 
 
 type SwitchTo
@@ -233,11 +94,6 @@ type SwitchTo
     | SwitchToPage Campaign
     | SwitchToPupil Pupil
     | SwitchToNewPupils
-
-
-type NewCampaignFormDataInput
-    = Title String
-    | NumOfDays Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -249,7 +105,7 @@ update msg model =
                     ( { model | connection = Success Overview, campaigns = campaigns }, Cmd.none )
 
                 Err err ->
-                    ( model |> parseError err, Cmd.none )
+                    ( { model | connection = Failure (parseError err) }, Cmd.none )
 
         SwitchPage s ->
             case s of
@@ -257,7 +113,7 @@ update msg model =
                     ( { model | connection = Success <| Overview }, Cmd.none )
 
                 SwitchToNewCampaign ->
-                    ( { model | connection = Success NewCampaign }, Cmd.none )
+                    ( { model | connection = Success NewCampaignPage }, Cmd.none )
 
                 SwitchToPage c ->
                     ( { model | connection = Success <| CampaignPage <| c }, Cmd.none )
@@ -268,83 +124,23 @@ update msg model =
                 SwitchToNewPupils ->
                     ( { model | connection = Success NewPupils }, Cmd.none )
 
-        NewCampaignFormDataMsg i ->
+        NewCampaignMsg innerMsg ->
             let
-                newData : NewCampaignFormData
-                newData =
-                    let
-                        currentData =
-                            model.newCampaignFormData
-                    in
-                    case i of
-                        Title t ->
-                            { currentData | title = t }
-
-                        NumOfDays n ->
-                            { currentData | numOfDays = n }
+                ( innerModel, effect ) =
+                    NewCampaign.update innerMsg model.newCampaign
             in
-            ( { model | newCampaignFormData = newData }, Cmd.none )
+            case effect of
+                NewCampaign.None ->
+                    ( { model | newCampaign = innerModel }, Cmd.none )
 
-        SendNewCampaignForm ->
-            let
-                mutationQuery =
-                    String.join " "
-                        [ "mutation"
-                        , "{"
-                        , "addCampaign"
-                        , "("
-                        , "title:"
-                        , E.encode 0 <| E.string model.newCampaignFormData.title
-                        , ")"
-                        , queryCampaign
-                        , "}"
-                        ]
+                NewCampaign.Loading innerCmd ->
+                    ( { model | connection = Loading }, innerCmd |> Cmd.map NewCampaignMsg )
 
-                addCampaignDecoder : D.Decoder Campaign
-                addCampaignDecoder =
-                    D.field
-                        "data"
-                        (D.field "addCampaign" campaignDecoder)
-            in
-            ( { model | connection = Loading }
-            , Http.post
-                { url = queryUrl
-                , body = Http.jsonBody <| E.object [ ( "query", E.string mutationQuery ) ]
-                , expect = Http.expectJson GotNewCampaign addCampaignDecoder
-                }
-            )
-
-        GotNewCampaign res ->
-            case res of
-                Ok c ->
+                NewCampaign.Done c ->
                     ( { model | connection = Success Overview, campaigns = model.campaigns ++ [ c ] }, Cmd.none )
 
-                Err err ->
-                    ( model |> parseError err, Cmd.none )
-
-
-parseError : Http.Error -> Model -> Model
-parseError err model =
-    let
-        errMsg : String
-        errMsg =
-            case err of
-                Http.BadUrl m ->
-                    "bad url: " ++ m
-
-                Http.Timeout ->
-                    "timeout"
-
-                Http.NetworkError ->
-                    "network error"
-
-                Http.BadStatus code ->
-                    "bad status: " ++ String.fromInt code
-
-                Http.BadBody m ->
-                    "bad body: " ++ m
-    in
-    { model | connection = Failure errMsg }
+                NewCampaign.Error err ->
+                    ( { model | connection = Failure err }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -388,8 +184,8 @@ view model =
                         CampaignPage c ->
                             campaignView c
 
-                        NewCampaign ->
-                            newCampaignView model.newCampaignFormData
+                        NewCampaignPage ->
+                            NewCampaign.view model.newCampaign |> List.map (Html.map NewCampaignMsg)
 
                         PupilPage pup ->
                             pupilView pup
@@ -455,53 +251,6 @@ pupilUl pupList =
         )
 
 
-newCampaignView : NewCampaignFormData -> List (Html Msg)
-newCampaignView ncfd =
-    let
-        labelNumOfDays : String
-        labelNumOfDays =
-            "Anzahl der Tage"
-    in
-    [ h1 [ classes "title is-3" ] [ text "Neue Kampagne hinzufügen" ]
-    , div [ class "columns" ]
-        [ div [ classes "column is-half-tablet is-one-third-desktop is-one-quarter-widescreen" ]
-            [ form [ onSubmit <| SendNewCampaignForm ]
-                [ div [ class "field" ]
-                    [ div [ class "control" ]
-                        [ input
-                            [ class "input"
-                            , type_ "text"
-                            , placeholder "Titel"
-                            , attribute "aria-label" "Titel"
-                            , required True
-                            , onInput (Title >> NewCampaignFormDataMsg)
-                            , value ncfd.title
-                            ]
-                            []
-                        ]
-                    ]
-                , div [ class "field" ]
-                    [ div [ class "control" ]
-                        [ input
-                            [ class "input"
-                            , type_ "number"
-                            , attribute "aria-label" labelNumOfDays
-                            , Html.Attributes.min "1"
-                            , onInput (String.toInt >> Maybe.withDefault 0 >> NumOfDays >> NewCampaignFormDataMsg)
-                            , value <| String.fromInt ncfd.numOfDays
-                            ]
-                            []
-                        ]
-                    , p [ class "help" ] [ text labelNumOfDays ]
-                    ]
-                , div [ class "field" ]
-                    [ button [ classes "button is-primary", type_ "submit" ] [ text "Hinzufügen" ] ]
-                ]
-            ]
-        ]
-    ]
-
-
 pupilView : Pupil -> List (Html Msg)
 pupilView pup =
     [ h1 [ classes "title is-3" ] [ text <| pupilToStr pup ]
@@ -520,23 +269,3 @@ newPupilsView =
             ]
         ]
     ]
-
-
-{-| This helper takes a string with class names separated by one whitespace. All
-classes are applied to the result.
-
-    import Html exposing (..)
-
-    view : Model -> Html msg
-    view model =
-        div [ classes "center with-border nice-color" ] [ text model.content ]
-
--}
-classes : String -> Html.Attribute msg
-classes s =
-    let
-        cl : List ( String, Bool )
-        cl =
-            String.split " " s |> List.map (\c -> ( c, True ))
-    in
-    Html.Attributes.classList cl
