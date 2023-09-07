@@ -20,8 +20,6 @@ import (
 	"github.com/ostcar/timer/sticky"
 )
 
-const pathPrefixAssets = "/assets"
-
 //go:embed schema.graphql
 var schema string
 
