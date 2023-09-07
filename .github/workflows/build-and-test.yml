@@ -27,4 +27,4 @@ jobs:
           mv elm ~/.local/bin
 
       - name: Run default task as defined in Taskfile.yaml
-        run: task
+        run: task build
