@@ -31,7 +31,7 @@ queryUrl =
 
 type alias Model =
     { connection : Connection
-    , data : Data
+    , campaigns : List Campaign
     , newCampaignFormData : NewCampaignFormData
     }
 
@@ -39,7 +39,7 @@ type alias Model =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { connection = Loading
-      , data = { campaigns = [] }
+      , campaigns = []
       , newCampaignFormData = NewCampaignFormData "" 2
       }
     , Http.post
@@ -52,41 +52,44 @@ init _ =
 
 queryCampaignList : String
 queryCampaignList =
+    String.join " " [ "{", "campaignList", queryCampaign, "}" ]
+
+
+queryCampaign : String
+queryCampaign =
     """
     {
-        campaignList {
+        id
+        title
+        days {
             id
             title
-            days {
-                id
-                title
-                events {
-                    event {
-                        id
-                    }
-                    pupils {
-                        id
-                    }
-                }
-            }
             events {
-                id
-                title
-                capacity
-                maxSpecialPupils
-            }
-            pupils {
-                id
-                name
-                class
-                isSpecial
-                choices {
-                    event {
-                        id
-                        title
-                    }
-                    choice
+                event {
+                    id
                 }
+                pupils {
+                    id
+                }
+            }
+        }
+        events {
+            id
+            title
+            capacity
+            maxSpecialPupils
+        }
+        pupils {
+            id
+            name
+            class
+            isSpecial
+            choices {
+                event {
+                    id
+                    title
+                }
+                choice
             }
         }
     }
@@ -107,18 +110,11 @@ type Page
     | NewPupils
 
 
-type alias Data =
-    { campaigns : List Campaign
-    }
-
-
-dataDecoder : D.Decoder Data
+dataDecoder : D.Decoder (List Campaign)
 dataDecoder =
-    D.map Data
-        (D.field
-            "data"
-            (D.field "campaignList" <| D.list campaignDecoder)
-        )
+    D.field
+        "data"
+        (D.field "campaignList" <| D.list campaignDecoder)
 
 
 type alias CampaignId =
@@ -205,7 +201,6 @@ pupilDecoder =
     D.map3 Pupil
         (D.field "name" D.string)
         (D.field "class" D.string)
-        -- TODO: Rename this to 'isSpecial'
         (D.field "isSpecial" D.bool)
 
 
@@ -225,7 +220,7 @@ pupilToStr p =
 
 
 type Msg
-    = GotData (Result Http.Error Data)
+    = GotData (Result Http.Error (List Campaign))
     | SwitchPage SwitchTo
     | NewCampaignFormDataMsg NewCampaignFormDataInput
     | SendNewCampaignForm
@@ -250,8 +245,8 @@ update msg model =
     case msg of
         GotData res ->
             case res of
-                Ok data ->
-                    ( { model | connection = Success Overview, data = data }, Cmd.none )
+                Ok campaigns ->
+                    ( { model | connection = Success Overview, campaigns = campaigns }, Cmd.none )
 
                 Err err ->
                     ( model |> parseError err, Cmd.none )
@@ -291,18 +286,38 @@ update msg model =
             ( { model | newCampaignFormData = newData }, Cmd.none )
 
         SendNewCampaignForm ->
+            let
+                mutationQuery =
+                    String.join " "
+                        [ "mutation"
+                        , "{"
+                        , "addCampaign"
+                        , "("
+                        , "title:"
+                        , E.encode 0 <| E.string model.newCampaignFormData.title
+                        , ")"
+                        , queryCampaign
+                        , "}"
+                        ]
+
+                addCampaignDecoder : D.Decoder Campaign
+                addCampaignDecoder =
+                    D.field
+                        "data"
+                        (D.field "addCampaign" campaignDecoder)
+            in
             ( { model | connection = Loading }
             , Http.post
                 { url = queryUrl
-                , body = Http.jsonBody <| E.object [ ( "query", E.string """{ mutation addCampaign(title: "blub"){id} }""" ) ]
-                , expect = Http.expectJson GotNewCampaign campaignDecoder
+                , body = Http.jsonBody <| E.object [ ( "query", E.string mutationQuery ) ]
+                , expect = Http.expectJson GotNewCampaign addCampaignDecoder
                 }
             )
 
         GotNewCampaign res ->
             case res of
-                Ok _ ->
-                    ( model, Cmd.none )
+                Ok c ->
+                    ( { model | connection = Success Overview, campaigns = model.campaigns ++ [ c ] }, Cmd.none )
 
                 Err err ->
                     ( model |> parseError err, Cmd.none )
@@ -357,7 +372,7 @@ view model =
                         Overview ->
                             [ h1 [ classes "title is-3" ] [ text "Überblick über alle Kampagnen" ]
                             , div [ class "buttons" ]
-                                (model.data.campaigns
+                                (model.campaigns
                                     |> List.map
                                         (\c ->
                                             button

@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.Q.B === region.Y.B)
+	if (region.P.D === region.X.D)
 	{
-		return 'on line ' + region.Q.B;
+		return 'on line ' + region.P.D;
 	}
-	return 'on lines ' + region.Q.B + ' through ' + region.Y.B;
+	return 'on lines ' + region.P.D + ' through ' + region.X.D;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aO,
-		impl.a$,
-		impl.aZ,
+		impl.aN,
+		impl.a_,
+		impl.aY,
 		function() { return function() {} }
 	);
 });
@@ -2720,8 +2720,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		q: func(record.q),
-		R: record.R,
-		O: record.O
+		Q: record.Q,
+		N: record.N
 	}
 });
 
@@ -2990,10 +2990,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.q;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.R;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.Q;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.O) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.N) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3943,11 +3943,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aO,
-		impl.a$,
-		impl.aZ,
+		impl.aN,
+		impl.a_,
+		impl.aY,
 		function(sendToApp, initialModel) {
-			var view = impl.a0;
+			var view = impl.a$;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3979,12 +3979,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aO,
-		impl.a$,
-		impl.aZ,
+		impl.aN,
+		impl.a_,
+		impl.aY,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.P && impl.P(sendToApp)
-			var view = impl.a0;
+			var divertHrefToApp = impl.O && impl.O(sendToApp)
+			var view = impl.a$;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -3992,12 +3992,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.T);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.S);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.m) && (_VirtualDom_doc.title = title = doc.m);
+				(title !== doc.k) && (_VirtualDom_doc.title = title = doc.k);
 			});
 		}
 	);
@@ -4053,12 +4053,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aR;
-	var onUrlRequest = impl.aS;
+	var onUrlChange = impl.aQ;
+	var onUrlRequest = impl.aR;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		P: function(sendToApp)
+		O: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4074,9 +4074,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.an === next.an
-							&& curr.ad === next.ad
-							&& curr.ak.a === next.ak.a
+							&& curr.am === next.am
+							&& curr.ac === next.ac
+							&& curr.aj.a === next.aj.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4084,13 +4084,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aO: function(flags)
+		aN: function(flags)
 		{
-			return A3(impl.aO, flags, _Browser_getUrl(), key);
+			return A3(impl.aN, flags, _Browser_getUrl(), key);
 		},
-		a0: impl.a0,
 		a$: impl.a$,
-		aZ: impl.aZ
+		a_: impl.a_,
+		aY: impl.aY
 	});
 }
 
@@ -4156,17 +4156,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aM: 'hidden', aI: 'visibilitychange' }
+		? { aL: 'hidden', aH: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aM: 'mozHidden', aI: 'mozvisibilitychange' }
+		? { aL: 'mozHidden', aH: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aM: 'msHidden', aI: 'msvisibilitychange' }
+		? { aL: 'msHidden', aH: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aM: 'webkitHidden', aI: 'webkitvisibilitychange' }
-		: { aM: 'hidden', aI: 'visibilitychange' };
+		? { aL: 'webkitHidden', aH: 'webkitvisibilitychange' }
+		: { aL: 'hidden', aH: 'visibilitychange' };
 }
 
 
@@ -4247,12 +4247,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		au: _Browser_getScene(),
-		aA: {
-			aC: _Browser_window.pageXOffset,
-			aD: _Browser_window.pageYOffset,
-			aB: _Browser_doc.documentElement.clientWidth,
-			ac: _Browser_doc.documentElement.clientHeight
+		at: _Browser_getScene(),
+		az: {
+			aB: _Browser_window.pageXOffset,
+			aC: _Browser_window.pageYOffset,
+			aA: _Browser_doc.documentElement.clientWidth,
+			ab: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4262,8 +4262,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		aB: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		ac: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		aA: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		ab: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4286,15 +4286,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			au: {
-				aB: node.scrollWidth,
-				ac: node.scrollHeight
+			at: {
+				aA: node.scrollWidth,
+				ab: node.scrollHeight
 			},
-			aA: {
-				aC: node.scrollLeft,
-				aD: node.scrollTop,
-				aB: node.clientWidth,
-				ac: node.clientHeight
+			az: {
+				aB: node.scrollLeft,
+				aC: node.scrollTop,
+				aA: node.clientWidth,
+				ab: node.clientHeight
 			}
 		};
 	});
@@ -4324,18 +4324,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			au: _Browser_getScene(),
-			aA: {
-				aC: x,
-				aD: y,
-				aB: _Browser_doc.documentElement.clientWidth,
-				ac: _Browser_doc.documentElement.clientHeight
+			at: _Browser_getScene(),
+			az: {
+				aB: x,
+				aC: y,
+				aA: _Browser_doc.documentElement.clientWidth,
+				ab: _Browser_doc.documentElement.clientHeight
 			},
-			aK: {
-				aC: x + rect.left,
-				aD: y + rect.top,
-				aB: rect.width,
-				ac: rect.height
+			aJ: {
+				aB: x + rect.left,
+				aC: y + rect.top,
+				aA: rect.width,
+				ab: rect.height
 			}
 		};
 	});
@@ -4380,25 +4380,25 @@ var _Http_toTask = F3(function(router, toTask, request)
 	return _Scheduler_binding(function(callback)
 	{
 		function done(response) {
-			callback(toTask(request._.a(response)));
+			callback(toTask(request.Z.a(response)));
 		}
 
 		var xhr = new XMLHttpRequest();
 		xhr.addEventListener('error', function() { done($elm$http$Http$NetworkError_); });
 		xhr.addEventListener('timeout', function() { done($elm$http$Http$Timeout_); });
-		xhr.addEventListener('load', function() { done(_Http_toResponse(request._.b, xhr)); });
-		$elm$core$Maybe$isJust(request.ay) && _Http_track(router, xhr, request.ay.a);
+		xhr.addEventListener('load', function() { done(_Http_toResponse(request.Z.b, xhr)); });
+		$elm$core$Maybe$isJust(request.ax) && _Http_track(router, xhr, request.ax.a);
 
 		try {
-			xhr.open(request.aQ, request.az, true);
+			xhr.open(request.aP, request.ay, true);
 		} catch (e) {
-			return done($elm$http$Http$BadUrl_(request.az));
+			return done($elm$http$Http$BadUrl_(request.ay));
 		}
 
 		_Http_configureRequest(xhr, request);
 
-		request.T.a && xhr.setRequestHeader('Content-Type', request.T.a);
-		xhr.send(request.T.b);
+		request.S.a && xhr.setRequestHeader('Content-Type', request.S.a);
+		xhr.send(request.S.b);
 
 		return function() { xhr.c = true; xhr.abort(); };
 	});
@@ -4409,13 +4409,13 @@ var _Http_toTask = F3(function(router, toTask, request)
 
 function _Http_configureRequest(xhr, request)
 {
-	for (var headers = request.ab; headers.b; headers = headers.b) // WHILE_CONS
+	for (var headers = request.aa; headers.b; headers = headers.b) // WHILE_CONS
 	{
 		xhr.setRequestHeader(headers.a.a, headers.a.b);
 	}
-	xhr.timeout = request.a_.a || 0;
-	xhr.responseType = request._.d;
-	xhr.withCredentials = request.aF;
+	xhr.timeout = request.aZ.a || 0;
+	xhr.responseType = request.Z.d;
+	xhr.withCredentials = request.aE;
 }
 
 
@@ -4436,10 +4436,10 @@ function _Http_toResponse(toBody, xhr)
 function _Http_toMetadata(xhr)
 {
 	return {
-		az: xhr.responseURL,
-		aX: xhr.status,
-		aY: xhr.statusText,
-		ab: _Http_parseHeaders(xhr.getAllResponseHeaders())
+		ay: xhr.responseURL,
+		aW: xhr.status,
+		aX: xhr.statusText,
+		aa: _Http_parseHeaders(xhr.getAllResponseHeaders())
 	};
 }
 
@@ -4534,15 +4534,15 @@ function _Http_track(router, xhr, tracker)
 	xhr.upload.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Sending({
-			aW: event.loaded,
-			av: event.total
+			aV: event.loaded,
+			au: event.total
 		}))));
 	});
 	xhr.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Receiving({
-			aU: event.loaded,
-			av: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
+			aT: event.loaded,
+			au: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
 		}))));
 	});
 }var $elm$core$Basics$EQ = 1;
@@ -5049,7 +5049,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {aa: fragment, ad: host, ai: path, ak: port_, an: protocol, ap: query};
+		return {_: fragment, ac: host, ah: path, aj: port_, am: protocol, ao: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5334,18 +5334,15 @@ var $author$project$Main$GotData = function (a) {
 var $author$project$Main$Loading = {$: 0};
 var $author$project$Main$NewCampaignFormData = F2(
 	function (title, numOfDays) {
-		return {M: numOfDays, m: title};
+		return {L: numOfDays, k: title};
 	});
-var $author$project$Main$Data = function (campaigns) {
-	return {I: campaigns};
-};
 var $author$project$Main$Campaign = F5(
 	function (id, title, days, events, pupils) {
-		return {X: days, J: events, K: id, ao: pupils, m: title};
+		return {W: days, I: events, J: id, an: pupils, k: title};
 	});
 var $author$project$Main$Day = F3(
 	function (id, title, events) {
-		return {J: events, K: id, m: title};
+		return {I: events, J: id, k: title};
 	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$int = _Json_decodeInt;
@@ -5379,7 +5376,7 @@ var $author$project$Main$dayDecoder = A4(
 						A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$int)))))));
 var $author$project$Main$Event = F3(
 	function (id, title, capacity) {
-		return {aH: capacity, K: id, m: title};
+		return {aG: capacity, J: id, k: title};
 	});
 var $author$project$Main$eventDecoder = A4(
 	$elm$json$Json$Decode$map3,
@@ -5390,7 +5387,7 @@ var $author$project$Main$eventDecoder = A4(
 var $elm$json$Json$Decode$map5 = _Json_map5;
 var $author$project$Main$Pupil = F3(
 	function (name, _class, isSpecial) {
-		return {V: _class, aP: isSpecial, ag: name};
+		return {U: _class, aO: isSpecial, af: name};
 	});
 var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $author$project$Main$pupilDecoder = A4(
@@ -5417,15 +5414,12 @@ var $author$project$Main$campaignDecoder = A6(
 		'pupils',
 		$elm$json$Json$Decode$list($author$project$Main$pupilDecoder)));
 var $author$project$Main$dataDecoder = A2(
-	$elm$json$Json$Decode$map,
-	$author$project$Main$Data,
+	$elm$json$Json$Decode$field,
+	'data',
 	A2(
 		$elm$json$Json$Decode$field,
-		'data',
-		A2(
-			$elm$json$Json$Decode$field,
-			'campaignList',
-			$elm$json$Json$Decode$list($author$project$Main$campaignDecoder))));
+		'campaignList',
+		$elm$json$Json$Decode$list($author$project$Main$campaignDecoder)));
 var $elm$json$Json$Decode$decodeString = _Json_runOnString;
 var $elm$http$Http$BadStatus_ = F2(
 	function (a, b) {
@@ -6018,7 +6012,7 @@ var $elm$http$Http$resolve = F2(
 			case 3:
 				var metadata = response.a;
 				return $elm$core$Result$Err(
-					$elm$http$Http$BadStatus(metadata.aX));
+					$elm$http$Http$BadStatus(metadata.aW));
 			default:
 				var body = response.b;
 				return A2(
@@ -6064,7 +6058,7 @@ var $elm$http$Http$Request = function (a) {
 };
 var $elm$http$Http$State = F2(
 	function (reqs, subs) {
-		return {ar: reqs, aw: subs};
+		return {aq: reqs, av: subs};
 	});
 var $elm$http$Http$init = $elm$core$Task$succeed(
 	A2($elm$http$Http$State, $elm$core$Dict$empty, _List_Nil));
@@ -6108,7 +6102,7 @@ var $elm$http$Http$updateReqs = F3(
 					return A2(
 						$elm$core$Task$andThen,
 						function (pid) {
-							var _v4 = req.ay;
+							var _v4 = req.ax;
 							if (_v4.$ === 1) {
 								return A3($elm$http$Http$updateReqs, router, otherCmds, reqs);
 							} else {
@@ -6138,7 +6132,7 @@ var $elm$http$Http$onEffects = F4(
 				return $elm$core$Task$succeed(
 					A2($elm$http$Http$State, reqs, subs));
 			},
-			A3($elm$http$Http$updateReqs, router, cmds, state.ar));
+			A3($elm$http$Http$updateReqs, router, cmds, state.aq));
 	});
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
@@ -6181,7 +6175,7 @@ var $elm$http$Http$onSelfMsg = F3(
 				A2(
 					$elm$core$List$filterMap,
 					A3($elm$http$Http$maybeSend, router, tracker, progress),
-					state.aw)));
+					state.av)));
 	});
 var $elm$http$Http$Cancel = function (a) {
 	return {$: 0, a: a};
@@ -6195,14 +6189,14 @@ var $elm$http$Http$cmdMap = F2(
 			var r = cmd.a;
 			return $elm$http$Http$Request(
 				{
-					aF: r.aF,
-					T: r.T,
-					_: A2(_Http_mapExpect, func, r._),
-					ab: r.ab,
-					aQ: r.aQ,
-					a_: r.a_,
-					ay: r.ay,
-					az: r.az
+					aE: r.aE,
+					S: r.S,
+					Z: A2(_Http_mapExpect, func, r.Z),
+					aa: r.aa,
+					aP: r.aP,
+					aZ: r.aZ,
+					ax: r.ax,
+					ay: r.ay
 				});
 		}
 	});
@@ -6225,25 +6219,30 @@ var $elm$http$Http$subscription = _Platform_leaf('Http');
 var $elm$http$Http$request = function (r) {
 	return $elm$http$Http$command(
 		$elm$http$Http$Request(
-			{aF: false, T: r.T, _: r._, ab: r.ab, aQ: r.aQ, a_: r.a_, ay: r.ay, az: r.az}));
+			{aE: false, S: r.S, Z: r.Z, aa: r.aa, aP: r.aP, aZ: r.aZ, ax: r.ax, ay: r.ay}));
 };
 var $elm$http$Http$post = function (r) {
 	return $elm$http$Http$request(
-		{T: r.T, _: r._, ab: _List_Nil, aQ: 'POST', a_: $elm$core$Maybe$Nothing, ay: $elm$core$Maybe$Nothing, az: r.az});
+		{S: r.S, Z: r.Z, aa: _List_Nil, aP: 'POST', aZ: $elm$core$Maybe$Nothing, ax: $elm$core$Maybe$Nothing, ay: r.ay});
 };
-var $author$project$Main$queryCampaignList = '\n    {\n        campaignList {\n            id\n            title\n            days {\n                id\n                title\n                events {\n                    event {\n                        id\n                    }\n                    pupils {\n                        id\n                    }\n                }\n            }\n            events {\n                id\n                title\n                capacity\n                maxSpecialPupils\n            }\n            pupils {\n                id\n                name\n                class\n                isSpecial\n                choices {\n                    event {\n                        id\n                        title\n                    }\n                    choice\n                }\n            }\n        }\n    }\n    ';
+var $author$project$Main$queryCampaign = '\n    {\n        id\n        title\n        days {\n            id\n            title\n            events {\n                event {\n                    id\n                }\n                pupils {\n                    id\n                }\n            }\n        }\n        events {\n            id\n            title\n            capacity\n            maxSpecialPupils\n        }\n        pupils {\n            id\n            name\n            class\n            isSpecial\n            choices {\n                event {\n                    id\n                    title\n                }\n                choice\n            }\n        }\n    }\n    ';
+var $author$project$Main$queryCampaignList = A2(
+	$elm$core$String$join,
+	' ',
+	_List_fromArray(
+		['{', 'campaignList', $author$project$Main$queryCampaign, '}']));
 var $author$project$Main$queryUrl = '/query';
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
 		{
-			i: $author$project$Main$Loading,
-			H: {I: _List_Nil},
-			C: A2($author$project$Main$NewCampaignFormData, '', 2)
+			x: _List_Nil,
+			g: $author$project$Main$Loading,
+			z: A2($author$project$Main$NewCampaignFormData, '', 2)
 		},
 		$elm$http$Http$post(
 			{
-				T: $elm$http$Http$jsonBody(
+				S: $elm$http$Http$jsonBody(
 					$elm$json$Json$Encode$object(
 						_List_fromArray(
 							[
@@ -6251,8 +6250,8 @@ var $author$project$Main$init = function (_v0) {
 								'query',
 								$elm$json$Json$Encode$string($author$project$Main$queryCampaignList))
 							]))),
-				_: A2($elm$http$Http$expectJson, $author$project$Main$GotData, $author$project$Main$dataDecoder),
-				az: $author$project$Main$queryUrl
+				Z: A2($elm$http$Http$expectJson, $author$project$Main$GotData, $author$project$Main$dataDecoder),
+				ay: $author$project$Main$queryUrl
 			}));
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -6302,7 +6301,7 @@ var $author$project$Main$parseError = F2(
 		return _Utils_update(
 			model,
 			{
-				i: $author$project$Main$Failure(errMsg)
+				g: $author$project$Main$Failure(errMsg)
 			});
 	});
 var $author$project$Main$update = F2(
@@ -6311,13 +6310,13 @@ var $author$project$Main$update = F2(
 			case 0:
 				var res = msg.a;
 				if (!res.$) {
-					var data = res.a;
+					var campaigns = res.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								i: $author$project$Main$Success($author$project$Main$Overview),
-								H: data
+								x: campaigns,
+								g: $author$project$Main$Success($author$project$Main$Overview)
 							}),
 						$elm$core$Platform$Cmd$none);
 				} else {
@@ -6334,7 +6333,7 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									i: $author$project$Main$Success($author$project$Main$Overview)
+									g: $author$project$Main$Success($author$project$Main$Overview)
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 1:
@@ -6342,7 +6341,7 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									i: $author$project$Main$Success($author$project$Main$NewCampaign)
+									g: $author$project$Main$Success($author$project$Main$NewCampaign)
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 2:
@@ -6351,7 +6350,7 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									i: $author$project$Main$Success(
+									g: $author$project$Main$Success(
 										$author$project$Main$CampaignPage(c))
 								}),
 							$elm$core$Platform$Cmd$none);
@@ -6361,7 +6360,7 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									i: $author$project$Main$Success(
+									g: $author$project$Main$Success(
 										$author$project$Main$PupilPage(pup))
 								}),
 							$elm$core$Platform$Cmd$none);
@@ -6370,53 +6369,86 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									i: $author$project$Main$Success($author$project$Main$NewPupils)
+									g: $author$project$Main$Success($author$project$Main$NewPupils)
 								}),
 							$elm$core$Platform$Cmd$none);
 				}
 			case 2:
 				var i = msg.a;
 				var newData = function () {
-					var currentData = model.C;
+					var currentData = model.z;
 					if (!i.$) {
 						var t = i.a;
 						return _Utils_update(
 							currentData,
-							{m: t});
+							{k: t});
 					} else {
 						var n = i.a;
 						return _Utils_update(
 							currentData,
-							{M: n});
+							{L: n});
 					}
 				}();
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{C: newData}),
+						{z: newData}),
 					$elm$core$Platform$Cmd$none);
 			case 3:
+				var mutationQuery = A2(
+					$elm$core$String$join,
+					' ',
+					_List_fromArray(
+						[
+							'mutation',
+							'{',
+							'addCampaign',
+							'(',
+							'title:',
+							A2(
+							$elm$json$Json$Encode$encode,
+							0,
+							$elm$json$Json$Encode$string(model.z.k)),
+							')',
+							$author$project$Main$queryCampaign,
+							'}'
+						]));
+				var addCampaignDecoder = A2(
+					$elm$json$Json$Decode$field,
+					'data',
+					A2($elm$json$Json$Decode$field, 'addCampaign', $author$project$Main$campaignDecoder));
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{i: $author$project$Main$Loading}),
+						{g: $author$project$Main$Loading}),
 					$elm$http$Http$post(
 						{
-							T: $elm$http$Http$jsonBody(
+							S: $elm$http$Http$jsonBody(
 								$elm$json$Json$Encode$object(
 									_List_fromArray(
 										[
 											_Utils_Tuple2(
 											'query',
-											$elm$json$Json$Encode$string('{ mutation addCampaign(title: "blub"){id} }'))
+											$elm$json$Json$Encode$string(mutationQuery))
 										]))),
-							_: A2($elm$http$Http$expectJson, $author$project$Main$GotNewCampaign, $author$project$Main$campaignDecoder),
-							az: $author$project$Main$queryUrl
+							Z: A2($elm$http$Http$expectJson, $author$project$Main$GotNewCampaign, addCampaignDecoder),
+							ay: $author$project$Main$queryUrl
 						}));
 			default:
 				var res = msg.a;
 				if (!res.$) {
-					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					var c = res.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								x: _Utils_ap(
+									model.x,
+									_List_fromArray(
+										[c])),
+								g: $author$project$Main$Success($author$project$Main$Overview)
+							}),
+						$elm$core$Platform$Cmd$none);
 				} else {
 					var err = res.a;
 					return _Utils_Tuple2(
@@ -6509,7 +6541,7 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		$elm$json$Json$Decode$succeed(msg));
 };
 var $author$project$Main$pupilToStr = function (p) {
-	return p.ag + (' (Klasse ' + (p.V + ')'));
+	return p.af + (' (Klasse ' + (p.U + ')'));
 };
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
@@ -6584,7 +6616,7 @@ var $author$project$Main$dayView = function (d) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(d.m)
+						$elm$html$Html$text(d.k)
 					])),
 			_Utils_ap(events, unassignedPupils)));
 };
@@ -6605,7 +6637,7 @@ var $author$project$Main$eventView = function (e) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(e.m)
+						$elm$html$Html$text(e.k)
 					]))
 			]));
 };
@@ -6621,7 +6653,7 @@ var $author$project$Main$campaignView = function (c) {
 				]),
 			_List_fromArray(
 				[
-					$elm$html$Html$text(c.m)
+					$elm$html$Html$text(c.k)
 				])),
 			A2(
 			$elm$html$Html$div,
@@ -6629,7 +6661,7 @@ var $author$project$Main$campaignView = function (c) {
 				[
 					$elm$html$Html$Attributes$class('block')
 				]),
-			A2($elm$core$List$map, $author$project$Main$dayView, c.X)),
+			A2($elm$core$List$map, $author$project$Main$dayView, c.W)),
 			A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -6649,7 +6681,7 @@ var $author$project$Main$campaignView = function (c) {
 							$elm$html$Html$text('Alle Angebote')
 						])),
 				_Utils_ap(
-					A2($elm$core$List$map, $author$project$Main$eventView, c.J),
+					A2($elm$core$List$map, $author$project$Main$eventView, c.I),
 					_List_fromArray(
 						[
 							A2(
@@ -6681,7 +6713,7 @@ var $author$project$Main$campaignView = function (c) {
 						[
 							$elm$html$Html$text('Alle Schüler/innen')
 						])),
-					$author$project$Main$pupilUl(c.ao),
+					$author$project$Main$pupilUl(c.an),
 					A2(
 					$elm$html$Html$button,
 					_List_fromArray(
@@ -6859,7 +6891,7 @@ var $author$project$Main$newCampaignView = function (ncfd) {
 															$elm$html$Html$Attributes$required(true),
 															$elm$html$Html$Events$onInput(
 															A2($elm$core$Basics$composeR, $author$project$Main$Title, $author$project$Main$NewCampaignFormDataMsg)),
-															$elm$html$Html$Attributes$value(ncfd.m)
+															$elm$html$Html$Attributes$value(ncfd.k)
 														]),
 													_List_Nil)
 												]))
@@ -6897,7 +6929,7 @@ var $author$project$Main$newCampaignView = function (ncfd) {
 																	$elm$core$Maybe$withDefault(0),
 																	A2($elm$core$Basics$composeR, $author$project$Main$NumOfDays, $author$project$Main$NewCampaignFormDataMsg)))),
 															$elm$html$Html$Attributes$value(
-															$elm$core$String$fromInt(ncfd.M))
+															$elm$core$String$fromInt(ncfd.L))
 														]),
 													_List_Nil)
 												])),
@@ -7027,7 +7059,7 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$Attributes$class('section')
 					]),
 				function () {
-					var _v0 = model.i;
+					var _v0 = model.g;
 					switch (_v0.$) {
 						case 0:
 							return _List_fromArray(
@@ -7076,10 +7108,10 @@ var $author$project$Main$view = function (model) {
 															]),
 														_List_fromArray(
 															[
-																$elm$html$Html$text(c.m)
+																$elm$html$Html$text(c.k)
 															]));
 												},
-												model.H.I)),
+												model.x)),
 											A2(
 											$elm$html$Html$button,
 											_List_fromArray(
@@ -7097,7 +7129,7 @@ var $author$project$Main$view = function (model) {
 									var c = p.a;
 									return $author$project$Main$campaignView(c);
 								case 2:
-									return $author$project$Main$newCampaignView(model.C);
+									return $author$project$Main$newCampaignView(model.z);
 								case 3:
 									var pup = p.a;
 									return $author$project$Main$pupilView(pup);
@@ -7109,6 +7141,6 @@ var $author$project$Main$view = function (model) {
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
-	{aO: $author$project$Main$init, aZ: $author$project$Main$subscriptions, a$: $author$project$Main$update, a0: $author$project$Main$view});
+	{aN: $author$project$Main$init, aY: $author$project$Main$subscriptions, a_: $author$project$Main$update, a$: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
