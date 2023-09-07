@@ -65,6 +65,11 @@ update msg model =
 
         SendNewCampaignForm ->
             let
+                dayList : List String
+                dayList =
+                    List.range 1 model.numOfDays
+                        |> List.map (\i -> "Tag " ++ String.fromInt i)
+
                 mutationQuery : String
                 mutationQuery =
                     String.join " "
@@ -74,6 +79,9 @@ update msg model =
                         , "("
                         , "title:"
                         , E.encode 0 <| E.string model.title
+                        , ","
+                        , "days:"
+                        , E.encode 0 <| E.list E.string dayList
                         , ")"
                         , queryCampaign
                         , "}"
@@ -139,6 +147,7 @@ view ncfd =
                             , type_ "number"
                             , attribute "aria-label" labelNumOfDays
                             , Html.Attributes.min "1"
+                            , Html.Attributes.max "10"
                             , onInput (String.toInt >> Maybe.withDefault 0 >> NumOfDays >> NewCampaignFormDataMsg)
                             , value <| String.fromInt ncfd.numOfDays
                             ]

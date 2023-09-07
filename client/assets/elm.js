@@ -5334,11 +5334,11 @@ var $author$project$Main$GotData = function (a) {
 var $author$project$Main$Loading = {$: 0};
 var $author$project$Data$Campaign = F5(
 	function (id, title, days, events, pupils) {
-		return {aD: days, V: events, H: id, aR: pupils, P: title};
+		return {aD: days, V: events, I: id, aR: pupils, P: title};
 	});
 var $author$project$Data$Day = F3(
 	function (id, title, events) {
-		return {V: events, H: id, P: title};
+		return {V: events, I: id, P: title};
 	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$int = _Json_decodeInt;
@@ -5372,7 +5372,7 @@ var $author$project$Data$dayDecoder = A4(
 						A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$int)))))));
 var $author$project$Data$Event = F3(
 	function (id, title, capacity) {
-		return {aA: capacity, H: id, P: title};
+		return {aA: capacity, I: id, P: title};
 	});
 var $author$project$Data$eventDecoder = A4(
 	$elm$json$Json$Decode$map3,
@@ -6032,7 +6032,7 @@ var $elm$http$Http$expectJson = F2(
 	});
 var $author$project$NewCampaign$Model = F2(
 	function (title, numOfDays) {
-		return {J: numOfDays, P: title};
+		return {H: numOfDays, P: title};
 	});
 var $author$project$NewCampaign$init = A2($author$project$NewCampaign$Model, '', 2);
 var $elm$http$Http$jsonBody = function (value) {
@@ -6307,6 +6307,15 @@ var $author$project$NewCampaign$Loading = function (a) {
 	return {$: 1, a: a};
 };
 var $author$project$NewCampaign$None = {$: 0};
+var $elm$json$Json$Encode$list = F2(
+	function (func, entries) {
+		return _Json_wrap(
+			A3(
+				$elm$core$List$foldl,
+				_Json_addEntry(func),
+				_Json_emptyArray(0),
+				entries));
+	});
 var $author$project$NewCampaign$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -6322,11 +6331,17 @@ var $author$project$NewCampaign$update = F2(
 						var n = newData.a;
 						return _Utils_update(
 							model,
-							{J: n});
+							{H: n});
 					}
 				}();
 				return _Utils_Tuple2(updatedModel, $author$project$NewCampaign$None);
 			case 1:
+				var dayList = A2(
+					$elm$core$List$map,
+					function (i) {
+						return 'Tag ' + $elm$core$String$fromInt(i);
+					},
+					A2($elm$core$List$range, 1, model.H));
 				var mutationQuery = A2(
 					$elm$core$String$join,
 					' ',
@@ -6341,6 +6356,12 @@ var $author$project$NewCampaign$update = F2(
 							$elm$json$Json$Encode$encode,
 							0,
 							$elm$json$Json$Encode$string(model.P)),
+							',',
+							'days:',
+							A2(
+							$elm$json$Json$Encode$encode,
+							0,
+							A2($elm$json$Json$Encode$list, $elm$json$Json$Encode$string, dayList)),
 							')',
 							$author$project$Data$queryCampaign,
 							'}'
@@ -7053,7 +7074,7 @@ var $author$project$NewCampaign$view = function (ncfd) {
 																	$elm$core$Maybe$withDefault(0),
 																	A2($elm$core$Basics$composeR, $author$project$NewCampaign$NumOfDays, $author$project$NewCampaign$NewCampaignFormDataMsg)))),
 															$elm$html$Html$Attributes$value(
-															$elm$core$String$fromInt(ncfd.J))
+															$elm$core$String$fromInt(ncfd.H))
 														]),
 													_List_Nil)
 												])),
