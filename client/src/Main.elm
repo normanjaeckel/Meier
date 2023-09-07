@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Data exposing (Campaign, Day, Event, Pupil)
-import Html exposing (Html, a, button, div, footer, form, h1, h2, h3, li, main_, nav, p, section, text, ul)
+import Html exposing (Html, a, button, div, form, h1, h2, h3, li, main_, nav, p, section, text, ul)
 import Html.Attributes exposing (class, type_)
 import Html.Events exposing (onClick)
 import Http
