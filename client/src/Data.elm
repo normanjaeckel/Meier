@@ -1,4 +1,4 @@
-module Data exposing (Campaign, Day, Event, Pupil, campaignDecoder, dayDecoder, eventDecoder, pupilDecoder, queryCampaign)
+module Data exposing (Campaign, CampaignId, Day, DayId, Event, EventId, Pupil, PupilId, campaignDecoder, queryCampaign)
 
 import Json.Decode as D
 

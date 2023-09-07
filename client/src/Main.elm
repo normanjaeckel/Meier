@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Data exposing (Campaign, Day, Event, Pupil)
-import Html exposing (..)
+import Html exposing (Html, a, button, div, footer, form, h1, h2, h3, li, main_, nav, p, section, text, ul)
 import Html.Attributes exposing (class, type_)
 import Html.Events exposing (onClick)
 import Http
@@ -154,45 +154,57 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view model =
-    main_ []
-        [ section [ class "section" ]
-            (case model.connection of
-                Loading ->
-                    [ text "Loading" ]
+    div []
+        [ navbar
+        , main_ []
+            [ section [ class "section" ]
+                (case model.connection of
+                    Loading ->
+                        [ text "Loading" ]
 
-                Failure f ->
-                    [ text f ]
+                    Failure f ->
+                        [ text f ]
 
-                Success p ->
-                    case p of
-                        Overview ->
-                            [ h1 [ classes "title is-3" ] [ text "Überblick über alle Kampagnen" ]
-                            , div [ class "buttons" ]
-                                (model.campaigns
-                                    |> List.map
-                                        (\c ->
-                                            button
-                                                [ class "button"
-                                                , onClick <| SwitchPage <| SwitchToPage c
-                                                ]
-                                                [ text c.title ]
-                                        )
-                                )
-                            , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewCampaign ] [ text "Neue Kampagne" ]
-                            ]
+                    Success p ->
+                        case p of
+                            Overview ->
+                                [ h1 [ classes "title is-3" ] [ text "Überblick über alle Kampagnen" ]
+                                , div [ class "buttons" ]
+                                    (model.campaigns
+                                        |> List.map
+                                            (\c ->
+                                                button
+                                                    [ class "button"
+                                                    , onClick <| SwitchPage <| SwitchToPage c
+                                                    ]
+                                                    [ text c.title ]
+                                            )
+                                    )
+                                , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewCampaign ] [ text "Neue Kampagne" ]
+                                ]
 
-                        CampaignPage c ->
-                            campaignView c
+                            CampaignPage c ->
+                                campaignView c
 
-                        NewCampaignPage ->
-                            NewCampaign.view model.newCampaign |> List.map (Html.map NewCampaignMsg)
+                            NewCampaignPage ->
+                                NewCampaign.view model.newCampaign |> List.map (Html.map NewCampaignMsg)
 
-                        PupilPage pup ->
-                            pupilView pup
+                            PupilPage pup ->
+                                pupilView pup
 
-                        NewPupils ->
-                            newPupilsView
-            )
+                            NewPupils ->
+                                newPupilsView
+                )
+            ]
+        ]
+
+
+navbar : Html Msg
+navbar =
+    nav [ class "navbar" ]
+        [ div [ class "navbar-brand" ]
+            [ a [ classes "navbar-item", onClick <| SwitchPage <| SwitchToOverview ] [ text "Home" ]
+            ]
         ]
 
 
@@ -221,16 +233,18 @@ dayView d =
             --d.events |> Dict.values |> List.map eventView
             []
 
+        unassignedPupils : List (Html Msg)
         unassignedPupils =
-            if List.isEmpty [] then
-                []
+            []
 
-            else
-                [ div [ class "block" ]
-                    [ h3 [ classes "subtitle is-5" ] [ text "Bisher nicht zugeordnete Schüler/innen" ]
-                    , pupilUl []
-                    ]
-                ]
+        -- if True then
+        --     []
+        -- else
+        --     [ div [ class "block" ]
+        --         [ h3 [ classes "subtitle is-5" ] [ text "Bisher nicht zugeordnete Schüler/innen" ]
+        --         , pupilUl []
+        --         ]
+        --     ]
     in
     div [ class "block" ]
         (h2 [ classes "title is-5" ] [ text d.title ] :: events ++ unassignedPupils)

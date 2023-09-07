@@ -1,7 +1,7 @@
 module NewCampaign exposing (Effect(..), Model, Msg, init, update, view)
 
 import Data exposing (Campaign, queryCampaign)
-import Html exposing (..)
+import Html exposing (Html, button, div, form, h1, input, p, text)
 import Html.Attributes exposing (attribute, class, placeholder, required, type_, value)
 import Html.Events exposing (onInput, onSubmit)
 import Http
@@ -65,6 +65,7 @@ update msg model =
 
         SendNewCampaignForm ->
             let
+                mutationQuery : String
                 mutationQuery =
                     String.join " "
                         [ "mutation"

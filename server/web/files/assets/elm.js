@@ -6552,19 +6552,54 @@ var $author$project$Shared$classes = function (s) {
 };
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$h2 = _VirtualDom_node('h2');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$dayView = function (d) {
+	var unassignedPupils = _List_Nil;
+	var events = _List_Nil;
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('block')
+			]),
+		A2(
+			$elm$core$List$cons,
+			A2(
+				$elm$html$Html$h2,
+				_List_fromArray(
+					[
+						$author$project$Shared$classes('title is-5')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(d.P)
+					])),
+			_Utils_ap(events, unassignedPupils)));
+};
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
-var $elm$core$List$isEmpty = function (xs) {
-	if (!xs.b) {
-		return true;
-	} else {
-		return false;
-	}
+var $author$project$Main$eventView = function (e) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('block')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$h3,
+				_List_fromArray(
+					[
+						$author$project$Shared$classes('subtitle is-5')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(e.P)
+					]))
+			]));
 };
-var $author$project$Main$SwitchToPupil = function (a) {
-	return {$: 3, a: a};
-};
-var $elm$html$Html$a = _VirtualDom_node('a');
-var $elm$html$Html$li = _VirtualDom_node('li');
+var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 0, a: a};
 };
@@ -6582,11 +6617,14 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
+var $author$project$Main$SwitchToPupil = function (a) {
+	return {$: 3, a: a};
+};
+var $elm$html$Html$a = _VirtualDom_node('a');
+var $elm$html$Html$li = _VirtualDom_node('li');
 var $author$project$Main$pupilToStr = function (p) {
 	return p.aN + (' (Klasse ' + (p.aC + ')'));
 };
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$pupilUl = function (pupList) {
 	return A2(
@@ -6617,73 +6655,6 @@ var $author$project$Main$pupilUl = function (pupList) {
 			},
 			pupList));
 };
-var $author$project$Main$dayView = function (d) {
-	var unassignedPupils = $elm$core$List$isEmpty(_List_Nil) ? _List_Nil : _List_fromArray(
-		[
-			A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('block')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$h3,
-					_List_fromArray(
-						[
-							$author$project$Shared$classes('subtitle is-5')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text('Bisher nicht zugeordnete Schüler/innen')
-						])),
-					$author$project$Main$pupilUl(_List_Nil)
-				]))
-		]);
-	var events = _List_Nil;
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class('block')
-			]),
-		A2(
-			$elm$core$List$cons,
-			A2(
-				$elm$html$Html$h2,
-				_List_fromArray(
-					[
-						$author$project$Shared$classes('title is-5')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(d.P)
-					])),
-			_Utils_ap(events, unassignedPupils)));
-};
-var $author$project$Main$eventView = function (e) {
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class('block')
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$h3,
-				_List_fromArray(
-					[
-						$author$project$Shared$classes('subtitle is-5')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(e.P)
-					]))
-			]));
-};
-var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $author$project$Main$campaignView = function (c) {
 	return _List_fromArray(
 		[
@@ -6774,6 +6745,38 @@ var $author$project$Main$campaignView = function (c) {
 var $elm$html$Html$main_ = _VirtualDom_node('main');
 var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
 var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
+var $author$project$Main$SwitchToOverview = {$: 0};
+var $elm$html$Html$nav = _VirtualDom_node('nav');
+var $author$project$Main$navbar = A2(
+	$elm$html$Html$nav,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$class('navbar')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('navbar-brand')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$a,
+					_List_fromArray(
+						[
+							$author$project$Shared$classes('navbar-item'),
+							$elm$html$Html$Events$onClick(
+							$author$project$Main$SwitchPage($author$project$Main$SwitchToOverview))
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Home')
+						]))
+				]))
+		]));
 var $elm$html$Html$form = _VirtualDom_node('form');
 var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
@@ -7092,99 +7095,106 @@ var $author$project$NewCampaign$view = function (ncfd) {
 };
 var $author$project$Main$view = function (model) {
 	return A2(
-		$elm$html$Html$main_,
+		$elm$html$Html$div,
 		_List_Nil,
 		_List_fromArray(
 			[
+				$author$project$Main$navbar,
 				A2(
-				$elm$html$Html$section,
+				$elm$html$Html$main_,
+				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('section')
-					]),
-				function () {
-					var _v0 = model.f;
-					switch (_v0.$) {
-						case 0:
-							return _List_fromArray(
-								[
-									$elm$html$Html$text('Loading')
-								]);
-						case 1:
-							var f = _v0.a;
-							return _List_fromArray(
-								[
-									$elm$html$Html$text(f)
-								]);
-						default:
-							var p = _v0.a;
-							switch (p.$) {
+						A2(
+						$elm$html$Html$section,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('section')
+							]),
+						function () {
+							var _v0 = model.f;
+							switch (_v0.$) {
 								case 0:
 									return _List_fromArray(
 										[
-											A2(
-											$elm$html$Html$h1,
-											_List_fromArray(
-												[
-													$author$project$Shared$classes('title is-3')
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text('Überblick über alle Kampagnen')
-												])),
-											A2(
-											$elm$html$Html$div,
-											_List_fromArray(
-												[
-													$elm$html$Html$Attributes$class('buttons')
-												]),
-											A2(
-												$elm$core$List$map,
-												function (c) {
-													return A2(
-														$elm$html$Html$button,
-														_List_fromArray(
-															[
-																$elm$html$Html$Attributes$class('button'),
-																$elm$html$Html$Events$onClick(
-																$author$project$Main$SwitchPage(
-																	$author$project$Main$SwitchToPage(c)))
-															]),
-														_List_fromArray(
-															[
-																$elm$html$Html$text(c.P)
-															]));
-												},
-												model.w)),
-											A2(
-											$elm$html$Html$button,
-											_List_fromArray(
-												[
-													$author$project$Shared$classes('button is-primary'),
-													$elm$html$Html$Events$onClick(
-													$author$project$Main$SwitchPage($author$project$Main$SwitchToNewCampaign))
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text('Neue Kampagne')
-												]))
+											$elm$html$Html$text('Loading')
 										]);
 								case 1:
-									var c = p.a;
-									return $author$project$Main$campaignView(c);
-								case 2:
-									return A2(
-										$elm$core$List$map,
-										$elm$html$Html$map($author$project$Main$NewCampaignMsg),
-										$author$project$NewCampaign$view(model.C));
-								case 3:
-									var pup = p.a;
-									return $author$project$Main$pupilView(pup);
+									var f = _v0.a;
+									return _List_fromArray(
+										[
+											$elm$html$Html$text(f)
+										]);
 								default:
-									return $author$project$Main$newPupilsView;
+									var p = _v0.a;
+									switch (p.$) {
+										case 0:
+											return _List_fromArray(
+												[
+													A2(
+													$elm$html$Html$h1,
+													_List_fromArray(
+														[
+															$author$project$Shared$classes('title is-3')
+														]),
+													_List_fromArray(
+														[
+															$elm$html$Html$text('Überblick über alle Kampagnen')
+														])),
+													A2(
+													$elm$html$Html$div,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('buttons')
+														]),
+													A2(
+														$elm$core$List$map,
+														function (c) {
+															return A2(
+																$elm$html$Html$button,
+																_List_fromArray(
+																	[
+																		$elm$html$Html$Attributes$class('button'),
+																		$elm$html$Html$Events$onClick(
+																		$author$project$Main$SwitchPage(
+																			$author$project$Main$SwitchToPage(c)))
+																	]),
+																_List_fromArray(
+																	[
+																		$elm$html$Html$text(c.P)
+																	]));
+														},
+														model.w)),
+													A2(
+													$elm$html$Html$button,
+													_List_fromArray(
+														[
+															$author$project$Shared$classes('button is-primary'),
+															$elm$html$Html$Events$onClick(
+															$author$project$Main$SwitchPage($author$project$Main$SwitchToNewCampaign))
+														]),
+													_List_fromArray(
+														[
+															$elm$html$Html$text('Neue Kampagne')
+														]))
+												]);
+										case 1:
+											var c = p.a;
+											return $author$project$Main$campaignView(c);
+										case 2:
+											return A2(
+												$elm$core$List$map,
+												$elm$html$Html$map($author$project$Main$NewCampaignMsg),
+												$author$project$NewCampaign$view(model.C));
+										case 3:
+											var pup = p.a;
+											return $author$project$Main$pupilView(pup);
+										default:
+											return $author$project$Main$newPupilsView;
+									}
 							}
-					}
-				}())
+						}())
+					]))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
