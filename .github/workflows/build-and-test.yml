@@ -26,5 +26,5 @@ jobs:
           chmod +x elm
           mv elm ~/.local/bin
 
-      - name: Run default task as defined in Taskfile.yaml
+      - name: Run build task as defined in Taskfile.yaml
         run: task build
