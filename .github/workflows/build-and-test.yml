@@ -2,7 +2,6 @@ name: Build client and server and run all tests and checks
 
 on:
   - pull_request
-  - push
 
 jobs:
   run-default-task:
@@ -12,7 +11,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Go
+      - name: Set up Go (https://go.dev)
         uses: actions/setup-go@v4
         with:
           go-version: '1.21.0'
@@ -20,6 +19,8 @@ jobs:
       - name: Install Taskfile (https://taskfile.dev)
         run: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
 
+      - name: Where we are
+        run: ls -al
 
       - name: Run default task as defined in Taskfile.yaml
         run: task
