@@ -1,13 +1,12 @@
 name: Build client and server and run all tests and checks
 
-run-name : New push by ${{ github.actor }}
-
 on:
   - pull_request
   - push
 
 jobs:
   run-default-task:
+    runs-on: ubuntu-latest
     steps:
 
       - name: Checkout code
