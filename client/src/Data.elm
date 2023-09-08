@@ -8,8 +8,10 @@ module Data exposing
     , Pupil
     , PupilId
     , campaignDecoder
+    , dayDecoder
     , eventDecoder
     , queryCampaign
+    , queryDay
     , queryEvent
     )
 
@@ -45,18 +47,9 @@ queryCampaign =
     {
         id
         title
-        days {
-            id
-            title
-            events {
-                event {
-                    id
-                }
-                pupils {
-                    id
-                }
-            }
-        }
+        days """
+        ++ queryDay
+        ++ """
         events
     """
         ++ queryEvent
@@ -102,6 +95,24 @@ dayDecoder =
                 )
             )
         )
+
+
+queryDay : String
+queryDay =
+    """
+    {
+        id
+        title
+        events {
+            event {
+                id
+            }
+            pupils {
+                id
+            }
+        }
+    }
+    """
 
 
 type alias Event =

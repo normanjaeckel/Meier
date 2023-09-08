@@ -45,7 +45,7 @@ type NewEventFormDataInput
 type Effect
     = None
     | Loading (Cmd Msg)
-    | Done Campaign Event
+    | Done Campaign
     | Error String
 
 
@@ -109,7 +109,7 @@ update msg model =
         GotNewEvent c res ->
             case res of
                 Ok e ->
-                    ( model, Done c e )
+                    ( model, Done { c | events = c.events ++ [ e ] } )
 
                 Err err ->
                     ( model, Error (Shared.parseError err) )

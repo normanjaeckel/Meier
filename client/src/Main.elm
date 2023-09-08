@@ -9,6 +9,7 @@ import Http
 import Json.Decode as D
 import Json.Encode as E
 import NewCampaign
+import NewDay
 import NewEvent
 import Shared exposing (classes, parseError)
 
@@ -31,6 +32,7 @@ type alias Model =
     { connection : Connection
     , campaigns : List Campaign
     , newCampaign : NewCampaign.Model
+    , newDay : NewDay.Model
     , newEvent : NewEvent.Model
     }
 
@@ -40,6 +42,7 @@ init _ =
     ( { connection = Loading
       , campaigns = []
       , newCampaign = NewCampaign.init
+      , newDay = NewDay.init
       , newEvent = NewEvent.init
       }
     , Http.post
@@ -72,6 +75,7 @@ type Page
     = Overview
     | CampaignPage Campaign
     | NewCampaignPage
+    | NewDayPage Campaign
     | NewEventPage Campaign
     | PupilPage Pupil
     | NewPupils
@@ -85,12 +89,14 @@ type Msg
     = GotData (Result Http.Error (List Campaign))
     | SwitchPage SwitchTo
     | NewCampaignMsg NewCampaign.Msg
+    | NewDayMsg NewDay.Msg
     | NewEventMsg NewEvent.Msg
 
 
 type SwitchTo
     = SwitchToOverview
     | SwitchToNewCampaign
+    | SwitchToNewDay Campaign
     | SwitchToNewEvent Campaign
     | SwitchToPage Campaign
     | SwitchToPupil Pupil
@@ -115,6 +121,9 @@ update msg model =
 
                 SwitchToNewCampaign ->
                     ( { model | connection = Success NewCampaignPage }, Cmd.none )
+
+                SwitchToNewDay c ->
+                    ( { model | connection = Success <| NewDayPage c }, Cmd.none )
 
                 SwitchToNewEvent c ->
                     ( { model | connection = Success <| NewEventPage c }, Cmd.none )
@@ -146,6 +155,38 @@ update msg model =
                 NewCampaign.Error err ->
                     ( { model | connection = Failure err }, Cmd.none )
 
+        NewDayMsg innerMsg ->
+            let
+                ( innerModel, effect ) =
+                    NewDay.update innerMsg model.newDay
+            in
+            case effect of
+                NewDay.None ->
+                    ( { model | newDay = innerModel }, Cmd.none )
+
+                NewDay.Loading innerCmd ->
+                    ( { model | connection = Loading }, innerCmd |> Cmd.map NewDayMsg )
+
+                NewDay.Done updatedCamp ->
+                    let
+                        newCampaignList : List Campaign
+                        newCampaignList =
+                            model.campaigns
+                                |> List.foldr
+                                    (\camp acc ->
+                                        if camp.id == updatedCamp.id then
+                                            updatedCamp :: acc
+
+                                        else
+                                            camp :: acc
+                                    )
+                                    []
+                    in
+                    ( { model | connection = Success <| CampaignPage updatedCamp, campaigns = newCampaignList }, Cmd.none )
+
+                NewDay.Error err ->
+                    ( { model | connection = Failure err }, Cmd.none )
+
         NewEventMsg innerMsg ->
             let
                 ( innerModel, effect ) =
@@ -158,23 +199,22 @@ update msg model =
                 NewEvent.Loading innerCmd ->
                     ( { model | connection = Loading }, innerCmd |> Cmd.map NewEventMsg )
 
-                NewEvent.Done camp event ->
-                    -- e verwenden und zum Model hinzufügen
+                NewEvent.Done updatedCamp ->
                     let
                         newCampaignList : List Campaign
                         newCampaignList =
                             model.campaigns
                                 |> List.foldr
-                                    (\a b ->
-                                        if a.id == camp.id then
-                                            { a | events = a.events ++ [ event ] } :: b
+                                    (\camp acc ->
+                                        if camp.id == updatedCamp.id then
+                                            updatedCamp :: acc
 
                                         else
-                                            a :: b
+                                            camp :: acc
                                     )
                                     []
                     in
-                    ( { model | connection = Success Overview, campaigns = newCampaignList }, Cmd.none )
+                    ( { model | connection = Success <| CampaignPage updatedCamp, campaigns = newCampaignList }, Cmd.none )
 
                 NewEvent.Error err ->
                     ( { model | connection = Failure err }, Cmd.none )
@@ -226,6 +266,9 @@ view model =
                             NewCampaignPage ->
                                 NewCampaign.view model.newCampaign |> List.map (Html.map NewCampaignMsg)
 
+                            NewDayPage c ->
+                                NewDay.view c model.newDay |> List.map (Html.map NewDayMsg)
+
                             NewEventPage c ->
                                 NewEvent.view c model.newEvent |> List.map (Html.map NewEventMsg)
 
@@ -256,7 +299,10 @@ navbar =
 campaignView : Campaign -> List (Html Msg)
 campaignView c =
     [ h1 [ classes "title is-3" ] [ text c.title ]
-    , div [ class "block" ] (c.days |> List.map dayView)
+    , div [ class "block" ]
+        ((c.days |> List.map dayView)
+            ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewDay c ] [ text "Neuer Tag" ] ]
+        )
     , div [ class "block" ]
         (h2 [ classes "title is-5" ] [ text "Alle Angebote" ]
             :: (c.events |> List.map eventView)
