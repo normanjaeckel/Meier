@@ -1,4 +1,17 @@
-module Data exposing (Campaign, CampaignId, Day, DayId, Event, EventId, Pupil, PupilId, campaignDecoder, queryCampaign)
+module Data exposing
+    ( Campaign
+    , CampaignId
+    , Day
+    , DayId
+    , Event
+    , EventId
+    , Pupil
+    , PupilId
+    , campaignDecoder
+    , eventDecoder
+    , queryCampaign
+    , queryEvent
+    )
 
 import Json.Decode as D
 
@@ -44,12 +57,10 @@ queryCampaign =
                 }
             }
         }
-        events {
-            id
-            title
-            capacity
-            maxSpecialPupils
-        }
+        events
+    """
+        ++ queryEvent
+        ++ """
         pupils {
             id
             name
@@ -97,6 +108,7 @@ type alias Event =
     { id : EventId
     , title : String
     , capacity : Int
+    , maxSpecialPupils : Int
     }
 
 
@@ -106,10 +118,23 @@ type alias EventId =
 
 eventDecoder : D.Decoder Event
 eventDecoder =
-    D.map3 Event
+    D.map4 Event
         (D.field "id" D.int)
         (D.field "title" D.string)
         (D.field "capacity" D.int)
+        (D.field "maxSpecialPupils" D.int)
+
+
+queryEvent : String
+queryEvent =
+    """
+    {
+        id
+        title
+        capacity
+        maxSpecialPupils
+    }
+    """
 
 
 type alias Pupil =

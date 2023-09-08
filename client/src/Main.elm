@@ -2,13 +2,14 @@ module Main exposing (main)
 
 import Browser
 import Data exposing (Campaign, Day, Event, Pupil)
-import Html exposing (Html, a, button, div, form, h1, h2, h3, li, main_, nav, p, section, text, ul)
+import Html exposing (Html, a, button, div, form, h1, h2, h3, li, main_, nav, p, section, span, text, ul)
 import Html.Attributes exposing (class, type_)
 import Html.Events exposing (onClick)
 import Http
 import Json.Decode as D
 import Json.Encode as E
 import NewCampaign
+import NewEvent
 import Shared exposing (classes, parseError)
 
 
@@ -30,6 +31,7 @@ type alias Model =
     { connection : Connection
     , campaigns : List Campaign
     , newCampaign : NewCampaign.Model
+    , newEvent : NewEvent.Model
     }
 
 
@@ -38,6 +40,7 @@ init _ =
     ( { connection = Loading
       , campaigns = []
       , newCampaign = NewCampaign.init
+      , newEvent = NewEvent.init
       }
     , Http.post
         { url = Shared.queryUrl
@@ -52,6 +55,13 @@ queryCampaignList =
     String.join " " [ "{", "campaignList", Data.queryCampaign, "}" ]
 
 
+dataDecoder : D.Decoder (List Campaign)
+dataDecoder =
+    D.field
+        "data"
+        (D.field "campaignList" <| D.list Data.campaignDecoder)
+
+
 type Connection
     = Loading
     | Failure String
@@ -62,20 +72,9 @@ type Page
     = Overview
     | CampaignPage Campaign
     | NewCampaignPage
+    | NewEventPage Campaign
     | PupilPage Pupil
     | NewPupils
-
-
-dataDecoder : D.Decoder (List Campaign)
-dataDecoder =
-    D.field
-        "data"
-        (D.field "campaignList" <| D.list Data.campaignDecoder)
-
-
-pupilToStr : Pupil -> String
-pupilToStr p =
-    p.name ++ " (Klasse " ++ p.class ++ ")"
 
 
 
@@ -86,11 +85,13 @@ type Msg
     = GotData (Result Http.Error (List Campaign))
     | SwitchPage SwitchTo
     | NewCampaignMsg NewCampaign.Msg
+    | NewEventMsg NewEvent.Msg
 
 
 type SwitchTo
     = SwitchToOverview
     | SwitchToNewCampaign
+    | SwitchToNewEvent Campaign
     | SwitchToPage Campaign
     | SwitchToPupil Pupil
     | SwitchToNewPupils
@@ -115,8 +116,11 @@ update msg model =
                 SwitchToNewCampaign ->
                     ( { model | connection = Success NewCampaignPage }, Cmd.none )
 
+                SwitchToNewEvent c ->
+                    ( { model | connection = Success <| NewEventPage c }, Cmd.none )
+
                 SwitchToPage c ->
-                    ( { model | connection = Success <| CampaignPage <| c }, Cmd.none )
+                    ( { model | connection = Success <| CampaignPage c }, Cmd.none )
 
                 SwitchToPupil pup ->
                     ( { model | connection = Success <| PupilPage pup }, Cmd.none )
@@ -137,9 +141,42 @@ update msg model =
                     ( { model | connection = Loading }, innerCmd |> Cmd.map NewCampaignMsg )
 
                 NewCampaign.Done c ->
-                    ( { model | connection = Success Overview, campaigns = model.campaigns ++ [ c ] }, Cmd.none )
+                    ( { model | connection = Success <| CampaignPage c, campaigns = model.campaigns ++ [ c ] }, Cmd.none )
 
                 NewCampaign.Error err ->
+                    ( { model | connection = Failure err }, Cmd.none )
+
+        NewEventMsg innerMsg ->
+            let
+                ( innerModel, effect ) =
+                    NewEvent.update innerMsg model.newEvent
+            in
+            case effect of
+                NewEvent.None ->
+                    ( { model | newEvent = innerModel }, Cmd.none )
+
+                NewEvent.Loading innerCmd ->
+                    ( { model | connection = Loading }, innerCmd |> Cmd.map NewEventMsg )
+
+                NewEvent.Done camp event ->
+                    -- e verwenden und zum Model hinzufügen
+                    let
+                        newCampaignList : List Campaign
+                        newCampaignList =
+                            model.campaigns
+                                |> List.foldr
+                                    (\a b ->
+                                        if a.id == camp.id then
+                                            { a | events = a.events ++ [ event ] } :: b
+
+                                        else
+                                            a :: b
+                                    )
+                                    []
+                    in
+                    ( { model | connection = Success Overview, campaigns = newCampaignList }, Cmd.none )
+
+                NewEvent.Error err ->
                     ( { model | connection = Failure err }, Cmd.none )
 
 
@@ -189,6 +226,9 @@ view model =
                             NewCampaignPage ->
                                 NewCampaign.view model.newCampaign |> List.map (Html.map NewCampaignMsg)
 
+                            NewEventPage c ->
+                                NewEvent.view c model.newEvent |> List.map (Html.map NewEventMsg)
+
                             PupilPage pup ->
                                 pupilView pup
 
@@ -197,6 +237,11 @@ view model =
                 )
             ]
         ]
+
+
+pupilToStr : Pupil -> String
+pupilToStr p =
+    p.name ++ " (Klasse " ++ p.class ++ ")"
 
 
 navbar : Html Msg
@@ -215,7 +260,7 @@ campaignView c =
     , div [ class "block" ]
         (h2 [ classes "title is-5" ] [ text "Alle Angebote" ]
             :: (c.events |> List.map eventView)
-            ++ [ button [ classes "button is-primary" ] [ text "Neues Angebot" ] ]
+            ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewEvent c ] [ text "Neues Angebot" ] ]
         )
     , div [ class "block" ]
         [ h2 [ classes "title is-5" ] [ text "Alle Schüler/innen" ]
@@ -253,7 +298,24 @@ dayView d =
 eventView : Event -> Html Msg
 eventView e =
     div [ class "block" ]
-        [ h3 [ classes "subtitle is-5" ] [ text e.title ] ]
+        [ div [ classes "field is-grouped is-grouped-multiline" ]
+            [ div [ class "control" ]
+                [ h3 [ classes "subtitle is-5" ] [ text e.title ]
+                ]
+            , div [ class "control" ]
+                [ div [ classes "tags has-addons" ]
+                    [ span [ class "tag" ] [ text "max." ]
+                    , span [ classes "tag is-primary" ] [ text <| String.fromInt e.capacity ]
+                    ]
+                ]
+            , div [ class "control" ]
+                [ div [ classes "tags has-addons" ]
+                    [ span [ class "tag" ] [ text "bes." ]
+                    , span [ classes "tag is-primary" ] [ text <| String.fromInt e.maxSpecialPupils ]
+                    ]
+                ]
+            ]
+        ]
 
 
 pupilUl : List Pupil -> Html Msg
