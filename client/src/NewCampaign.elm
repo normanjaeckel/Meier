@@ -7,7 +7,7 @@ import Html.Events exposing (onInput, onSubmit)
 import Http
 import Json.Decode as D
 import Json.Encode as E
-import Shared exposing (classes, parseError)
+import Shared exposing (classes)
 
 
 
@@ -108,7 +108,7 @@ update msg model =
                     ( model, Done camp )
 
                 Err err ->
-                    ( model, Error (parseError err) )
+                    ( model, Error (Shared.parseError err) )
 
 
 
@@ -116,7 +116,7 @@ update msg model =
 
 
 view : Model -> List (Html Msg)
-view ncfd =
+view model =
     let
         labelNumOfDays : String
         labelNumOfDays =
@@ -135,7 +135,7 @@ view ncfd =
                             , attribute "aria-label" "Titel"
                             , required True
                             , onInput (Title >> NewCampaignFormDataMsg)
-                            , value ncfd.title
+                            , value model.title
                             ]
                             []
                         ]
@@ -149,7 +149,7 @@ view ncfd =
                             , Html.Attributes.min "1"
                             , Html.Attributes.max "10"
                             , onInput (String.toInt >> Maybe.withDefault 0 >> NumOfDays >> NewCampaignFormDataMsg)
-                            , value <| String.fromInt ncfd.numOfDays
+                            , value <| String.fromInt model.numOfDays
                             ]
                             []
                         ]

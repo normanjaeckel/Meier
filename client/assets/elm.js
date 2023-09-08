@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.N.B === region.T.B)
+	if (region.O.B === region.U.B)
 	{
-		return 'on line ' + region.N.B;
+		return 'on line ' + region.O.B;
 	}
-	return 'on lines ' + region.N.B + ' through ' + region.T.B;
+	return 'on lines ' + region.O.B + ' through ' + region.U.B;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aK,
+		impl.aL,
+		impl.a$,
 		impl.aZ,
-		impl.aX,
 		function() { return function() {} }
 	);
 });
@@ -2719,9 +2719,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		p: func(record.p),
-		O: record.O,
-		L: record.L
+		q: func(record.q),
+		P: record.P,
+		M: record.M
 	}
 });
 
@@ -2989,11 +2989,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.p;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.O;
+		var message = !tag ? value : tag < 3 ? value.a : value.q;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.P;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.L) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.M) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3943,11 +3943,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aK,
+		impl.aL,
+		impl.a$,
 		impl.aZ,
-		impl.aX,
 		function(sendToApp, initialModel) {
-			var view = impl.a$;
+			var view = impl.a1;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3979,12 +3979,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.aK,
+		impl.aL,
+		impl.a$,
 		impl.aZ,
-		impl.aX,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.M && impl.M(sendToApp)
-			var view = impl.a$;
+			var divertHrefToApp = impl.N && impl.N(sendToApp)
+			var view = impl.a1;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -3992,12 +3992,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.az);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aA);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc.P) && (_VirtualDom_doc.title = title = doc.P);
+				(title !== doc.Q) && (_VirtualDom_doc.title = title = doc.Q);
 			});
 		}
 	);
@@ -4053,12 +4053,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.aO;
-	var onUrlRequest = impl.aP;
+	var onUrlChange = impl.aQ;
+	var onUrlRequest = impl.aR;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		M: function(sendToApp)
+		N: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4074,9 +4074,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.ah === next.ah
-							&& curr.Z === next.Z
-							&& curr.ae.a === next.ae.a
+							&& curr.ai === next.ai
+							&& curr._ === next._
+							&& curr.af.a === next.af.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4084,13 +4084,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		aK: function(flags)
+		aL: function(flags)
 		{
-			return A3(impl.aK, flags, _Browser_getUrl(), key);
+			return A3(impl.aL, flags, _Browser_getUrl(), key);
 		},
+		a1: impl.a1,
 		a$: impl.a$,
-		aZ: impl.aZ,
-		aX: impl.aX
+		aZ: impl.aZ
 	});
 }
 
@@ -4156,17 +4156,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { aI: 'hidden', aB: 'visibilitychange' }
+		? { aJ: 'hidden', aC: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { aI: 'mozHidden', aB: 'mozvisibilitychange' }
+		? { aJ: 'mozHidden', aC: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { aI: 'msHidden', aB: 'msvisibilitychange' }
+		? { aJ: 'msHidden', aC: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { aI: 'webkitHidden', aB: 'webkitvisibilitychange' }
-		: { aI: 'hidden', aB: 'visibilitychange' };
+		? { aJ: 'webkitHidden', aC: 'webkitvisibilitychange' }
+		: { aJ: 'hidden', aC: 'visibilitychange' };
 }
 
 
@@ -4247,12 +4247,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		an: _Browser_getScene(),
-		as: {
-			au: _Browser_window.pageXOffset,
-			av: _Browser_window.pageYOffset,
-			at: _Browser_doc.documentElement.clientWidth,
-			Y: _Browser_doc.documentElement.clientHeight
+		ao: _Browser_getScene(),
+		at: {
+			av: _Browser_window.pageXOffset,
+			aw: _Browser_window.pageYOffset,
+			au: _Browser_doc.documentElement.clientWidth,
+			Z: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4262,8 +4262,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		at: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		Y: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		au: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		Z: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4286,15 +4286,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			an: {
-				at: node.scrollWidth,
-				Y: node.scrollHeight
+			ao: {
+				au: node.scrollWidth,
+				Z: node.scrollHeight
 			},
-			as: {
-				au: node.scrollLeft,
-				av: node.scrollTop,
-				at: node.clientWidth,
-				Y: node.clientHeight
+			at: {
+				av: node.scrollLeft,
+				aw: node.scrollTop,
+				au: node.clientWidth,
+				Z: node.clientHeight
 			}
 		};
 	});
@@ -4324,18 +4324,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			an: _Browser_getScene(),
-			as: {
-				au: x,
-				av: y,
-				at: _Browser_doc.documentElement.clientWidth,
-				Y: _Browser_doc.documentElement.clientHeight
+			ao: _Browser_getScene(),
+			at: {
+				av: x,
+				aw: y,
+				au: _Browser_doc.documentElement.clientWidth,
+				Z: _Browser_doc.documentElement.clientHeight
 			},
-			aF: {
-				au: x + rect.left,
-				av: y + rect.top,
-				at: rect.width,
-				Y: rect.height
+			aG: {
+				av: x + rect.left,
+				aw: y + rect.top,
+				au: rect.width,
+				Z: rect.height
 			}
 		};
 	});
@@ -4380,25 +4380,25 @@ var _Http_toTask = F3(function(router, toTask, request)
 	return _Scheduler_binding(function(callback)
 	{
 		function done(response) {
-			callback(toTask(request.aG.a(response)));
+			callback(toTask(request.aH.a(response)));
 		}
 
 		var xhr = new XMLHttpRequest();
 		xhr.addEventListener('error', function() { done($elm$http$Http$NetworkError_); });
 		xhr.addEventListener('timeout', function() { done($elm$http$Http$Timeout_); });
-		xhr.addEventListener('load', function() { done(_Http_toResponse(request.aG.b, xhr)); });
-		$elm$core$Maybe$isJust(request.ar) && _Http_track(router, xhr, request.ar.a);
+		xhr.addEventListener('load', function() { done(_Http_toResponse(request.aH.b, xhr)); });
+		$elm$core$Maybe$isJust(request.as) && _Http_track(router, xhr, request.as.a);
 
 		try {
-			xhr.open(request.aM, request.a_, true);
+			xhr.open(request.aO, request.a0, true);
 		} catch (e) {
-			return done($elm$http$Http$BadUrl_(request.a_));
+			return done($elm$http$Http$BadUrl_(request.a0));
 		}
 
 		_Http_configureRequest(xhr, request);
 
-		request.az.a && xhr.setRequestHeader('Content-Type', request.az.a);
-		xhr.send(request.az.b);
+		request.aA.a && xhr.setRequestHeader('Content-Type', request.aA.a);
+		xhr.send(request.aA.b);
 
 		return function() { xhr.c = true; xhr.abort(); };
 	});
@@ -4409,13 +4409,13 @@ var _Http_toTask = F3(function(router, toTask, request)
 
 function _Http_configureRequest(xhr, request)
 {
-	for (var headers = request.X; headers.b; headers = headers.b) // WHILE_CONS
+	for (var headers = request.Y; headers.b; headers = headers.b) // WHILE_CONS
 	{
 		xhr.setRequestHeader(headers.a.a, headers.a.b);
 	}
-	xhr.timeout = request.aY.a || 0;
-	xhr.responseType = request.aG.d;
-	xhr.withCredentials = request.ax;
+	xhr.timeout = request.a_.a || 0;
+	xhr.responseType = request.aH.d;
+	xhr.withCredentials = request.ay;
 }
 
 
@@ -4436,10 +4436,10 @@ function _Http_toResponse(toBody, xhr)
 function _Http_toMetadata(xhr)
 {
 	return {
-		a_: xhr.responseURL,
-		aV: xhr.status,
-		aW: xhr.statusText,
-		X: _Http_parseHeaders(xhr.getAllResponseHeaders())
+		a0: xhr.responseURL,
+		aX: xhr.status,
+		aY: xhr.statusText,
+		Y: _Http_parseHeaders(xhr.getAllResponseHeaders())
 	};
 }
 
@@ -4534,15 +4534,15 @@ function _Http_track(router, xhr, tracker)
 	xhr.upload.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Sending({
-			aU: event.loaded,
-			ao: event.total
+			aW: event.loaded,
+			ap: event.total
 		}))));
 	});
 	xhr.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Receiving({
-			aS: event.loaded,
-			ao: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
+			aU: event.loaded,
+			ap: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
 		}))));
 	});
 }var $elm$core$Basics$EQ = 1;
@@ -4962,7 +4962,7 @@ var $elm$core$Array$builderToArray = F2(
 			var treeLen = builder.a * $elm$core$Array$branchFactor;
 			var depth = $elm$core$Basics$floor(
 				A2($elm$core$Basics$logBase, $elm$core$Array$branchFactor, treeLen - 1));
-			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.d) : builder.d;
+			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.e) : builder.e;
 			var tree = A2($elm$core$Array$treeFromBuilder, correctNodeList, builder.a);
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
@@ -4982,7 +4982,7 @@ var $elm$core$Array$initializeHelp = F5(
 				return A2(
 					$elm$core$Array$builderToArray,
 					false,
-					{d: nodeList, a: (len / $elm$core$Array$branchFactor) | 0, c: tail});
+					{e: nodeList, a: (len / $elm$core$Array$branchFactor) | 0, c: tail});
 			} else {
 				var leaf = $elm$core$Array$Leaf(
 					A3($elm$core$Elm$JsArray$initialize, $elm$core$Array$branchFactor, fromIndex, fn));
@@ -5049,7 +5049,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {W: fragment, Z: host, ac: path, ae: port_, ah: protocol, ai: query};
+		return {X: fragment, _: host, ad: path, af: port_, ai: protocol, aj: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5334,11 +5334,11 @@ var $author$project$Main$GotData = function (a) {
 var $author$project$Main$Loading = {$: 0};
 var $author$project$Data$Campaign = F5(
 	function (id, title, days, events, pupils) {
-		return {aD: days, V: events, I: id, aR: pupils, P: title};
+		return {aE: days, W: events, J: id, aT: pupils, Q: title};
 	});
 var $author$project$Data$Day = F3(
 	function (id, title, events) {
-		return {V: events, I: id, P: title};
+		return {W: events, J: id, Q: title};
 	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$int = _Json_decodeInt;
@@ -5370,20 +5370,22 @@ var $author$project$Data$dayDecoder = A4(
 					'pupils',
 					$elm$json$Json$Decode$list(
 						A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$int)))))));
-var $author$project$Data$Event = F3(
-	function (id, title, capacity) {
-		return {aA: capacity, I: id, P: title};
+var $author$project$Data$Event = F4(
+	function (id, title, capacity, maxSpecialPupils) {
+		return {aB: capacity, J: id, aN: maxSpecialPupils, Q: title};
 	});
-var $author$project$Data$eventDecoder = A4(
-	$elm$json$Json$Decode$map3,
+var $elm$json$Json$Decode$map4 = _Json_map4;
+var $author$project$Data$eventDecoder = A5(
+	$elm$json$Json$Decode$map4,
 	$author$project$Data$Event,
 	A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$int),
 	A2($elm$json$Json$Decode$field, 'title', $elm$json$Json$Decode$string),
-	A2($elm$json$Json$Decode$field, 'capacity', $elm$json$Json$Decode$int));
+	A2($elm$json$Json$Decode$field, 'capacity', $elm$json$Json$Decode$int),
+	A2($elm$json$Json$Decode$field, 'maxSpecialPupils', $elm$json$Json$Decode$int));
 var $elm$json$Json$Decode$map5 = _Json_map5;
 var $author$project$Data$Pupil = F3(
 	function (name, _class, isSpecial) {
-		return {aC: _class, aL: isSpecial, aN: name};
+		return {aD: _class, aM: isSpecial, aP: name};
 	});
 var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $author$project$Data$pupilDecoder = A4(
@@ -6008,7 +6010,7 @@ var $elm$http$Http$resolve = F2(
 			case 3:
 				var metadata = response.a;
 				return $elm$core$Result$Err(
-					$elm$http$Http$BadStatus(metadata.aV));
+					$elm$http$Http$BadStatus(metadata.aX));
 			default:
 				var body = response.b;
 				return A2(
@@ -6032,9 +6034,14 @@ var $elm$http$Http$expectJson = F2(
 	});
 var $author$project$NewCampaign$Model = F2(
 	function (title, numOfDays) {
-		return {H: numOfDays, P: title};
+		return {I: numOfDays, Q: title};
 	});
 var $author$project$NewCampaign$init = A2($author$project$NewCampaign$Model, '', 2);
+var $author$project$NewEvent$Model = F3(
+	function (title, capacity, maxSpecialPupils) {
+		return {aB: capacity, aN: maxSpecialPupils, Q: title};
+	});
+var $author$project$NewEvent$init = A3($author$project$NewEvent$Model, '', 12, 2);
 var $elm$http$Http$jsonBody = function (value) {
 	return A2(
 		_Http_pair,
@@ -6059,7 +6066,7 @@ var $elm$http$Http$Request = function (a) {
 };
 var $elm$http$Http$State = F2(
 	function (reqs, subs) {
-		return {ak: reqs, ap: subs};
+		return {al: reqs, aq: subs};
 	});
 var $elm$http$Http$init = $elm$core$Task$succeed(
 	A2($elm$http$Http$State, $elm$core$Dict$empty, _List_Nil));
@@ -6103,7 +6110,7 @@ var $elm$http$Http$updateReqs = F3(
 					return A2(
 						$elm$core$Task$andThen,
 						function (pid) {
-							var _v4 = req.ar;
+							var _v4 = req.as;
 							if (_v4.$ === 1) {
 								return A3($elm$http$Http$updateReqs, router, otherCmds, reqs);
 							} else {
@@ -6133,7 +6140,7 @@ var $elm$http$Http$onEffects = F4(
 				return $elm$core$Task$succeed(
 					A2($elm$http$Http$State, reqs, subs));
 			},
-			A3($elm$http$Http$updateReqs, router, cmds, state.ak));
+			A3($elm$http$Http$updateReqs, router, cmds, state.al));
 	});
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
@@ -6176,7 +6183,7 @@ var $elm$http$Http$onSelfMsg = F3(
 				A2(
 					$elm$core$List$filterMap,
 					A3($elm$http$Http$maybeSend, router, tracker, progress),
-					state.ap)));
+					state.aq)));
 	});
 var $elm$http$Http$Cancel = function (a) {
 	return {$: 0, a: a};
@@ -6190,14 +6197,14 @@ var $elm$http$Http$cmdMap = F2(
 			var r = cmd.a;
 			return $elm$http$Http$Request(
 				{
-					ax: r.ax,
-					az: r.az,
-					aG: A2(_Http_mapExpect, func, r.aG),
-					X: r.X,
-					aM: r.aM,
-					aY: r.aY,
-					ar: r.ar,
-					a_: r.a_
+					ay: r.ay,
+					aA: r.aA,
+					aH: A2(_Http_mapExpect, func, r.aH),
+					Y: r.Y,
+					aO: r.aO,
+					a_: r.a_,
+					as: r.as,
+					a0: r.a0
 				});
 		}
 	});
@@ -6220,13 +6227,14 @@ var $elm$http$Http$subscription = _Platform_leaf('Http');
 var $elm$http$Http$request = function (r) {
 	return $elm$http$Http$command(
 		$elm$http$Http$Request(
-			{ax: false, az: r.az, aG: r.aG, X: r.X, aM: r.aM, aY: r.aY, ar: r.ar, a_: r.a_}));
+			{ay: false, aA: r.aA, aH: r.aH, Y: r.Y, aO: r.aO, a_: r.a_, as: r.as, a0: r.a0}));
 };
 var $elm$http$Http$post = function (r) {
 	return $elm$http$Http$request(
-		{az: r.az, aG: r.aG, X: _List_Nil, aM: 'POST', aY: $elm$core$Maybe$Nothing, ar: $elm$core$Maybe$Nothing, a_: r.a_});
+		{aA: r.aA, aH: r.aH, Y: _List_Nil, aO: 'POST', a_: $elm$core$Maybe$Nothing, as: $elm$core$Maybe$Nothing, a0: r.a0});
 };
-var $author$project$Data$queryCampaign = '\n    {\n        id\n        title\n        days {\n            id\n            title\n            events {\n                event {\n                    id\n                }\n                pupils {\n                    id\n                }\n            }\n        }\n        events {\n            id\n            title\n            capacity\n            maxSpecialPupils\n        }\n        pupils {\n            id\n            name\n            class\n            isSpecial\n            choices {\n                event {\n                    id\n                    title\n                }\n                choice\n            }\n        }\n    }\n    ';
+var $author$project$Data$queryEvent = '\n    {\n        id\n        title\n        capacity\n        maxSpecialPupils\n    }\n    ';
+var $author$project$Data$queryCampaign = '\n    {\n        id\n        title\n        days {\n            id\n            title\n            events {\n                event {\n                    id\n                }\n                pupils {\n                    id\n                }\n            }\n        }\n        events\n    ' + ($author$project$Data$queryEvent + '\n        pupils {\n            id\n            name\n            class\n            isSpecial\n            choices {\n                event {\n                    id\n                    title\n                }\n                choice\n            }\n        }\n    }\n    ');
 var $author$project$Main$queryCampaignList = A2(
 	$elm$core$String$join,
 	' ',
@@ -6236,10 +6244,10 @@ var $author$project$Shared$queryUrl = '/query';
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		{w: _List_Nil, f: $author$project$Main$Loading, C: $author$project$NewCampaign$init},
+		{p: _List_Nil, d: $author$project$Main$Loading, C: $author$project$NewCampaign$init, D: $author$project$NewEvent$init},
 		$elm$http$Http$post(
 			{
-				az: $elm$http$Http$jsonBody(
+				aA: $elm$http$Http$jsonBody(
 					$elm$json$Json$Encode$object(
 						_List_fromArray(
 							[
@@ -6247,8 +6255,8 @@ var $author$project$Main$init = function (_v0) {
 								'query',
 								$elm$json$Json$Encode$string($author$project$Main$queryCampaignList))
 							]))),
-				aG: A2($elm$http$Http$expectJson, $author$project$Main$GotData, $author$project$Main$dataDecoder),
-				a_: $author$project$Shared$queryUrl
+				aH: A2($elm$http$Http$expectJson, $author$project$Main$GotData, $author$project$Main$dataDecoder),
+				a0: $author$project$Shared$queryUrl
 			}));
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -6266,10 +6274,16 @@ var $author$project$Main$NewCampaignMsg = function (a) {
 	return {$: 2, a: a};
 };
 var $author$project$Main$NewCampaignPage = {$: 2};
-var $author$project$Main$NewPupils = {$: 4};
+var $author$project$Main$NewEventMsg = function (a) {
+	return {$: 3, a: a};
+};
+var $author$project$Main$NewEventPage = function (a) {
+	return {$: 3, a: a};
+};
+var $author$project$Main$NewPupils = {$: 5};
 var $author$project$Main$Overview = {$: 0};
 var $author$project$Main$PupilPage = function (a) {
-	return {$: 3, a: a};
+	return {$: 4, a: a};
 };
 var $author$project$Main$Success = function (a) {
 	return {$: 2, a: a};
@@ -6326,12 +6340,12 @@ var $author$project$NewCampaign$update = F2(
 						var t = newData.a;
 						return _Utils_update(
 							model,
-							{P: t});
+							{Q: t});
 					} else {
 						var n = newData.a;
 						return _Utils_update(
 							model,
-							{H: n});
+							{I: n});
 					}
 				}();
 				return _Utils_Tuple2(updatedModel, $author$project$NewCampaign$None);
@@ -6341,7 +6355,7 @@ var $author$project$NewCampaign$update = F2(
 					function (i) {
 						return 'Tag ' + $elm$core$String$fromInt(i);
 					},
-					A2($elm$core$List$range, 1, model.H));
+					A2($elm$core$List$range, 1, model.I));
 				var mutationQuery = A2(
 					$elm$core$String$join,
 					' ',
@@ -6355,7 +6369,7 @@ var $author$project$NewCampaign$update = F2(
 							A2(
 							$elm$json$Json$Encode$encode,
 							0,
-							$elm$json$Json$Encode$string(model.P)),
+							$elm$json$Json$Encode$string(model.Q)),
 							',',
 							'days:',
 							A2(
@@ -6375,7 +6389,7 @@ var $author$project$NewCampaign$update = F2(
 					$author$project$NewCampaign$Loading(
 						$elm$http$Http$post(
 							{
-								az: $elm$http$Http$jsonBody(
+								aA: $elm$http$Http$jsonBody(
 									$elm$json$Json$Encode$object(
 										_List_fromArray(
 											[
@@ -6383,8 +6397,8 @@ var $author$project$NewCampaign$update = F2(
 												'query',
 												$elm$json$Json$Encode$string(mutationQuery))
 											]))),
-								aG: A2($elm$http$Http$expectJson, $author$project$NewCampaign$GotNewCampaign, addCampaignDecoder),
-								a_: $author$project$Shared$queryUrl
+								aH: A2($elm$http$Http$expectJson, $author$project$NewCampaign$GotNewCampaign, addCampaignDecoder),
+								a0: $author$project$Shared$queryUrl
 							})));
 			default:
 				var res = msg.a;
@@ -6402,6 +6416,123 @@ var $author$project$NewCampaign$update = F2(
 				}
 		}
 	});
+var $author$project$NewEvent$Done = F2(
+	function (a, b) {
+		return {$: 2, a: a, b: b};
+	});
+var $author$project$NewEvent$Error = function (a) {
+	return {$: 3, a: a};
+};
+var $author$project$NewEvent$GotNewEvent = F2(
+	function (a, b) {
+		return {$: 2, a: a, b: b};
+	});
+var $author$project$NewEvent$Loading = function (a) {
+	return {$: 1, a: a};
+};
+var $author$project$NewEvent$None = {$: 0};
+var $elm$json$Json$Encode$int = _Json_wrap;
+var $author$project$NewEvent$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 0:
+				var newData = msg.a;
+				var updatedModel = function () {
+					switch (newData.$) {
+						case 0:
+							var t = newData.a;
+							return _Utils_update(
+								model,
+								{Q: t});
+						case 1:
+							var c = newData.a;
+							return _Utils_update(
+								model,
+								{aB: c});
+						default:
+							var msp = newData.a;
+							return _Utils_update(
+								model,
+								{aN: msp});
+					}
+				}();
+				return _Utils_Tuple2(updatedModel, $author$project$NewEvent$None);
+			case 1:
+				var c = msg.a;
+				var mutationQuery = A2(
+					$elm$core$String$join,
+					' ',
+					_List_fromArray(
+						[
+							'mutation',
+							'{',
+							'addEvent',
+							'(',
+							'campaignID:',
+							A2(
+							$elm$json$Json$Encode$encode,
+							0,
+							$elm$json$Json$Encode$int(c.J)),
+							', title:',
+							A2(
+							$elm$json$Json$Encode$encode,
+							0,
+							$elm$json$Json$Encode$string(model.Q)),
+							',capacity:',
+							A2(
+							$elm$json$Json$Encode$encode,
+							0,
+							$elm$json$Json$Encode$int(model.aB)),
+							', maxSpecialPupils:',
+							A2(
+							$elm$json$Json$Encode$encode,
+							0,
+							$elm$json$Json$Encode$int(model.aN)),
+							', dayIDs: []',
+							')',
+							$author$project$Data$queryEvent,
+							'}'
+						]));
+				var addEventDecoder = A2(
+					$elm$json$Json$Decode$field,
+					'data',
+					A2($elm$json$Json$Decode$field, 'addEvent', $author$project$Data$eventDecoder));
+				return _Utils_Tuple2(
+					model,
+					$author$project$NewEvent$Loading(
+						$elm$http$Http$post(
+							{
+								aA: $elm$http$Http$jsonBody(
+									$elm$json$Json$Encode$object(
+										_List_fromArray(
+											[
+												_Utils_Tuple2(
+												'query',
+												$elm$json$Json$Encode$string(mutationQuery))
+											]))),
+								aH: A2(
+									$elm$http$Http$expectJson,
+									$author$project$NewEvent$GotNewEvent(c),
+									addEventDecoder),
+								a0: $author$project$Shared$queryUrl
+							})));
+			default:
+				var c = msg.a;
+				var res = msg.b;
+				if (!res.$) {
+					var e = res.a;
+					return _Utils_Tuple2(
+						model,
+						A2($author$project$NewEvent$Done, c, e));
+				} else {
+					var err = res.a;
+					return _Utils_Tuple2(
+						model,
+						$author$project$NewEvent$Error(
+							$author$project$Shared$parseError(err)));
+				}
+		}
+	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -6413,8 +6544,8 @@ var $author$project$Main$update = F2(
 						_Utils_update(
 							model,
 							{
-								w: campaigns,
-								f: $author$project$Main$Success($author$project$Main$Overview)
+								p: campaigns,
+								d: $author$project$Main$Success($author$project$Main$Overview)
 							}),
 						$elm$core$Platform$Cmd$none);
 				} else {
@@ -6423,7 +6554,7 @@ var $author$project$Main$update = F2(
 						_Utils_update(
 							model,
 							{
-								f: $author$project$Main$Failure(
+								d: $author$project$Main$Failure(
 									$author$project$Shared$parseError(err))
 							}),
 						$elm$core$Platform$Cmd$none);
@@ -6436,7 +6567,7 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									f: $author$project$Main$Success($author$project$Main$Overview)
+									d: $author$project$Main$Success($author$project$Main$Overview)
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 1:
@@ -6444,7 +6575,7 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									f: $author$project$Main$Success($author$project$Main$NewCampaignPage)
+									d: $author$project$Main$Success($author$project$Main$NewCampaignPage)
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 2:
@@ -6453,17 +6584,27 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									f: $author$project$Main$Success(
-										$author$project$Main$CampaignPage(c))
+									d: $author$project$Main$Success(
+										$author$project$Main$NewEventPage(c))
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 3:
+						var c = s.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									d: $author$project$Main$Success(
+										$author$project$Main$CampaignPage(c))
+								}),
+							$elm$core$Platform$Cmd$none);
+					case 4:
 						var pup = s.a;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
 								{
-									f: $author$project$Main$Success(
+									d: $author$project$Main$Success(
 										$author$project$Main$PupilPage(pup))
 								}),
 							$elm$core$Platform$Cmd$none);
@@ -6472,11 +6613,11 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									f: $author$project$Main$Success($author$project$Main$NewPupils)
+									d: $author$project$Main$Success($author$project$Main$NewPupils)
 								}),
 							$elm$core$Platform$Cmd$none);
 				}
-			default:
+			case 2:
 				var innerMsg = msg.a;
 				var _v3 = A2($author$project$NewCampaign$update, innerMsg, model.C);
 				var innerModel = _v3.a;
@@ -6493,7 +6634,7 @@ var $author$project$Main$update = F2(
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
-								{f: $author$project$Main$Loading}),
+								{d: $author$project$Main$Loading}),
 							A2($elm$core$Platform$Cmd$map, $author$project$Main$NewCampaignMsg, innerCmd));
 					case 2:
 						var c = effect.a;
@@ -6501,11 +6642,12 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									w: _Utils_ap(
-										model.w,
+									p: _Utils_ap(
+										model.p,
 										_List_fromArray(
 											[c])),
-									f: $author$project$Main$Success($author$project$Main$Overview)
+									d: $author$project$Main$Success(
+										$author$project$Main$CampaignPage(c))
 								}),
 							$elm$core$Platform$Cmd$none);
 					default:
@@ -6514,7 +6656,65 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									f: $author$project$Main$Failure(err)
+									d: $author$project$Main$Failure(err)
+								}),
+							$elm$core$Platform$Cmd$none);
+				}
+			default:
+				var innerMsg = msg.a;
+				var _v5 = A2($author$project$NewEvent$update, innerMsg, model.D);
+				var innerModel = _v5.a;
+				var effect = _v5.b;
+				switch (effect.$) {
+					case 0:
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{D: innerModel}),
+							$elm$core$Platform$Cmd$none);
+					case 1:
+						var innerCmd = effect.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{d: $author$project$Main$Loading}),
+							A2($elm$core$Platform$Cmd$map, $author$project$Main$NewEventMsg, innerCmd));
+					case 2:
+						var camp = effect.a;
+						var event = effect.b;
+						var newCampaignList = A3(
+							$elm$core$List$foldr,
+							F2(
+								function (a, b) {
+									return _Utils_eq(a.J, camp.J) ? A2(
+										$elm$core$List$cons,
+										_Utils_update(
+											a,
+											{
+												W: _Utils_ap(
+													a.W,
+													_List_fromArray(
+														[event]))
+											}),
+										b) : A2($elm$core$List$cons, a, b);
+								}),
+							_List_Nil,
+							model.p);
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									p: newCampaignList,
+									d: $author$project$Main$Success($author$project$Main$Overview)
+								}),
+							$elm$core$Platform$Cmd$none);
+					default:
+						var err = effect.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									d: $author$project$Main$Failure(err)
 								}),
 							$elm$core$Platform$Cmd$none);
 				}
@@ -6525,10 +6725,13 @@ var $author$project$Main$SwitchPage = function (a) {
 };
 var $author$project$Main$SwitchToNewCampaign = {$: 1};
 var $author$project$Main$SwitchToPage = function (a) {
-	return {$: 2, a: a};
+	return {$: 3, a: a};
 };
 var $elm$html$Html$button = _VirtualDom_node('button');
-var $author$project$Main$SwitchToNewPupils = {$: 4};
+var $author$project$Main$SwitchToNewEvent = function (a) {
+	return {$: 2, a: a};
+};
+var $author$project$Main$SwitchToNewPupils = {$: 5};
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(
@@ -6594,11 +6797,12 @@ var $author$project$Main$dayView = function (d) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(d.P)
+						$elm$html$Html$text(d.Q)
 					])),
 			_Utils_ap(events, unassignedPupils)));
 };
 var $elm$html$Html$h3 = _VirtualDom_node('h3');
+var $elm$html$Html$span = _VirtualDom_node('span');
 var $author$project$Main$eventView = function (e) {
 	return A2(
 		$elm$html$Html$div,
@@ -6609,14 +6813,110 @@ var $author$project$Main$eventView = function (e) {
 		_List_fromArray(
 			[
 				A2(
-				$elm$html$Html$h3,
+				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$author$project$Shared$classes('subtitle is-5')
+						$author$project$Shared$classes('field is-grouped is-grouped-multiline')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(e.P)
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('control')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$h3,
+								_List_fromArray(
+									[
+										$author$project$Shared$classes('subtitle is-5')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(e.Q)
+									]))
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('control')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$author$project$Shared$classes('tags has-addons')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('tag')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('max.')
+											])),
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$author$project$Shared$classes('tag is-primary')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text(
+												$elm$core$String$fromInt(e.aB))
+											]))
+									]))
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('control')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$author$project$Shared$classes('tags has-addons')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('tag')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('bes.')
+											])),
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$author$project$Shared$classes('tag is-primary')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text(
+												$elm$core$String$fromInt(e.aN))
+											]))
+									]))
+							]))
 					]))
 			]));
 };
@@ -6639,12 +6939,12 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		$elm$json$Json$Decode$succeed(msg));
 };
 var $author$project$Main$SwitchToPupil = function (a) {
-	return {$: 3, a: a};
+	return {$: 4, a: a};
 };
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$html$Html$li = _VirtualDom_node('li');
 var $author$project$Main$pupilToStr = function (p) {
-	return p.aN + (' (Klasse ' + (p.aC + ')'));
+	return p.aP + (' (Klasse ' + (p.aD + ')'));
 };
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$pupilUl = function (pupList) {
@@ -6687,7 +6987,7 @@ var $author$project$Main$campaignView = function (c) {
 				]),
 			_List_fromArray(
 				[
-					$elm$html$Html$text(c.P)
+					$elm$html$Html$text(c.Q)
 				])),
 			A2(
 			$elm$html$Html$div,
@@ -6695,7 +6995,7 @@ var $author$project$Main$campaignView = function (c) {
 				[
 					$elm$html$Html$Attributes$class('block')
 				]),
-			A2($elm$core$List$map, $author$project$Main$dayView, c.aD)),
+			A2($elm$core$List$map, $author$project$Main$dayView, c.aE)),
 			A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -6715,14 +7015,17 @@ var $author$project$Main$campaignView = function (c) {
 							$elm$html$Html$text('Alle Angebote')
 						])),
 				_Utils_ap(
-					A2($elm$core$List$map, $author$project$Main$eventView, c.V),
+					A2($elm$core$List$map, $author$project$Main$eventView, c.W),
 					_List_fromArray(
 						[
 							A2(
 							$elm$html$Html$button,
 							_List_fromArray(
 								[
-									$author$project$Shared$classes('button is-primary')
+									$author$project$Shared$classes('button is-primary'),
+									$elm$html$Html$Events$onClick(
+									$author$project$Main$SwitchPage(
+										$author$project$Main$SwitchToNewEvent(c)))
 								]),
 							_List_fromArray(
 								[
@@ -6747,7 +7050,7 @@ var $author$project$Main$campaignView = function (c) {
 						[
 							$elm$html$Html$text('Alle Schüler/innen')
 						])),
-					$author$project$Main$pupilUl(c.aR),
+					$author$project$Main$pupilUl(c.aT),
 					A2(
 					$elm$html$Html$button,
 					_List_fromArray(
@@ -6897,6 +7200,7 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 	});
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$Attributes$max = $elm$html$Html$Attributes$stringProperty('max');
 var $elm$html$Html$Attributes$min = $elm$html$Html$Attributes$stringProperty('min');
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
@@ -6971,7 +7275,7 @@ var $elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var $author$project$NewCampaign$view = function (ncfd) {
+var $author$project$NewCampaign$view = function (model) {
 	var labelNumOfDays = 'Anzahl der Tage';
 	return _List_fromArray(
 		[
@@ -7036,7 +7340,7 @@ var $author$project$NewCampaign$view = function (ncfd) {
 															$elm$html$Html$Attributes$required(true),
 															$elm$html$Html$Events$onInput(
 															A2($elm$core$Basics$composeR, $author$project$NewCampaign$Title, $author$project$NewCampaign$NewCampaignFormDataMsg)),
-															$elm$html$Html$Attributes$value(ncfd.P)
+															$elm$html$Html$Attributes$value(model.Q)
 														]),
 													_List_Nil)
 												]))
@@ -7065,6 +7369,7 @@ var $author$project$NewCampaign$view = function (ncfd) {
 															$elm$html$Html$Attributes$type_('number'),
 															A2($elm$html$Html$Attributes$attribute, 'aria-label', labelNumOfDays),
 															$elm$html$Html$Attributes$min('1'),
+															$elm$html$Html$Attributes$max('10'),
 															$elm$html$Html$Events$onInput(
 															A2(
 																$elm$core$Basics$composeR,
@@ -7074,7 +7379,7 @@ var $author$project$NewCampaign$view = function (ncfd) {
 																	$elm$core$Maybe$withDefault(0),
 																	A2($elm$core$Basics$composeR, $author$project$NewCampaign$NumOfDays, $author$project$NewCampaign$NewCampaignFormDataMsg)))),
 															$elm$html$Html$Attributes$value(
-															$elm$core$String$fromInt(ncfd.H))
+															$elm$core$String$fromInt(model.I))
 														]),
 													_List_Nil)
 												])),
@@ -7114,6 +7419,215 @@ var $author$project$NewCampaign$view = function (ncfd) {
 				]))
 		]);
 };
+var $author$project$NewEvent$Capacity = function (a) {
+	return {$: 1, a: a};
+};
+var $author$project$NewEvent$MaxSpecialPupils = function (a) {
+	return {$: 2, a: a};
+};
+var $author$project$NewEvent$NewEventFormDataMsg = function (a) {
+	return {$: 0, a: a};
+};
+var $author$project$NewEvent$SendNewEventForm = function (a) {
+	return {$: 1, a: a};
+};
+var $author$project$NewEvent$Title = function (a) {
+	return {$: 0, a: a};
+};
+var $author$project$NewEvent$view = F2(
+	function (c, model) {
+		var labelMaxSpecialPupils = 'Maximale Anzahl an besonderen Schüler/innen';
+		var labelCapacity = 'Maximale Anzahl der Schüler/innen';
+		return _List_fromArray(
+			[
+				A2(
+				$elm$html$Html$h1,
+				_List_fromArray(
+					[
+						$author$project$Shared$classes('title is-3')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Neues Event hinzufügen')
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('columns')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$author$project$Shared$classes('column is-half-tablet is-one-third-desktop is-one-quarter-widescreen')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$form,
+								_List_fromArray(
+									[
+										$elm$html$Html$Events$onSubmit(
+										$author$project$NewEvent$SendNewEventForm(c))
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('field')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$div,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('control')
+													]),
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$input,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('input'),
+																$elm$html$Html$Attributes$type_('text'),
+																$elm$html$Html$Attributes$placeholder('Titel'),
+																A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Titel'),
+																$elm$html$Html$Attributes$required(true),
+																$elm$html$Html$Events$onInput(
+																A2($elm$core$Basics$composeR, $author$project$NewEvent$Title, $author$project$NewEvent$NewEventFormDataMsg)),
+																$elm$html$Html$Attributes$value(model.Q)
+															]),
+														_List_Nil)
+													]))
+											])),
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('field')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$div,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('control')
+													]),
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$input,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('input'),
+																$elm$html$Html$Attributes$type_('number'),
+																A2($elm$html$Html$Attributes$attribute, 'aria-label', labelCapacity),
+																$elm$html$Html$Attributes$min('1'),
+																$elm$html$Html$Events$onInput(
+																A2(
+																	$elm$core$Basics$composeR,
+																	$elm$core$String$toInt,
+																	A2(
+																		$elm$core$Basics$composeR,
+																		$elm$core$Maybe$withDefault(0),
+																		A2($elm$core$Basics$composeR, $author$project$NewEvent$Capacity, $author$project$NewEvent$NewEventFormDataMsg)))),
+																$elm$html$Html$Attributes$value(
+																$elm$core$String$fromInt(model.aB))
+															]),
+														_List_Nil)
+													])),
+												A2(
+												$elm$html$Html$p,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('help')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text(labelCapacity)
+													]))
+											])),
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('field')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$div,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('control')
+													]),
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$input,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('input'),
+																$elm$html$Html$Attributes$type_('number'),
+																A2($elm$html$Html$Attributes$attribute, 'aria-label', labelMaxSpecialPupils),
+																$elm$html$Html$Attributes$min('1'),
+																$elm$html$Html$Events$onInput(
+																A2(
+																	$elm$core$Basics$composeR,
+																	$elm$core$String$toInt,
+																	A2(
+																		$elm$core$Basics$composeR,
+																		$elm$core$Maybe$withDefault(0),
+																		A2($elm$core$Basics$composeR, $author$project$NewEvent$MaxSpecialPupils, $author$project$NewEvent$NewEventFormDataMsg)))),
+																$elm$html$Html$Attributes$value(
+																$elm$core$String$fromInt(model.aN))
+															]),
+														_List_Nil)
+													])),
+												A2(
+												$elm$html$Html$p,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('help')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text(labelMaxSpecialPupils)
+													]))
+											])),
+										A2(
+										$elm$html$Html$div,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('field')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$button,
+												_List_fromArray(
+													[
+														$author$project$Shared$classes('button is-primary'),
+														$elm$html$Html$Attributes$type_('submit')
+													]),
+												_List_fromArray(
+													[
+														$elm$html$Html$text('Hinzufügen')
+													]))
+											]))
+									]))
+							]))
+					]))
+			]);
+	});
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
@@ -7133,7 +7647,7 @@ var $author$project$Main$view = function (model) {
 								$elm$html$Html$Attributes$class('section')
 							]),
 						function () {
-							var _v0 = model.f;
+							var _v0 = model.d;
 							switch (_v0.$) {
 								case 0:
 									return _List_fromArray(
@@ -7182,10 +7696,10 @@ var $author$project$Main$view = function (model) {
 																	]),
 																_List_fromArray(
 																	[
-																		$elm$html$Html$text(c.P)
+																		$elm$html$Html$text(c.Q)
 																	]));
 														},
-														model.w)),
+														model.p)),
 													A2(
 													$elm$html$Html$button,
 													_List_fromArray(
@@ -7208,6 +7722,12 @@ var $author$project$Main$view = function (model) {
 												$elm$html$Html$map($author$project$Main$NewCampaignMsg),
 												$author$project$NewCampaign$view(model.C));
 										case 3:
+											var c = p.a;
+											return A2(
+												$elm$core$List$map,
+												$elm$html$Html$map($author$project$Main$NewEventMsg),
+												A2($author$project$NewEvent$view, c, model.D));
+										case 4:
 											var pup = p.a;
 											return $author$project$Main$pupilView(pup);
 										default:
@@ -7219,6 +7739,6 @@ var $author$project$Main$view = function (model) {
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
-	{aK: $author$project$Main$init, aX: $author$project$Main$subscriptions, aZ: $author$project$Main$update, a$: $author$project$Main$view});
+	{aL: $author$project$Main$init, aZ: $author$project$Main$subscriptions, a$: $author$project$Main$update, a1: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));
