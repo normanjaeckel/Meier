@@ -16,8 +16,8 @@ jobs:
         with:
           node-version: '20.5.1'
 
-      - name: Install Elm (https://elm-lang.org/) and its tools
-        run: npm install elm
+      - name: Install Elm (https://elm-lang.org/)
+        run: npm install --global elm
 
       - name: Set up Go (https://go.dev)
         uses: actions/setup-go@v4
