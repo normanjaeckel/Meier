@@ -34,3 +34,6 @@ jobs:
 
       - name: Run build task as defined in Taskfile.yaml
         run: task build
+
+      - name: Run client:review task
+        run: task client:review
