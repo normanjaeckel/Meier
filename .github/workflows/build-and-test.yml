@@ -11,23 +11,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Setup Node.js (https://nodejs.org)
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.5.1'
+
+      - name: Enable Corepack to use Yarn
+        run: corepack enable
+
+      - name: Install Elm (https://elm-lang.org/) and its tools
+        run: yarn
+
       - name: Set up Go (https://go.dev)
         uses: actions/setup-go@v4
         with:
           go-version: '1.21.0'
 
-      - name: Install Taskfile (https://taskfile.dev)
-        run: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
-
-      - name: Install Elm (https://elm-lang.org/)
-        run: |
-          curl -L -o elm.gz https://github.com/elm/compiler/releases/download/0.19.1/binary-for-linux-64-bit.gz
-          gunzip elm.gz
-          chmod +x elm
-          mv elm ~/.local/bin
-
       - name: Install Staticcheck
         run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+      - name: Install Taskfile (https://taskfile.dev)
+        run: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
 
       - name: Run build task as defined in Taskfile.yaml
         run: task build
