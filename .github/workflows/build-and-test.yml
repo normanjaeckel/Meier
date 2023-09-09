@@ -37,6 +37,8 @@ jobs:
 
       - name: Install elm-review
         uses: sparksp/elm-review-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run client:review task
         run: task client:review
