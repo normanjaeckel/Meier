@@ -16,11 +16,8 @@ jobs:
         with:
           node-version: '20.5.1'
 
-      - name: Enable Corepack to use Yarn
-        run: corepack enable
-
       - name: Install Elm (https://elm-lang.org/) and its tools
-        run: yarn
+        run: npm install elm
 
       - name: Set up Go (https://go.dev)
         uses: actions/setup-go@v4
