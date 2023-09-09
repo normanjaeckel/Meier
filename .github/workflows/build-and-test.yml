@@ -11,13 +11,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Node.js (https://nodejs.org)
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20.5.1'
+      # - name: Setup Node.js (https://nodejs.org)
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: '20.5.1'
 
       - name: Install Elm (https://elm-lang.org/)
-        run: npm install --global elm
+        uses: jorelali/setup-elm@v5
+        with:
+          elm-version: 0.19.1
 
       - name: Set up Go (https://go.dev)
         uses: actions/setup-go@v4
