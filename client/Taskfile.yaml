@@ -6,6 +6,13 @@ tasks:
   default:
     - task: build
 
+  review:
+    desc: Analyzes source code with elm-review
+    cmds:
+      - elm-review
+    sources:
+      - src/**/*.elm
+
   build:
     desc: Compiles all Elm files to our assets/elm.js
     cmds:
