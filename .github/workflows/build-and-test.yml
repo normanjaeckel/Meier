@@ -41,6 +41,7 @@ jobs:
 
       - name: Run elm-review
         uses: sparksp/elm-review-action@v1
+        working-directory: client
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
