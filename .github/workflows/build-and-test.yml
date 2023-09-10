@@ -37,7 +37,7 @@ jobs:
           node-version: '20.5.1'
 
       - name: Install elm-review
-        run: npm install elm-review
+        run: npm install --global elm-review
 
       - name: Run elm-review
         uses: sparksp/elm-review-action@v1
