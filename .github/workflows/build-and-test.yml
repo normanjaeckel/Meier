@@ -4,17 +4,13 @@ on:
   - pull_request
 
 jobs:
+  # TODO: Make 2 jobs. One for client (review and build) and one for server (test, vet, staticcheck and build)
   run-build-task:
     runs-on: ubuntu-latest
     steps:
 
       - name: Checkout code
         uses: actions/checkout@v3
-
-      # - name: Setup Node.js (https://nodejs.org)
-      #   uses: actions/setup-node@v3
-      #   with:
-      #     node-version: '20.5.1'
 
       - name: Install Elm (https://elm-lang.org/)
         uses: jorelali/setup-elm@v5
@@ -35,10 +31,18 @@ jobs:
       - name: Run build task as defined in Taskfile.yaml
         run: task build
 
+      - name: Setup Node.js (https://nodejs.org)
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.5.1'
+
       - name: Install elm-review
+        run: npm install elm-review
+
+      - name: Run elm-review
         uses: sparksp/elm-review-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run client:review task
-        run: task client:review
+      #- name: Run client:review task
+      #  run: task client:review
