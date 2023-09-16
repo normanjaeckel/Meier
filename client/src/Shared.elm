@@ -1,5 +1,6 @@
-module Shared exposing (classes, parseError, queryUrl)
+module Shared exposing (classes, parseError, parseGraphqlError, queryUrl)
 
+import Graphql.Http
 import Html
 import Html.Attributes
 import Http
@@ -47,3 +48,8 @@ parseError err =
 
         Http.BadBody m ->
             "bad body: " ++ m
+
+
+parseGraphqlError : Graphql.Http.Error a -> String
+parseGraphqlError _ =
+    "graphqlError but is not parsed"

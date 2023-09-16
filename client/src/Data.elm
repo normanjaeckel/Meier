@@ -1,5 +1,6 @@
 module Data exposing
     ( Campaign
+    , Campaign2
     , CampaignId
     , Day
     , DayId
@@ -15,6 +16,7 @@ module Data exposing
     , queryEvent
     )
 
+import Api.ScalarCodecs
 import Json.Decode as D
 
 
@@ -24,6 +26,12 @@ type alias Campaign =
     , days : List Day
     , events : List Event
     , pupils : List Pupil
+    }
+
+
+type alias Campaign2 =
+    { id : Api.ScalarCodecs.Id
+    , title : String
     }
 
 

@@ -1,17 +1,20 @@
 module Main exposing (main)
 
+import Api.Object.Campaign
+import Api.Query
 import Browser
-import Data exposing (Campaign, Day, Event, Pupil)
+import Data exposing (Campaign, Campaign2, Day, Event, Pupil)
+import Graphql.Http
+import Graphql.Operation
+import Graphql.SelectionSet
 import Html exposing (Html, a, button, div, form, h1, h2, h3, li, main_, nav, p, section, span, text, ul)
 import Html.Attributes exposing (class, type_)
 import Html.Events exposing (onClick)
 import Http
-import Json.Decode as D
-import Json.Encode as E
 import NewCampaign
 import NewDay
 import NewEvent
-import Shared exposing (classes, parseError)
+import Shared exposing (classes, parseError, parseGraphqlError)
 
 
 main : Program () Model Msg
@@ -34,6 +37,7 @@ type alias Model =
     , newCampaign : NewCampaign.Model
     , newDay : NewDay.Model
     , newEvent : NewEvent.Model
+    , campaigns2 : List Campaign2
     }
 
 
@@ -44,25 +48,42 @@ init _ =
       , newCampaign = NewCampaign.init
       , newDay = NewDay.init
       , newEvent = NewEvent.init
+      , campaigns2 = []
       }
-    , Http.post
-        { url = Shared.queryUrl
-        , body = Http.jsonBody <| E.object [ ( "query", E.string queryCampaignList ) ]
-        , expect = Http.expectJson GotData dataDecoder
-        }
+    , queryCampaignList2
+        |> Graphql.Http.queryRequest Shared.queryUrl
+        |> Graphql.Http.send resultFn
+      -- , Http.post
+      --     { url = Shared.queryUrl
+      --     , body = Http.jsonBody <| E.object [ ( "query", E.string queryCampaignList ) ]
+      --     , expect = Http.expectJson GotData dataDecoder
+      --     }
     )
 
 
-queryCampaignList : String
-queryCampaignList =
-    String.join " " [ "{", "campaignList", Data.queryCampaign, "}" ]
+queryCampaignList2 : Graphql.SelectionSet.SelectionSet (List Campaign2) Graphql.Operation.RootQuery
+queryCampaignList2 =
+    Api.Query.campaignList
+        (Graphql.SelectionSet.map2 Campaign2
+            Api.Object.Campaign.id
+            Api.Object.Campaign.title
+        )
 
 
-dataDecoder : D.Decoder (List Campaign)
-dataDecoder =
-    D.field
-        "data"
-        (D.field "campaignList" <| D.list Data.campaignDecoder)
+resultFn : Result (Graphql.Http.Error (List Campaign2)) (List Campaign2) -> Msg
+resultFn res =
+    res |> GotCampaignList
+
+
+
+-- queryCampaignList : String
+-- queryCampaignList =
+--     String.join " " [ "{", "campaignList", Data.queryCampaign, "}" ]
+-- dataDecoder : D.Decoder (List Campaign)
+-- dataDecoder =
+--     D.field
+--         "data"
+--         (D.field "campaignList" <| D.list Data.campaignDecoder)
 
 
 type Connection
@@ -91,6 +112,7 @@ type Msg
     | NewCampaignMsg NewCampaign.Msg
     | NewDayMsg NewDay.Msg
     | NewEventMsg NewEvent.Msg
+    | GotCampaignList (Result (Graphql.Http.Error (List Campaign2)) (List Campaign2))
 
 
 type SwitchTo
@@ -106,6 +128,15 @@ type SwitchTo
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        GotCampaignList res ->
+            case res of
+                -- TODO: Use campaigns here
+                Ok campaigns ->
+                    ( { model | connection = Success Overview, campaigns2 = campaigns }, Cmd.none )
+
+                Err err ->
+                    ( { model | connection = Failure (parseGraphqlError err) }, Cmd.none )
+
         GotData res ->
             case res of
                 Ok campaigns ->
@@ -258,6 +289,7 @@ view model =
                                             )
                                     )
                                 , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewCampaign ] [ text "Neue Kampagne" ]
+                                , div [] (model.campaigns2 |> List.map (\c -> text c.title))
                                 ]
 
                             CampaignPage c ->
