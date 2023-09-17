@@ -10,30 +10,30 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Install Taskfile (https://taskfile.dev)
+        run: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
+
       - name: Install Elm (https://elm-lang.org/)
         uses: jorelali/setup-elm@v5
         with:
           elm-version: 0.19.1
 
-      - name: Install Taskfile (https://taskfile.dev)
-        run: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
-
       - name: Run build task as defined in Taskfile.yaml
         run: task client:build
 
-  elm-review:
+  client-elm-review:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Install Taskfile (https://taskfile.dev)
+        run: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
+
       - name: Install Elm (https://elm-lang.org/)
         uses: jorelali/setup-elm@v5
         with:
           elm-version: 0.19.1
-
-      - name: Install Taskfile (https://taskfile.dev)
-        run: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
 
       - name: Setup Node.js (https://nodejs.org)
         uses: actions/setup-node@v3
@@ -47,17 +47,14 @@ jobs:
         run: task client:review
 
 
-  run-build-task:
+  server-test-and-build:
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Elm (https://elm-lang.org/)
-        uses: jorelali/setup-elm@v5
-        with:
-          elm-version: 0.19.1
+      - name: Install Taskfile (https://taskfile.dev)
+        run: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
 
       - name: Set up Go (https://go.dev)
         uses: actions/setup-go@v4
@@ -67,10 +64,7 @@ jobs:
       - name: Install Staticcheck
         run: go install honnef.co/go/tools/cmd/staticcheck@latest
 
-      - name: Install Taskfile (https://taskfile.dev)
-        run: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
-
       - name: Run build task as defined in Taskfile.yaml
-        run: task build
+        run: task server:build
 
 
