@@ -4,7 +4,49 @@ on:
   - pull_request
 
 jobs:
-  # TODO: Make 2 jobs. One for client (review and build) and one for server (test, vet, staticcheck and build)
+  client-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Elm (https://elm-lang.org/)
+        uses: jorelali/setup-elm@v5
+        with:
+          elm-version: 0.19.1
+
+      - name: Install Taskfile (https://taskfile.dev)
+        run: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
+
+      - name: Run build task as defined in Taskfile.yaml
+        run: task client:build
+
+  elm-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Elm (https://elm-lang.org/)
+        uses: jorelali/setup-elm@v5
+        with:
+          elm-version: 0.19.1
+
+      - name: Install Taskfile (https://taskfile.dev)
+        run: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
+
+      - name: Setup Node.js (https://nodejs.org)
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.5.1'
+
+      - name: Install elm-review
+        run: npm install --global elm-review
+
+      - name: Run client:review task
+        run: task client:review
+
+
   run-build-task:
     runs-on: ubuntu-latest
     steps:
@@ -31,13 +73,4 @@ jobs:
       - name: Run build task as defined in Taskfile.yaml
         run: task build
 
-      - name: Setup Node.js (https://nodejs.org)
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20.5.1'
 
-      - name: Install elm-review
-        run: npm install --global elm-review
-
-      - name: Run client:review task
-        run: task client:review
