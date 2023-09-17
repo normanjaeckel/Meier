@@ -56,18 +56,18 @@ update msg model =
             in
             ( updatedModel, None )
 
-        SendNewDayForm c ->
+        SendNewDayForm campaign ->
             ( model
             , Loading <|
-                Api.Mutation.addDay (Api.Mutation.AddDayRequiredArguments c.id model.title) Data.daySelectionSet
+                Api.Mutation.addDay (Api.Mutation.AddDayRequiredArguments campaign.id model.title) Data.daySelectionSet
                     |> Graphql.Http.mutationRequest Shared.queryUrl
-                    |> Graphql.Http.send (GotNewDay c)
+                    |> Graphql.Http.send (GotNewDay campaign)
             )
 
-        GotNewDay c res ->
+        GotNewDay campaign res ->
             case res of
-                Ok d ->
-                    ( model, Done { c | days = c.days ++ [ d ] } )
+                Ok day ->
+                    ( model, Done { campaign | days = campaign.days ++ [ day ] } )
 
                 Err err ->
                     ( model, Error (Shared.parseGraphqlError err) )

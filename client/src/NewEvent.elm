@@ -75,10 +75,10 @@ update msg model =
                     |> Graphql.Http.send (GotNewEvent campaign)
             )
 
-        GotNewEvent c res ->
+        GotNewEvent campaign res ->
             case res of
-                Ok e ->
-                    ( model, Done { c | events = c.events ++ [ e ] } )
+                Ok event ->
+                    ( model, Done { campaign | events = campaign.events ++ [ event ] } )
 
                 Err err ->
                     ( model, Error (Shared.parseGraphqlError err) )
