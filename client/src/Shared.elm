@@ -1,9 +1,8 @@
-module Shared exposing (classes, parseError, parseGraphqlError, queryUrl)
+module Shared exposing (classes, parseGraphqlError, queryUrl)
 
 import Graphql.Http
 import Html
 import Html.Attributes
-import Http
 
 
 queryUrl : String
@@ -31,23 +30,20 @@ classes s =
     Html.Attributes.classList cl
 
 
-parseError : Http.Error -> String
-parseError err =
-    case err of
-        Http.BadUrl m ->
-            "bad url: " ++ m
 
-        Http.Timeout ->
-            "timeout"
-
-        Http.NetworkError ->
-            "network error"
-
-        Http.BadStatus code ->
-            "bad status: " ++ String.fromInt code
-
-        Http.BadBody m ->
-            "bad body: " ++ m
+-- parseError : Http.Error -> String
+-- parseError err =
+--     case err of
+--         Http.BadUrl m ->
+--             "bad url: " ++ m
+--         Http.Timeout ->
+--             "timeout"
+--         Http.NetworkError ->
+--             "network error"
+--         Http.BadStatus code ->
+--             "bad status: " ++ String.fromInt code
+--         Http.BadBody m ->
+--             "bad body: " ++ m
 
 
 parseGraphqlError : Graphql.Http.Error a -> String

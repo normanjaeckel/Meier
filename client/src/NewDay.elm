@@ -1,12 +1,11 @@
 module NewDay exposing (Effect(..), Model, Msg, init, update, view)
 
-import Data exposing (Campaign, Day)
+import Api.Mutation
+import Data
+import Graphql.Http
 import Html exposing (Html, button, div, form, h1, input, text)
 import Html.Attributes exposing (attribute, class, placeholder, required, type_, value)
 import Html.Events exposing (onInput, onSubmit)
-import Http
-import Json.Decode as D
-import Json.Encode as E
 import Shared exposing (classes)
 
 
@@ -29,8 +28,8 @@ init =
 
 type Msg
     = NewDayFormDataMsg NewDayFormDataInput
-    | SendNewDayForm Campaign
-    | GotNewDay Campaign (Result Http.Error Day)
+    | SendNewDayForm Data.Campaign2
+    | GotNewDay Data.Campaign2 (Result (Graphql.Http.Error Data.Day2) Data.Day2)
 
 
 type NewDayFormDataInput
@@ -40,7 +39,7 @@ type NewDayFormDataInput
 type Effect
     = None
     | Loading (Cmd Msg)
-    | Done Campaign
+    | Done Data.Campaign2
     | Error String
 
 
@@ -58,37 +57,11 @@ update msg model =
             ( updatedModel, None )
 
         SendNewDayForm c ->
-            let
-                mutationQuery : String
-                mutationQuery =
-                    -- TODO
-                    String.join " "
-                        [ "mutation"
-                        , "{"
-                        , "addDay"
-                        , "("
-                        , "campaignID:"
-                        , E.encode 0 <| E.int c.id
-                        , ", title:"
-                        , E.encode 0 <| E.string model.title
-                        , ")"
-                        , Data.queryDay
-                        , "}"
-                        ]
-
-                addDayDecoder : D.Decoder Day
-                addDayDecoder =
-                    D.field
-                        "data"
-                        (D.field "addDay" Data.dayDecoder)
-            in
             ( model
             , Loading <|
-                Http.post
-                    { url = Shared.queryUrl
-                    , body = Http.jsonBody <| E.object [ ( "query", E.string mutationQuery ) ]
-                    , expect = Http.expectJson (GotNewDay c) addDayDecoder
-                    }
+                Api.Mutation.addDay (Api.Mutation.AddDayRequiredArguments c.id model.title) Data.daySelectionSet
+                    |> Graphql.Http.mutationRequest Shared.queryUrl
+                    |> Graphql.Http.send (GotNewDay c)
             )
 
         GotNewDay c res ->
@@ -97,14 +70,14 @@ update msg model =
                     ( model, Done { c | days = c.days ++ [ d ] } )
 
                 Err err ->
-                    ( model, Error (Shared.parseError err) )
+                    ( model, Error (Shared.parseGraphqlError err) )
 
 
 
 -- VIEW
 
 
-view : Campaign -> Model -> List (Html Msg)
+view : Data.Campaign2 -> Model -> List (Html Msg)
 view c model =
     [ h1 [ classes "title is-3" ] [ text "Neuen Tag hinzufügen" ]
     , div [ class "columns" ]

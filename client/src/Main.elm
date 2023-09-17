@@ -1,20 +1,16 @@
 module Main exposing (main)
 
-import Api.Object.Campaign
 import Api.Query
 import Browser
-import Data exposing (Campaign, Campaign2, Day, Event, Pupil)
+import Data exposing (Campaign2, Day2, Event2, Pupil2)
 import Graphql.Http
-import Graphql.Operation
-import Graphql.SelectionSet
 import Html exposing (Html, a, button, div, form, h1, h2, h3, li, main_, nav, p, section, span, text, ul)
 import Html.Attributes exposing (class, type_)
 import Html.Events exposing (onClick)
-import Http
 import NewCampaign
 import NewDay
 import NewEvent
-import Shared exposing (classes, parseError, parseGraphqlError)
+import Shared exposing (classes, parseGraphqlError)
 
 
 main : Program () Model Msg
@@ -33,11 +29,10 @@ main =
 
 type alias Model =
     { connection : Connection
-    , campaigns : List Campaign
+    , campaigns : List Campaign2
     , newCampaign : NewCampaign.Model
     , newDay : NewDay.Model
     , newEvent : NewEvent.Model
-    , campaigns2 : List Campaign2
     }
 
 
@@ -48,42 +43,11 @@ init _ =
       , newCampaign = NewCampaign.init
       , newDay = NewDay.init
       , newEvent = NewEvent.init
-      , campaigns2 = []
       }
-    , queryCampaignList2
+    , Api.Query.campaignList Data.campaingSelectionSet
         |> Graphql.Http.queryRequest Shared.queryUrl
-        |> Graphql.Http.send resultFn
-      -- , Http.post
-      --     { url = Shared.queryUrl
-      --     , body = Http.jsonBody <| E.object [ ( "query", E.string queryCampaignList ) ]
-      --     , expect = Http.expectJson GotData dataDecoder
-      --     }
+        |> Graphql.Http.send GotCampaignList
     )
-
-
-queryCampaignList2 : Graphql.SelectionSet.SelectionSet (List Campaign2) Graphql.Operation.RootQuery
-queryCampaignList2 =
-    Api.Query.campaignList
-        (Graphql.SelectionSet.map2 Campaign2
-            Api.Object.Campaign.id
-            Api.Object.Campaign.title
-        )
-
-
-resultFn : Result (Graphql.Http.Error (List Campaign2)) (List Campaign2) -> Msg
-resultFn res =
-    res |> GotCampaignList
-
-
-
--- queryCampaignList : String
--- queryCampaignList =
---     String.join " " [ "{", "campaignList", Data.queryCampaign, "}" ]
--- dataDecoder : D.Decoder (List Campaign)
--- dataDecoder =
---     D.field
---         "data"
---         (D.field "campaignList" <| D.list Data.campaignDecoder)
 
 
 type Connection
@@ -94,11 +58,11 @@ type Connection
 
 type Page
     = Overview
-    | CampaignPage Campaign
+    | CampaignPage Campaign2
     | NewCampaignPage
-    | NewDayPage Campaign
-    | NewEventPage Campaign
-    | PupilPage Pupil
+    | NewDayPage Campaign2
+    | NewEventPage Campaign2
+    | PupilPage Pupil2
     | NewPupils
 
 
@@ -107,21 +71,20 @@ type Page
 
 
 type Msg
-    = GotData (Result Http.Error (List Campaign))
+    = GotCampaignList (Result (Graphql.Http.Error (List Campaign2)) (List Campaign2))
     | SwitchPage SwitchTo
     | NewCampaignMsg NewCampaign.Msg
     | NewDayMsg NewDay.Msg
     | NewEventMsg NewEvent.Msg
-    | GotCampaignList (Result (Graphql.Http.Error (List Campaign2)) (List Campaign2))
 
 
 type SwitchTo
     = SwitchToOverview
     | SwitchToNewCampaign
-    | SwitchToNewDay Campaign
-    | SwitchToNewEvent Campaign
-    | SwitchToPage Campaign
-    | SwitchToPupil Pupil
+    | SwitchToNewDay Campaign2
+    | SwitchToNewEvent Campaign2
+    | SwitchToPage Campaign2
+    | SwitchToPupil Pupil2
     | SwitchToNewPupils
 
 
@@ -130,20 +93,11 @@ update msg model =
     case msg of
         GotCampaignList res ->
             case res of
-                -- TODO: Use campaigns here
-                Ok campaigns ->
-                    ( { model | connection = Success Overview, campaigns2 = campaigns }, Cmd.none )
-
-                Err err ->
-                    ( { model | connection = Failure (parseGraphqlError err) }, Cmd.none )
-
-        GotData res ->
-            case res of
                 Ok campaigns ->
                     ( { model | connection = Success Overview, campaigns = campaigns }, Cmd.none )
 
                 Err err ->
-                    ( { model | connection = Failure (parseError err) }, Cmd.none )
+                    ( { model | connection = Failure (parseGraphqlError err) }, Cmd.none )
 
         SwitchPage s ->
             case s of
@@ -200,7 +154,7 @@ update msg model =
 
                 NewDay.Done updatedCamp ->
                     let
-                        newCampaignList : List Campaign
+                        newCampaignList : List Campaign2
                         newCampaignList =
                             model.campaigns
                                 |> List.foldr
@@ -232,7 +186,7 @@ update msg model =
 
                 NewEvent.Done updatedCamp ->
                     let
-                        newCampaignList : List Campaign
+                        newCampaignList : List Campaign2
                         newCampaignList =
                             model.campaigns
                                 |> List.foldr
@@ -289,7 +243,6 @@ view model =
                                             )
                                     )
                                 , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewCampaign ] [ text "Neue Kampagne" ]
-                                , div [] (model.campaigns2 |> List.map (\c -> text c.title))
                                 ]
 
                             CampaignPage c ->
@@ -314,7 +267,7 @@ view model =
         ]
 
 
-pupilToStr : Pupil -> String
+pupilToStr : Pupil2 -> String
 pupilToStr p =
     p.name ++ " (Klasse " ++ p.class ++ ")"
 
@@ -328,7 +281,7 @@ navbar =
         ]
 
 
-campaignView : Campaign -> List (Html Msg)
+campaignView : Campaign2 -> List (Html Msg)
 campaignView c =
     [ h1 [ classes "title is-3" ] [ text c.title ]
     , div [ class "block" ]
@@ -348,7 +301,7 @@ campaignView c =
     ]
 
 
-dayView : Day -> Html Msg
+dayView : Day2 -> Html Msg
 dayView d =
     let
         events : List (Html Msg)
@@ -373,7 +326,7 @@ dayView d =
         (h2 [ classes "title is-5" ] [ text d.title ] :: events ++ unassignedPupils)
 
 
-eventView : Event -> Html Msg
+eventView : Event2 -> Html Msg
 eventView e =
     div [ class "block" ]
         [ div [ classes "field is-grouped is-grouped-multiline" ]
@@ -396,7 +349,7 @@ eventView e =
         ]
 
 
-pupilUl : List Pupil -> Html Msg
+pupilUl : List Pupil2 -> Html Msg
 pupilUl pupList =
     ul []
         (pupList
@@ -405,7 +358,7 @@ pupilUl pupList =
         )
 
 
-pupilView : Pupil -> List (Html Msg)
+pupilView : Pupil2 -> List (Html Msg)
 pupilView pup =
     [ h1 [ classes "title is-3" ] [ text <| pupilToStr pup ]
     , p [] [ text "Lorem ipsum ..." ]

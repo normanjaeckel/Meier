@@ -1,175 +1,109 @@
 module Data exposing
-    ( Campaign
-    , Campaign2
-    , CampaignId
-    , Day
-    , DayId
-    , Event
-    , EventId
-    , Pupil
-    , PupilId
-    , campaignDecoder
-    , dayDecoder
-    , eventDecoder
-    , queryCampaign
-    , queryDay
-    , queryEvent
+    ( Campaign2
+    , Day2
+    , Event2
+    , Pupil2
+    , campaingSelectionSet
+    , daySelectionSet
+    , eventSelectionSet
     )
 
+import Api.Object
+import Api.Object.Campaign
+import Api.Object.Day
+import Api.Object.Event
+import Api.Object.EventPupil
+import Api.Object.Pupil
 import Api.ScalarCodecs
-import Json.Decode as D
-
-
-type alias Campaign =
-    { id : CampaignId
-    , title : String
-    , days : List Day
-    , events : List Event
-    , pupils : List Pupil
-    }
+import Graphql.SelectionSet
 
 
 type alias Campaign2 =
-    { id : Api.ScalarCodecs.Id
+    { id : CampaignId2
     , title : String
+    , days : List Day2
+    , events : List Event2
+    , pupils : List Pupil2
     }
 
 
-type alias CampaignId =
-    Int
+type alias CampaignId2 =
+    Api.ScalarCodecs.Id
 
 
-campaignDecoder : D.Decoder Campaign
-campaignDecoder =
-    D.map5 Campaign
-        (D.field "id" D.int)
-        (D.field "title" D.string)
-        (D.field "days" (D.list dayDecoder))
-        (D.field "events" (D.list eventDecoder))
-        (D.field "pupils" (D.list pupilDecoder))
+campaingSelectionSet : Graphql.SelectionSet.SelectionSet Campaign2 Api.Object.Campaign
+campaingSelectionSet =
+    Graphql.SelectionSet.map5 Campaign2
+        Api.Object.Campaign.id
+        Api.Object.Campaign.title
+        (Api.Object.Campaign.days daySelectionSet)
+        (Api.Object.Campaign.events eventSelectionSet)
+        (Api.Object.Campaign.pupils pupilSelectionSet)
 
 
-queryCampaign : String
-queryCampaign =
-    """
-    {
-        id
-        title
-        days """
-        ++ queryDay
-        ++ """
-        events
-    """
-        ++ queryEvent
-        ++ """
-        pupils {
-            id
-            name
-            class
-            isSpecial
-            choices {
-                event {
-                    id
-                    title
-                }
-                choice
-            }
-        }
-    }
-    """
-
-
-type alias Day =
-    { id : DayId
+type alias Day2 =
+    { id : DayId2
     , title : String
-    , events : List ( EventId, List PupilId )
+    , events : List ( EventId2, List PupilId2 )
     }
 
 
-type alias DayId =
-    Int
+type alias DayId2 =
+    Api.ScalarCodecs.Id
 
 
-dayDecoder : D.Decoder Day
-dayDecoder =
-    D.map3 Day
-        (D.field "id" D.int)
-        (D.field "title" D.string)
-        (D.field "events"
-            (D.list
-                (D.map2 Tuple.pair
-                    (D.field "event" (D.field "id" D.int))
-                    (D.field "pupils" (D.list <| D.field "id" D.int))
-                )
-            )
-        )
+daySelectionSet : Graphql.SelectionSet.SelectionSet Day2 Api.Object.Day
+daySelectionSet =
+    Graphql.SelectionSet.map3 Day2
+        Api.Object.Day.id
+        Api.Object.Day.title
+        (Api.Object.Day.events eventPupilSelectionSet)
 
 
-queryDay : String
-queryDay =
-    """
-    {
-        id
-        title
-        events {
-            event {
-                id
-            }
-            pupils {
-                id
-            }
-        }
-    }
-    """
+eventPupilSelectionSet : Graphql.SelectionSet.SelectionSet ( EventId2, List PupilId2 ) Api.Object.EventPupil
+eventPupilSelectionSet =
+    Graphql.SelectionSet.map2 Tuple.pair
+        (Api.Object.EventPupil.event Api.Object.Event.id)
+        (Api.Object.EventPupil.pupils Api.Object.Pupil.id)
 
 
-type alias Event =
-    { id : EventId
+type alias Event2 =
+    { id : EventId2
     , title : String
     , capacity : Int
     , maxSpecialPupils : Int
     }
 
 
-type alias EventId =
-    Int
+type alias EventId2 =
+    Api.ScalarCodecs.Id
 
 
-eventDecoder : D.Decoder Event
-eventDecoder =
-    D.map4 Event
-        (D.field "id" D.int)
-        (D.field "title" D.string)
-        (D.field "capacity" D.int)
-        (D.field "maxSpecialPupils" D.int)
+eventSelectionSet : Graphql.SelectionSet.SelectionSet Event2 Api.Object.Event
+eventSelectionSet =
+    Graphql.SelectionSet.map4 Event2
+        Api.Object.Event.id
+        Api.Object.Event.title
+        Api.Object.Event.capacity
+        Api.Object.Event.maxSpecialPupils
 
 
-queryEvent : String
-queryEvent =
-    """
-    {
-        id
-        title
-        capacity
-        maxSpecialPupils
-    }
-    """
-
-
-type alias Pupil =
-    { name : String
+type alias Pupil2 =
+    { id : PupilId2
+    , name : String
     , class : String
     , isSpecial : Bool
     }
 
 
-type alias PupilId =
-    Int
+type alias PupilId2 =
+    Api.ScalarCodecs.Id
 
 
-pupilDecoder : D.Decoder Pupil
-pupilDecoder =
-    D.map3 Pupil
-        (D.field "name" D.string)
-        (D.field "class" D.string)
-        (D.field "isSpecial" D.bool)
+pupilSelectionSet : Graphql.SelectionSet.SelectionSet Pupil2 Api.Object.Pupil
+pupilSelectionSet =
+    Graphql.SelectionSet.map4 Pupil2
+        Api.Object.Pupil.id
+        Api.Object.Pupil.name
+        Api.Object.Pupil.class
+        Api.Object.Pupil.isSpecial
