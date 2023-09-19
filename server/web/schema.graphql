@@ -19,7 +19,7 @@ type Mutation {
 
     addEvent(campaignID: ID!, title: String!, dayIDs: [ID!]!, capacity: Int!, maxSpecialPupils: Int! = 0): Event!
     updateEvent(id: ID!, title: String, dayIDs: [ID!], capacity: Int, maxSpecialPupils: Int): Event!
-    deleteDay(id: ID!): Boolean!
+    deleteEvent(id: ID!): Boolean!
 
     addPupil(campaignID: ID!, name: String!, loginToken: String, class: String!, special: Boolean = false): Pupil!
     updatePupil(id: ID!, name: String, class: String, special: Boolean, loginToken: String): Pupil!
