@@ -32,7 +32,7 @@ init =
 type Msg
     = NewCampaignFormDataMsg NewCampaignFormDataInput
     | SendNewCampaignForm
-    | GotNewCampaign (Result (Graphql.Http.Error Data.Campaign2) Data.Campaign2)
+    | GotNewCampaign (Result (Graphql.Http.Error Data.Campaign) Data.Campaign)
 
 
 type NewCampaignFormDataInput
@@ -43,7 +43,7 @@ type NewCampaignFormDataInput
 type Effect
     = None
     | Loading (Cmd Msg)
-    | Done Data.Campaign2
+    | Done Data.Campaign
     | Error String
 
 

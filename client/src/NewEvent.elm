@@ -31,8 +31,8 @@ init =
 
 type Msg
     = NewEventFormDataMsg NewEventFormDataInput
-    | SendNewEventForm Data.Campaign2
-    | GotNewEvent Data.Campaign2 (Result (Graphql.Http.Error Data.Event2) Data.Event2)
+    | SendNewEventForm Data.Campaign
+    | GotNewEvent Data.Campaign (Result (Graphql.Http.Error Data.Event) Data.Event)
 
 
 type NewEventFormDataInput
@@ -44,7 +44,7 @@ type NewEventFormDataInput
 type Effect
     = None
     | Loading (Cmd Msg)
-    | Done Data.Campaign2
+    | Done Data.Campaign
     | Error String
 
 
@@ -89,7 +89,7 @@ update msg model =
 -- VIEW
 
 
-view : Data.Campaign2 -> Model -> List (Html Msg)
+view : Data.Campaign -> Model -> List (Html Msg)
 view c model =
     let
         labelCapacity : String

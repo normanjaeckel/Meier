@@ -28,8 +28,8 @@ init =
 
 type Msg
     = NewDayFormDataMsg NewDayFormDataInput
-    | SendNewDayForm Data.Campaign2
-    | GotNewDay Data.Campaign2 (Result (Graphql.Http.Error Data.Day2) Data.Day2)
+    | SendNewDayForm Data.Campaign
+    | GotNewDay Data.Campaign (Result (Graphql.Http.Error Data.Day) Data.Day)
 
 
 type NewDayFormDataInput
@@ -39,7 +39,7 @@ type NewDayFormDataInput
 type Effect
     = None
     | Loading (Cmd Msg)
-    | Done Data.Campaign2
+    | Done Data.Campaign
     | Error String
 
 
@@ -78,7 +78,7 @@ update msg model =
 -- VIEW
 
 
-view : Data.Campaign2 -> Model -> List (Html Msg)
+view : Data.Campaign -> Model -> List (Html Msg)
 view c model =
     [ h1 [ classes "title is-3" ] [ text "Neuen Tag hinzufügen" ]
     , div [ class "columns" ]

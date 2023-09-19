@@ -1,12 +1,12 @@
 module Data exposing
-    ( Campaign2
-    , CampaignId2
-    , Day2
-    , DayId2
-    , Event2
-    , EventId2
-    , Pupil2
-    , PupilId2
+    ( Campaign
+    , CampaignId
+    , Day
+    , DayId
+    , Event
+    , EventId
+    , Pupil
+    , PupilId
     , campaingSelectionSet
     , daySelectionSet
     , eventSelectionSet
@@ -22,22 +22,22 @@ import Api.ScalarCodecs
 import Graphql.SelectionSet
 
 
-type alias Campaign2 =
-    { id : CampaignId2
+type alias Campaign =
+    { id : CampaignId
     , title : String
-    , days : List Day2
-    , events : List Event2
-    , pupils : List Pupil2
+    , days : List Day
+    , events : List Event
+    , pupils : List Pupil
     }
 
 
-type alias CampaignId2 =
+type alias CampaignId =
     Api.ScalarCodecs.Id
 
 
-campaingSelectionSet : Graphql.SelectionSet.SelectionSet Campaign2 Api.Object.Campaign
+campaingSelectionSet : Graphql.SelectionSet.SelectionSet Campaign Api.Object.Campaign
 campaingSelectionSet =
-    Graphql.SelectionSet.map5 Campaign2
+    Graphql.SelectionSet.map5 Campaign
         Api.Object.Campaign.id
         Api.Object.Campaign.title
         (Api.Object.Campaign.days daySelectionSet)
@@ -45,68 +45,68 @@ campaingSelectionSet =
         (Api.Object.Campaign.pupils pupilSelectionSet)
 
 
-type alias Day2 =
-    { id : DayId2
+type alias Day =
+    { id : DayId
     , title : String
-    , events : List ( EventId2, List PupilId2 )
+    , events : List ( EventId, List PupilId )
     }
 
 
-type alias DayId2 =
+type alias DayId =
     Api.ScalarCodecs.Id
 
 
-daySelectionSet : Graphql.SelectionSet.SelectionSet Day2 Api.Object.Day
+daySelectionSet : Graphql.SelectionSet.SelectionSet Day Api.Object.Day
 daySelectionSet =
-    Graphql.SelectionSet.map3 Day2
+    Graphql.SelectionSet.map3 Day
         Api.Object.Day.id
         Api.Object.Day.title
         (Api.Object.Day.events eventPupilSelectionSet)
 
 
-eventPupilSelectionSet : Graphql.SelectionSet.SelectionSet ( EventId2, List PupilId2 ) Api.Object.EventPupil
+eventPupilSelectionSet : Graphql.SelectionSet.SelectionSet ( EventId, List PupilId ) Api.Object.EventPupil
 eventPupilSelectionSet =
     Graphql.SelectionSet.map2 Tuple.pair
         (Api.Object.EventPupil.event Api.Object.Event.id)
         (Api.Object.EventPupil.pupils Api.Object.Pupil.id)
 
 
-type alias Event2 =
-    { id : EventId2
+type alias Event =
+    { id : EventId
     , title : String
     , capacity : Int
     , maxSpecialPupils : Int
     }
 
 
-type alias EventId2 =
+type alias EventId =
     Api.ScalarCodecs.Id
 
 
-eventSelectionSet : Graphql.SelectionSet.SelectionSet Event2 Api.Object.Event
+eventSelectionSet : Graphql.SelectionSet.SelectionSet Event Api.Object.Event
 eventSelectionSet =
-    Graphql.SelectionSet.map4 Event2
+    Graphql.SelectionSet.map4 Event
         Api.Object.Event.id
         Api.Object.Event.title
         Api.Object.Event.capacity
         Api.Object.Event.maxSpecialPupils
 
 
-type alias Pupil2 =
-    { id : PupilId2
+type alias Pupil =
+    { id : PupilId
     , name : String
     , class : String
     , isSpecial : Bool
     }
 
 
-type alias PupilId2 =
+type alias PupilId =
     Api.ScalarCodecs.Id
 
 
-pupilSelectionSet : Graphql.SelectionSet.SelectionSet Pupil2 Api.Object.Pupil
+pupilSelectionSet : Graphql.SelectionSet.SelectionSet Pupil Api.Object.Pupil
 pupilSelectionSet =
-    Graphql.SelectionSet.map4 Pupil2
+    Graphql.SelectionSet.map4 Pupil
         Api.Object.Pupil.id
         Api.Object.Pupil.name
         Api.Object.Pupil.class

@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Api.Query
 import Browser
-import Data exposing (Campaign2, Day2, Event2, Pupil2)
+import Data exposing (Campaign, Day, Event, Pupil)
 import Graphql.Http
 import Html exposing (Html, a, button, div, form, h1, h2, h3, li, main_, nav, p, section, span, text, ul)
 import Html.Attributes exposing (class, type_)
@@ -29,7 +29,7 @@ main =
 
 type alias Model =
     { connection : Connection
-    , campaigns : List Campaign2
+    , campaigns : List Campaign
     , newCampaign : NewCampaign.Model
     , newDay : NewDay.Model
     , newEvent : NewEvent.Model
@@ -58,11 +58,11 @@ type Connection
 
 type Page
     = Overview
-    | CampaignPage Campaign2
+    | CampaignPage Campaign
     | NewCampaignPage
-    | NewDayPage Campaign2
-    | NewEventPage Campaign2
-    | PupilPage Pupil2
+    | NewDayPage Campaign
+    | NewEventPage Campaign
+    | PupilPage Pupil
     | NewPupils
 
 
@@ -71,7 +71,7 @@ type Page
 
 
 type Msg
-    = GotCampaignList (Result (Graphql.Http.Error (List Campaign2)) (List Campaign2))
+    = GotCampaignList (Result (Graphql.Http.Error (List Campaign)) (List Campaign))
     | SwitchPage SwitchTo
     | NewCampaignMsg NewCampaign.Msg
     | NewDayMsg NewDay.Msg
@@ -81,10 +81,10 @@ type Msg
 type SwitchTo
     = SwitchToOverview
     | SwitchToNewCampaign
-    | SwitchToNewDay Campaign2
-    | SwitchToNewEvent Campaign2
-    | SwitchToPage Campaign2
-    | SwitchToPupil Pupil2
+    | SwitchToNewDay Campaign
+    | SwitchToNewEvent Campaign
+    | SwitchToPage Campaign
+    | SwitchToPupil Pupil
     | SwitchToNewPupils
 
 
@@ -154,7 +154,7 @@ update msg model =
 
                 NewDay.Done updatedCamp ->
                     let
-                        newCampaignList : List Campaign2
+                        newCampaignList : List Campaign
                         newCampaignList =
                             model.campaigns
                                 |> List.foldr
@@ -186,7 +186,7 @@ update msg model =
 
                 NewEvent.Done updatedCamp ->
                     let
-                        newCampaignList : List Campaign2
+                        newCampaignList : List Campaign
                         newCampaignList =
                             model.campaigns
                                 |> List.foldr
@@ -267,7 +267,7 @@ view model =
         ]
 
 
-pupilToStr : Pupil2 -> String
+pupilToStr : Pupil -> String
 pupilToStr p =
     p.name ++ " (Klasse " ++ p.class ++ ")"
 
@@ -281,7 +281,7 @@ navbar =
         ]
 
 
-campaignView : Campaign2 -> List (Html Msg)
+campaignView : Campaign -> List (Html Msg)
 campaignView c =
     [ h1 [ classes "title is-3" ] [ text c.title ]
     , div [ class "block" ]
@@ -301,7 +301,7 @@ campaignView c =
     ]
 
 
-dayView : Day2 -> Html Msg
+dayView : Day -> Html Msg
 dayView d =
     let
         events : List (Html Msg)
@@ -326,7 +326,7 @@ dayView d =
         (h2 [ classes "title is-5" ] [ text d.title ] :: events ++ unassignedPupils)
 
 
-eventView : Event2 -> Html Msg
+eventView : Event -> Html Msg
 eventView e =
     div [ class "block" ]
         [ div [ classes "field is-grouped is-grouped-multiline" ]
@@ -349,7 +349,7 @@ eventView e =
         ]
 
 
-pupilUl : List Pupil2 -> Html Msg
+pupilUl : List Pupil -> Html Msg
 pupilUl pupList =
     ul []
         (pupList
@@ -358,7 +358,7 @@ pupilUl pupList =
         )
 
 
-pupilView : Pupil2 -> List (Html Msg)
+pupilView : Pupil -> List (Html Msg)
 pupilView pup =
     [ h1 [ classes "title is-3" ] [ text <| pupilToStr pup ]
     , p [] [ text "Lorem ipsum ..." ]

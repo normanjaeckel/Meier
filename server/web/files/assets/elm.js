@@ -5807,11 +5807,11 @@ var $author$project$Api$Query$campaignList = function (object____) {
 		object____,
 		A2($elm$core$Basics$composeR, $elm$core$Basics$identity, $elm$json$Json$Decode$list));
 };
-var $author$project$Data$Campaign2 = F5(
+var $author$project$Data$Campaign = F5(
 	function (id, title, days, events, pupils) {
 		return {am: days, aB: events, h: id, bq: pupils, l: title};
 	});
-var $author$project$Data$Day2 = F3(
+var $author$project$Data$Day = F3(
 	function (id, title, events) {
 		return {aB: events, h: id, l: title};
 	});
@@ -5961,7 +5961,7 @@ var $dillonkearns$elm_graphql$Graphql$SelectionSet$map3 = F4(
 var $author$project$Api$Object$Day$title = A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField, 'String', 'title', _List_Nil, $elm$json$Json$Decode$string);
 var $author$project$Data$daySelectionSet = A4(
 	$dillonkearns$elm_graphql$Graphql$SelectionSet$map3,
-	$author$project$Data$Day2,
+	$author$project$Data$Day,
 	$author$project$Api$Object$Day$id,
 	$author$project$Api$Object$Day$title,
 	$author$project$Api$Object$Day$events($author$project$Data$eventPupilSelectionSet));
@@ -5973,7 +5973,7 @@ var $author$project$Api$Object$Campaign$days = function (object____) {
 		object____,
 		A2($elm$core$Basics$composeR, $elm$core$Basics$identity, $elm$json$Json$Decode$list));
 };
-var $author$project$Data$Event2 = F4(
+var $author$project$Data$Event = F4(
 	function (id, title, capacity, maxSpecialPupils) {
 		return {W: capacity, h: id, aa: maxSpecialPupils, l: title};
 	});
@@ -5998,7 +5998,7 @@ var $dillonkearns$elm_graphql$Graphql$SelectionSet$map4 = F5(
 	});
 var $author$project$Api$Object$Event$maxSpecialPupils = A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField, 'Int', 'maxSpecialPupils', _List_Nil, $elm$json$Json$Decode$int);
 var $author$project$Api$Object$Event$title = A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField, 'String', 'title', _List_Nil, $elm$json$Json$Decode$string);
-var $author$project$Data$eventSelectionSet = A5($dillonkearns$elm_graphql$Graphql$SelectionSet$map4, $author$project$Data$Event2, $author$project$Api$Object$Event$id, $author$project$Api$Object$Event$title, $author$project$Api$Object$Event$capacity, $author$project$Api$Object$Event$maxSpecialPupils);
+var $author$project$Data$eventSelectionSet = A5($dillonkearns$elm_graphql$Graphql$SelectionSet$map4, $author$project$Data$Event, $author$project$Api$Object$Event$id, $author$project$Api$Object$Event$title, $author$project$Api$Object$Event$capacity, $author$project$Api$Object$Event$maxSpecialPupils);
 var $author$project$Api$Object$Campaign$events = function (object____) {
 	return A4(
 		$dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForCompositeField,
@@ -6033,14 +6033,14 @@ var $dillonkearns$elm_graphql$Graphql$SelectionSet$map5 = F6(
 					[selectionFields1, selectionFields2, selectionFields3, selectionFields4, selectionFields5])),
 			A6($elm$json$Json$Decode$map5, combine, selectionDecoder1, selectionDecoder2, selectionDecoder3, selectionDecoder4, selectionDecoder5));
 	});
-var $author$project$Data$Pupil2 = F4(
+var $author$project$Data$Pupil = F4(
 	function (id, name, _class, isSpecial) {
 		return {Y: _class, h: id, bg: isSpecial, ab: name};
 	});
 var $author$project$Api$Object$Pupil$class = A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField, 'String', 'class', _List_Nil, $elm$json$Json$Decode$string);
 var $author$project$Api$Object$Pupil$isSpecial = A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField, 'Bool', 'isSpecial', _List_Nil, $elm$json$Json$Decode$bool);
 var $author$project$Api$Object$Pupil$name = A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField, 'String', 'name', _List_Nil, $elm$json$Json$Decode$string);
-var $author$project$Data$pupilSelectionSet = A5($dillonkearns$elm_graphql$Graphql$SelectionSet$map4, $author$project$Data$Pupil2, $author$project$Api$Object$Pupil$id, $author$project$Api$Object$Pupil$name, $author$project$Api$Object$Pupil$class, $author$project$Api$Object$Pupil$isSpecial);
+var $author$project$Data$pupilSelectionSet = A5($dillonkearns$elm_graphql$Graphql$SelectionSet$map4, $author$project$Data$Pupil, $author$project$Api$Object$Pupil$id, $author$project$Api$Object$Pupil$name, $author$project$Api$Object$Pupil$class, $author$project$Api$Object$Pupil$isSpecial);
 var $author$project$Api$Object$Campaign$pupils = function (object____) {
 	return A4(
 		$dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForCompositeField,
@@ -6052,7 +6052,7 @@ var $author$project$Api$Object$Campaign$pupils = function (object____) {
 var $author$project$Api$Object$Campaign$title = A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField, 'String', 'title', _List_Nil, $elm$json$Json$Decode$string);
 var $author$project$Data$campaingSelectionSet = A6(
 	$dillonkearns$elm_graphql$Graphql$SelectionSet$map5,
-	$author$project$Data$Campaign2,
+	$author$project$Data$Campaign,
 	$author$project$Api$Object$Campaign$id,
 	$author$project$Api$Object$Campaign$title,
 	$author$project$Api$Object$Campaign$days($author$project$Data$daySelectionSet),
