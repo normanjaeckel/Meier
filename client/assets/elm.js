@@ -7980,7 +7980,6 @@ var $author$project$Shared$parseGraphqlError = function (err) {
 				return 'bad payload: ' + $elm$json$Json$Decode$errorToString(e);
 		}
 	} else {
-		var ppd = err.a;
 		var gErrs = err.b;
 		var fn = function (e) {
 			return e.bk;

@@ -1,8 +1,12 @@
 module Data exposing
     ( Campaign2
+    , CampaignId2
     , Day2
+    , DayId2
     , Event2
+    , EventId2
     , Pupil2
+    , PupilId2
     , campaingSelectionSet
     , daySelectionSet
     , eventSelectionSet

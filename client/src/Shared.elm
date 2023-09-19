@@ -68,7 +68,7 @@ parseGraphqlError err =
                 Graphql.Http.BadPayload e ->
                     "bad payload: " ++ Json.Decode.errorToString e
 
-        Graphql.Http.GraphqlError ppd gErrs ->
+        Graphql.Http.GraphqlError _ gErrs ->
             let
                 errMsg : String
                 errMsg =
