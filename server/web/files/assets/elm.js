@@ -7961,8 +7961,36 @@ var $author$project$Main$Success = function (a) {
 var $elm$core$Platform$Cmd$map = _Platform_map;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Shared$parseGraphqlError = function (_v0) {
-	return 'graphqlError but is not parsed';
+var $author$project$Shared$parseGraphqlError = function (err) {
+	if (err.$ === 1) {
+		var httpErr = err.a;
+		switch (httpErr.$) {
+			case 0:
+				var m = httpErr.a;
+				return 'bad url: ' + m;
+			case 1:
+				return 'timeout';
+			case 2:
+				return 'network error';
+			case 3:
+				var code = httpErr.b;
+				return 'bad status: ' + code;
+			default:
+				var e = httpErr.a;
+				return 'bad payload: ' + $elm$json$Json$Decode$errorToString(e);
+		}
+	} else {
+		var ppd = err.a;
+		var gErrs = err.b;
+		var fn = function (e) {
+			return e.bk;
+		};
+		var errMsg = A2(
+			$elm$core$String$join,
+			',',
+			A2($elm$core$List$map, fn, gErrs));
+		return 'graphql error: ' + errMsg;
+	}
 };
 var $author$project$Api$Mutation$AddCampaignRequiredArguments = function (title) {
 	return {l: title};

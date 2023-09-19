@@ -1,8 +1,10 @@
 module Shared exposing (classes, parseGraphqlError, queryUrl)
 
 import Graphql.Http
+import Graphql.Http.GraphqlError
 import Html
 import Html.Attributes
+import Json.Decode
 
 
 queryUrl : String
@@ -47,5 +49,33 @@ classes s =
 
 
 parseGraphqlError : Graphql.Http.Error a -> String
-parseGraphqlError _ =
-    "graphqlError but is not parsed"
+parseGraphqlError err =
+    case err of
+        Graphql.Http.HttpError httpErr ->
+            case httpErr of
+                Graphql.Http.BadUrl m ->
+                    "bad url: " ++ m
+
+                Graphql.Http.Timeout ->
+                    "timeout"
+
+                Graphql.Http.NetworkError ->
+                    "network error"
+
+                Graphql.Http.BadStatus _ code ->
+                    "bad status: " ++ code
+
+                Graphql.Http.BadPayload e ->
+                    "bad payload: " ++ Json.Decode.errorToString e
+
+        Graphql.Http.GraphqlError ppd gErrs ->
+            let
+                errMsg : String
+                errMsg =
+                    gErrs |> List.map fn |> String.join ","
+
+                fn : Graphql.Http.GraphqlError.GraphqlError -> String
+                fn e =
+                    e.message
+            in
+            "graphql error: " ++ errMsg
