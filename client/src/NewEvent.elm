@@ -70,9 +70,10 @@ update msg model =
         SendNewEventForm campaign ->
             ( model
             , Loading <|
-                Api.Mutation.addEvent (Api.Mutation.AddEventRequiredArguments campaign.id model.title [] model.capacity model.maxSpecialPupils) Data.eventSelectionSet
+                (Api.Mutation.addEvent (Api.Mutation.AddEventRequiredArguments campaign.id model.title [] model.capacity model.maxSpecialPupils) Data.eventSelectionSet
                     |> Graphql.Http.mutationRequest Shared.queryUrl
                     |> Graphql.Http.send (GotNewEvent campaign)
+                )
             )
 
         GotNewEvent campaign res ->

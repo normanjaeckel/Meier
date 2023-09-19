@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.ae.a8 === region.ak.a8)
+	if (region.ar.bh === region.az.bh)
 	{
-		return 'on line ' + region.ae.a8;
+		return 'on line ' + region.ar.bh;
 	}
-	return 'on lines ' + region.ae.a8 + ' through ' + region.ak.a8;
+	return 'on lines ' + region.ar.bh + ' through ' + region.az.bh;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.a6,
-		impl.bs,
-		impl.br,
+		impl.bf,
+		impl.bz,
+		impl.by,
 		function() { return function() {} }
 	);
 });
@@ -2719,9 +2719,9 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		bc: func(record.bc),
-		af: record.af,
-		ac: record.ac
+		bk: func(record.bk),
+		as: record.as,
+		ap: record.ap
 	}
 });
 
@@ -2989,11 +2989,11 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.bc;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.af;
+		var message = !tag ? value : tag < 3 ? value.a : value.bk;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.as;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.ac) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.ap) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3943,11 +3943,11 @@ var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debug
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.a6,
-		impl.bs,
-		impl.br,
+		impl.bf,
+		impl.bz,
+		impl.by,
 		function(sendToApp, initialModel) {
-			var view = impl.bu;
+			var view = impl.bA;
 			/**/
 			var domNode = args['node'];
 			//*/
@@ -3979,12 +3979,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.a6,
-		impl.bs,
-		impl.br,
+		impl.bf,
+		impl.bz,
+		impl.by,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.ad && impl.ad(sendToApp)
-			var view = impl.bu;
+			var divertHrefToApp = impl.aq && impl.aq(sendToApp)
+			var view = impl.bA;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
 			var currNode = _VirtualDom_virtualize(bodyNode);
@@ -3992,12 +3992,12 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aS);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.y);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
 				_VirtualDom_divertHrefToApp = 0;
-				(title !== doc._) && (_VirtualDom_doc.title = title = doc._);
+				(title !== doc.l) && (_VirtualDom_doc.title = title = doc.l);
 			});
 		}
 	);
@@ -4053,12 +4053,12 @@ function _Browser_makeAnimator(model, draw)
 
 function _Browser_application(impl)
 {
-	var onUrlChange = impl.bg;
-	var onUrlRequest = impl.bh;
+	var onUrlChange = impl.bn;
+	var onUrlRequest = impl.bo;
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		ad: function(sendToApp)
+		aq: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4074,9 +4074,9 @@ function _Browser_application(impl)
 					var next = $elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.aA === next.aA
-							&& curr.aq === next.aq
-							&& curr.ax.a === next.ax.a
+							&& curr.aO === next.aO
+							&& curr.aF === next.aF
+							&& curr.aL.a === next.aL.a
 						)
 							? $elm$browser$Browser$Internal(next)
 							: $elm$browser$Browser$External(href)
@@ -4084,13 +4084,13 @@ function _Browser_application(impl)
 				}
 			});
 		},
-		a6: function(flags)
+		bf: function(flags)
 		{
-			return A3(impl.a6, flags, _Browser_getUrl(), key);
+			return A3(impl.bf, flags, _Browser_getUrl(), key);
 		},
-		bu: impl.bu,
-		bs: impl.bs,
-		br: impl.br
+		bA: impl.bA,
+		bz: impl.bz,
+		by: impl.by
 	});
 }
 
@@ -4156,17 +4156,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { a3: 'hidden', aV: 'visibilitychange' }
+		? { bc: 'hidden', a5: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { a3: 'mozHidden', aV: 'mozvisibilitychange' }
+		? { bc: 'mozHidden', a5: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { a3: 'msHidden', aV: 'msvisibilitychange' }
+		? { bc: 'msHidden', a5: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { a3: 'webkitHidden', aV: 'webkitvisibilitychange' }
-		: { a3: 'hidden', aV: 'visibilitychange' };
+		? { bc: 'webkitHidden', a5: 'webkitvisibilitychange' }
+		: { bc: 'hidden', a5: 'visibilitychange' };
 }
 
 
@@ -4247,12 +4247,12 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		aF: _Browser_getScene(),
-		aL: {
-			aN: _Browser_window.pageXOffset,
-			aO: _Browser_window.pageYOffset,
-			aM: _Browser_doc.documentElement.clientWidth,
-			ap: _Browser_doc.documentElement.clientHeight
+		aT: _Browser_getScene(),
+		aZ: {
+			a$: _Browser_window.pageXOffset,
+			a0: _Browser_window.pageYOffset,
+			a_: _Browser_doc.documentElement.clientWidth,
+			aE: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4262,8 +4262,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		aM: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		ap: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		a_: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		aE: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4286,15 +4286,15 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			aF: {
-				aM: node.scrollWidth,
-				ap: node.scrollHeight
+			aT: {
+				a_: node.scrollWidth,
+				aE: node.scrollHeight
 			},
-			aL: {
-				aN: node.scrollLeft,
-				aO: node.scrollTop,
-				aM: node.clientWidth,
-				ap: node.clientHeight
+			aZ: {
+				a$: node.scrollLeft,
+				a0: node.scrollTop,
+				a_: node.clientWidth,
+				aE: node.clientHeight
 			}
 		};
 	});
@@ -4324,18 +4324,18 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			aF: _Browser_getScene(),
-			aL: {
-				aN: x,
-				aO: y,
-				aM: _Browser_doc.documentElement.clientWidth,
-				ap: _Browser_doc.documentElement.clientHeight
+			aT: _Browser_getScene(),
+			aZ: {
+				a$: x,
+				a0: y,
+				a_: _Browser_doc.documentElement.clientWidth,
+				aE: _Browser_doc.documentElement.clientHeight
 			},
-			a0: {
-				aN: x + rect.left,
-				aO: y + rect.top,
-				aM: rect.width,
-				ap: rect.height
+			ba: {
+				a$: x + rect.left,
+				a0: y + rect.top,
+				a_: rect.width,
+				aE: rect.height
 			}
 		};
 	});
@@ -4417,25 +4417,25 @@ var _Http_toTask = F3(function(router, toTask, request)
 	return _Scheduler_binding(function(callback)
 	{
 		function done(response) {
-			callback(toTask(request.a1.a(response)));
+			callback(toTask(request.O.a(response)));
 		}
 
 		var xhr = new XMLHttpRequest();
 		xhr.addEventListener('error', function() { done($elm$http$Http$NetworkError_); });
 		xhr.addEventListener('timeout', function() { done($elm$http$Http$Timeout_); });
-		xhr.addEventListener('load', function() { done(_Http_toResponse(request.a1.b, xhr)); });
-		$elm$core$Maybe$isJust(request.aJ) && _Http_track(router, xhr, request.aJ.a);
+		xhr.addEventListener('load', function() { done(_Http_toResponse(request.O.b, xhr)); });
+		$elm$core$Maybe$isJust(request.aX) && _Http_track(router, xhr, request.aX.a);
 
 		try {
-			xhr.open(request.v, request.bt, true);
+			xhr.open(request.z, request.C, true);
 		} catch (e) {
-			return done($elm$http$Http$BadUrl_(request.bt));
+			return done($elm$http$Http$BadUrl_(request.C));
 		}
 
 		_Http_configureRequest(xhr, request);
 
-		request.aS.a && xhr.setRequestHeader('Content-Type', request.aS.a);
-		xhr.send(request.aS.b);
+		request.y.a && xhr.setRequestHeader('Content-Type', request.y.a);
+		xhr.send(request.y.b);
 
 		return function() { xhr.c = true; xhr.abort(); };
 	});
@@ -4446,13 +4446,13 @@ var _Http_toTask = F3(function(router, toTask, request)
 
 function _Http_configureRequest(xhr, request)
 {
-	for (var headers = request.i; headers.b; headers = headers.b) // WHILE_CONS
+	for (var headers = request.j; headers.b; headers = headers.b) // WHILE_CONS
 	{
 		xhr.setRequestHeader(headers.a.a, headers.a.b);
 	}
-	xhr.timeout = request.l.a || 0;
-	xhr.responseType = request.a1.d;
-	xhr.withCredentials = request.aQ;
+	xhr.timeout = request.n.a || 0;
+	xhr.responseType = request.O.d;
+	xhr.withCredentials = request.a2;
 }
 
 
@@ -4473,10 +4473,10 @@ function _Http_toResponse(toBody, xhr)
 function _Http_toMetadata(xhr)
 {
 	return {
-		bt: xhr.responseURL,
-		bo: xhr.status,
-		bp: xhr.statusText,
-		i: _Http_parseHeaders(xhr.getAllResponseHeaders())
+		C: xhr.responseURL,
+		bv: xhr.status,
+		bw: xhr.statusText,
+		j: _Http_parseHeaders(xhr.getAllResponseHeaders())
 	};
 }
 
@@ -4571,15 +4571,15 @@ function _Http_track(router, xhr, tracker)
 	xhr.upload.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Sending({
-			bn: event.loaded,
-			aG: event.total
+			bu: event.loaded,
+			aU: event.total
 		}))));
 	});
 	xhr.addEventListener('progress', function(event) {
 		if (xhr.c) { return; }
 		_Scheduler_rawSpawn(A2($elm$core$Platform$sendToSelf, router, _Utils_Tuple2(tracker, $elm$http$Http$Receiving({
-			bk: event.loaded,
-			aG: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
+			br: event.loaded,
+			aU: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
 		}))));
 	});
 }
@@ -4591,8 +4591,8 @@ var _Regex_never = /.^/;
 var _Regex_fromStringWith = F2(function(options, string)
 {
 	var flags = 'g';
-	if (options.bd) { flags += 'm'; }
-	if (options.aU) { flags += 'i'; }
+	if (options.bl) { flags += 'm'; }
+	if (options.a4) { flags += 'i'; }
 
 	try
 	{
@@ -5204,7 +5204,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {ao: fragment, aq: host, av: path, ax: port_, aA: protocol, aB: query};
+		return {aD: fragment, aF: host, aJ: path, aL: port_, aO: protocol, aP: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5483,25 +5483,10 @@ var $elm$core$Task$perform = F2(
 			A2($elm$core$Task$map, toMessage, task));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Main$Loading = {$: 0};
-var $author$project$NewCampaign$Model = F2(
-	function (title, numOfDays) {
-		return {Z: numOfDays, _: title};
-	});
-var $author$project$NewCampaign$init = A2($author$project$NewCampaign$Model, '', 2);
-var $author$project$NewDay$Model = function (title) {
-	return {_: title};
+var $author$project$Main$GotCampaignList = function (a) {
+	return {$: 0, a: a};
 };
-var $author$project$NewDay$init = $author$project$NewDay$Model('');
-var $author$project$NewEvent$Model = F3(
-	function (title, capacity, maxSpecialPupils) {
-		return {aT: capacity, bb: maxSpecialPupils, _: title};
-	});
-var $author$project$NewEvent$init = A3($author$project$NewEvent$Model, '', 12, 2);
-var $author$project$Data$Campaign2 = F2(
-	function (id, title) {
-		return {ar: id, _: title};
-	});
+var $author$project$Main$Loading = {$: 0};
 var $elm$core$Basics$composeR = F3(
 	function (f, g, x) {
 		return g(
@@ -5544,7 +5529,7 @@ var $elm$core$String$concat = function (strings) {
 };
 var $dillonkearns$elm_graphql$Graphql$Document$Hash$HashData = F4(
 	function (shift, seed, hash, charsProcessed) {
-		return {G: charsProcessed, I: hash, D: seed, J: shift};
+		return {M: charsProcessed, P: hash, I: seed, Q: shift};
 	});
 var $dillonkearns$elm_graphql$Graphql$Document$Hash$c1 = 3432918353;
 var $dillonkearns$elm_graphql$Graphql$Document$Hash$c2 = 461845907;
@@ -5563,14 +5548,14 @@ var $dillonkearns$elm_graphql$Graphql$Document$Hash$rotlBy = F2(
 	});
 var $elm$core$Bitwise$xor = _Bitwise_xor;
 var $dillonkearns$elm_graphql$Graphql$Document$Hash$finalize = function (data) {
-	var acc = (!(!data.I)) ? (data.D ^ A2(
+	var acc = (!(!data.P)) ? (data.I ^ A2(
 		$dillonkearns$elm_graphql$Graphql$Document$Hash$multiplyBy,
 		$dillonkearns$elm_graphql$Graphql$Document$Hash$c2,
 		A2(
 			$dillonkearns$elm_graphql$Graphql$Document$Hash$rotlBy,
 			15,
-			A2($dillonkearns$elm_graphql$Graphql$Document$Hash$multiplyBy, $dillonkearns$elm_graphql$Graphql$Document$Hash$c1, data.I)))) : data.D;
-	var h0 = acc ^ data.G;
+			A2($dillonkearns$elm_graphql$Graphql$Document$Hash$multiplyBy, $dillonkearns$elm_graphql$Graphql$Document$Hash$c1, data.P)))) : data.I;
+	var h0 = acc ^ data.M;
 	var h1 = A2($dillonkearns$elm_graphql$Graphql$Document$Hash$multiplyBy, 2246822507, h0 ^ (h0 >>> 16));
 	var h2 = A2($dillonkearns$elm_graphql$Graphql$Document$Hash$multiplyBy, 3266489909, h1 ^ (h1 >>> 13));
 	return (h2 ^ (h2 >>> 16)) >>> 0;
@@ -5594,17 +5579,17 @@ var $dillonkearns$elm_graphql$Graphql$Document$Hash$mix = F2(
 	});
 var $dillonkearns$elm_graphql$Graphql$Document$Hash$hashFold = F2(
 	function (c, data) {
-		var res = data.I | ((255 & $elm$core$Char$toCode(c)) << data.J);
-		var _v0 = data.J;
+		var res = data.P | ((255 & $elm$core$Char$toCode(c)) << data.Q);
+		var _v0 = data.Q;
 		if (_v0 === 24) {
 			return {
-				G: data.G + 1,
-				I: 0,
-				D: A2($dillonkearns$elm_graphql$Graphql$Document$Hash$mix, data.D, res),
-				J: 0
+				M: data.M + 1,
+				P: 0,
+				I: A2($dillonkearns$elm_graphql$Graphql$Document$Hash$mix, data.I, res),
+				Q: 0
 			};
 		} else {
-			return {G: data.G + 1, I: res, D: data.D, J: data.J + 8};
+			return {M: data.M + 1, P: res, I: data.I, Q: data.Q + 8};
 		}
 	});
 var $dillonkearns$elm_graphql$Graphql$Document$Hash$hashString = F2(
@@ -5738,8 +5723,8 @@ var $dillonkearns$elm_graphql$Graphql$Document$Field$maybeAliasHash = function (
 				return $elm$core$List$isEmpty(_arguments) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
 					$dillonkearns$elm_graphql$Graphql$Document$Argument$serialize(_arguments));
 			} else {
-				var typeString = field.a.aK;
-				var fieldName = field.a.an;
+				var typeString = field.a.aY;
+				var fieldName = field.a.aC;
 				var _arguments = field.b;
 				return (fieldName === '__typename') ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
 					$elm$core$String$concat(
@@ -5759,8 +5744,8 @@ var $dillonkearns$elm_graphql$Graphql$RawField$name = function (field) {
 		var fieldList = field.c;
 		return fieldName;
 	} else {
-		var typeString = field.a.aK;
-		var fieldName = field.a.an;
+		var typeString = field.a.aY;
+		var fieldName = field.a.aC;
 		var argumentList = field.b;
 		return fieldName;
 	}
@@ -5822,6 +5807,17 @@ var $author$project$Api$Query$campaignList = function (object____) {
 		object____,
 		A2($elm$core$Basics$composeR, $elm$core$Basics$identity, $elm$json$Json$Decode$list));
 };
+var $author$project$Data$Campaign2 = F5(
+	function (id, title, days, events, pupils) {
+		return {am: days, aB: events, h: id, bq: pupils, l: title};
+	});
+var $author$project$Data$Day2 = F3(
+	function (id, title, events) {
+		return {aB: events, h: id, l: title};
+	});
+var $author$project$Api$Object$EventPupil$event = function (object____) {
+	return A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForCompositeField, 'event', _List_Nil, object____, $elm$core$Basics$identity);
+};
 var $author$project$Api$Scalar$Id = $elm$core$Basics$identity;
 var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $elm$json$Json$Decode$float = _Json_decodeFloat;
@@ -5843,9 +5839,9 @@ var $dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$scalarDecoder = $e
 		]));
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $author$project$Api$Scalar$defaultCodecs = {
-	aX: {
-		a_: A2($elm$json$Json$Decode$map, $elm$core$Basics$identity, $dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$scalarDecoder),
-		aj: function (_v0) {
+	a6: {
+		a8: A2($elm$json$Json$Decode$map, $elm$core$Basics$identity, $dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$scalarDecoder),
+		ay: function (_v0) {
 			var raw = _v0;
 			return $elm$json$Json$Encode$string(raw);
 		}
@@ -5856,7 +5852,7 @@ var $author$project$Api$Scalar$defineCodecs = function (definitions) {
 	return definitions;
 };
 var $author$project$Api$ScalarCodecs$codecs = $author$project$Api$Scalar$defineCodecs(
-	{aX: $author$project$Api$Scalar$defaultCodecs.aX});
+	{a6: $author$project$Api$Scalar$defaultCodecs.a6});
 var $dillonkearns$elm_graphql$Graphql$RawField$Leaf = F2(
 	function (a, b) {
 		return {$: 1, a: a, b: b};
@@ -5869,7 +5865,7 @@ var $dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField 
 	function (typeString, fieldName, args, decoder) {
 		var newLeaf = A2(
 			$dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$leaf,
-			{an: fieldName, aK: typeString},
+			{aC: fieldName, aY: typeString},
 			args);
 		return A2(
 			$dillonkearns$elm_graphql$Graphql$SelectionSet$SelectionSet,
@@ -5889,12 +5885,18 @@ var $author$project$Api$Scalar$unwrapCodecs = function (_v0) {
 	var unwrappedCodecs = _v0;
 	return unwrappedCodecs;
 };
-var $author$project$Api$Object$Campaign$id = A4(
+var $author$project$Api$Object$Event$id = A4(
 	$dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField,
 	'ScalarCodecs.Id',
 	'id',
 	_List_Nil,
-	$author$project$Api$Scalar$unwrapCodecs($author$project$Api$ScalarCodecs$codecs).aX.a_);
+	$author$project$Api$Scalar$unwrapCodecs($author$project$Api$ScalarCodecs$codecs).a6.a8);
+var $author$project$Api$Object$Pupil$id = A4(
+	$dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField,
+	'ScalarCodecs.Id',
+	'id',
+	_List_Nil,
+	$author$project$Api$Scalar$unwrapCodecs($author$project$Api$ScalarCodecs$codecs).a6.a8);
 var $dillonkearns$elm_graphql$Graphql$SelectionSet$map2 = F3(
 	function (combine, _v0, _v1) {
 		var selectionFields1 = _v0.a;
@@ -5906,9 +5908,170 @@ var $dillonkearns$elm_graphql$Graphql$SelectionSet$map2 = F3(
 			_Utils_ap(selectionFields1, selectionFields2),
 			A3($elm$json$Json$Decode$map2, combine, selectionDecoder1, selectionDecoder2));
 	});
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
+var $author$project$Api$Object$EventPupil$pupils = function (object____) {
+	return A4(
+		$dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForCompositeField,
+		'pupils',
+		_List_Nil,
+		object____,
+		A2($elm$core$Basics$composeR, $elm$core$Basics$identity, $elm$json$Json$Decode$list));
+};
+var $author$project$Data$eventPupilSelectionSet = A3(
+	$dillonkearns$elm_graphql$Graphql$SelectionSet$map2,
+	$elm$core$Tuple$pair,
+	$author$project$Api$Object$EventPupil$event($author$project$Api$Object$Event$id),
+	$author$project$Api$Object$EventPupil$pupils($author$project$Api$Object$Pupil$id));
+var $author$project$Api$Object$Day$events = function (object____) {
+	return A4(
+		$dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForCompositeField,
+		'events',
+		_List_Nil,
+		object____,
+		A2($elm$core$Basics$composeR, $elm$core$Basics$identity, $elm$json$Json$Decode$list));
+};
+var $author$project$Api$Object$Day$id = A4(
+	$dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField,
+	'ScalarCodecs.Id',
+	'id',
+	_List_Nil,
+	$author$project$Api$Scalar$unwrapCodecs($author$project$Api$ScalarCodecs$codecs).a6.a8);
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$json$Json$Decode$map3 = _Json_map3;
+var $dillonkearns$elm_graphql$Graphql$SelectionSet$map3 = F4(
+	function (combine, _v0, _v1, _v2) {
+		var selectionFields1 = _v0.a;
+		var selectionDecoder1 = _v0.b;
+		var selectionFields2 = _v1.a;
+		var selectionDecoder2 = _v1.b;
+		var selectionFields3 = _v2.a;
+		var selectionDecoder3 = _v2.b;
+		return A2(
+			$dillonkearns$elm_graphql$Graphql$SelectionSet$SelectionSet,
+			$elm$core$List$concat(
+				_List_fromArray(
+					[selectionFields1, selectionFields2, selectionFields3])),
+			A4($elm$json$Json$Decode$map3, combine, selectionDecoder1, selectionDecoder2, selectionDecoder3));
+	});
+var $author$project$Api$Object$Day$title = A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField, 'String', 'title', _List_Nil, $elm$json$Json$Decode$string);
+var $author$project$Data$daySelectionSet = A4(
+	$dillonkearns$elm_graphql$Graphql$SelectionSet$map3,
+	$author$project$Data$Day2,
+	$author$project$Api$Object$Day$id,
+	$author$project$Api$Object$Day$title,
+	$author$project$Api$Object$Day$events($author$project$Data$eventPupilSelectionSet));
+var $author$project$Api$Object$Campaign$days = function (object____) {
+	return A4(
+		$dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForCompositeField,
+		'days',
+		_List_Nil,
+		object____,
+		A2($elm$core$Basics$composeR, $elm$core$Basics$identity, $elm$json$Json$Decode$list));
+};
+var $author$project$Data$Event2 = F4(
+	function (id, title, capacity, maxSpecialPupils) {
+		return {W: capacity, h: id, aa: maxSpecialPupils, l: title};
+	});
+var $author$project$Api$Object$Event$capacity = A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField, 'Int', 'capacity', _List_Nil, $elm$json$Json$Decode$int);
+var $elm$json$Json$Decode$map4 = _Json_map4;
+var $dillonkearns$elm_graphql$Graphql$SelectionSet$map4 = F5(
+	function (combine, _v0, _v1, _v2, _v3) {
+		var selectionFields1 = _v0.a;
+		var selectionDecoder1 = _v0.b;
+		var selectionFields2 = _v1.a;
+		var selectionDecoder2 = _v1.b;
+		var selectionFields3 = _v2.a;
+		var selectionDecoder3 = _v2.b;
+		var selectionFields4 = _v3.a;
+		var selectionDecoder4 = _v3.b;
+		return A2(
+			$dillonkearns$elm_graphql$Graphql$SelectionSet$SelectionSet,
+			$elm$core$List$concat(
+				_List_fromArray(
+					[selectionFields1, selectionFields2, selectionFields3, selectionFields4])),
+			A5($elm$json$Json$Decode$map4, combine, selectionDecoder1, selectionDecoder2, selectionDecoder3, selectionDecoder4));
+	});
+var $author$project$Api$Object$Event$maxSpecialPupils = A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField, 'Int', 'maxSpecialPupils', _List_Nil, $elm$json$Json$Decode$int);
+var $author$project$Api$Object$Event$title = A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField, 'String', 'title', _List_Nil, $elm$json$Json$Decode$string);
+var $author$project$Data$eventSelectionSet = A5($dillonkearns$elm_graphql$Graphql$SelectionSet$map4, $author$project$Data$Event2, $author$project$Api$Object$Event$id, $author$project$Api$Object$Event$title, $author$project$Api$Object$Event$capacity, $author$project$Api$Object$Event$maxSpecialPupils);
+var $author$project$Api$Object$Campaign$events = function (object____) {
+	return A4(
+		$dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForCompositeField,
+		'events',
+		_List_Nil,
+		object____,
+		A2($elm$core$Basics$composeR, $elm$core$Basics$identity, $elm$json$Json$Decode$list));
+};
+var $author$project$Api$Object$Campaign$id = A4(
+	$dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField,
+	'ScalarCodecs.Id',
+	'id',
+	_List_Nil,
+	$author$project$Api$Scalar$unwrapCodecs($author$project$Api$ScalarCodecs$codecs).a6.a8);
+var $elm$json$Json$Decode$map5 = _Json_map5;
+var $dillonkearns$elm_graphql$Graphql$SelectionSet$map5 = F6(
+	function (combine, _v0, _v1, _v2, _v3, _v4) {
+		var selectionFields1 = _v0.a;
+		var selectionDecoder1 = _v0.b;
+		var selectionFields2 = _v1.a;
+		var selectionDecoder2 = _v1.b;
+		var selectionFields3 = _v2.a;
+		var selectionDecoder3 = _v2.b;
+		var selectionFields4 = _v3.a;
+		var selectionDecoder4 = _v3.b;
+		var selectionFields5 = _v4.a;
+		var selectionDecoder5 = _v4.b;
+		return A2(
+			$dillonkearns$elm_graphql$Graphql$SelectionSet$SelectionSet,
+			$elm$core$List$concat(
+				_List_fromArray(
+					[selectionFields1, selectionFields2, selectionFields3, selectionFields4, selectionFields5])),
+			A6($elm$json$Json$Decode$map5, combine, selectionDecoder1, selectionDecoder2, selectionDecoder3, selectionDecoder4, selectionDecoder5));
+	});
+var $author$project$Data$Pupil2 = F4(
+	function (id, name, _class, isSpecial) {
+		return {Y: _class, h: id, bg: isSpecial, ab: name};
+	});
+var $author$project$Api$Object$Pupil$class = A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField, 'String', 'class', _List_Nil, $elm$json$Json$Decode$string);
+var $author$project$Api$Object$Pupil$isSpecial = A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField, 'Bool', 'isSpecial', _List_Nil, $elm$json$Json$Decode$bool);
+var $author$project$Api$Object$Pupil$name = A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField, 'String', 'name', _List_Nil, $elm$json$Json$Decode$string);
+var $author$project$Data$pupilSelectionSet = A5($dillonkearns$elm_graphql$Graphql$SelectionSet$map4, $author$project$Data$Pupil2, $author$project$Api$Object$Pupil$id, $author$project$Api$Object$Pupil$name, $author$project$Api$Object$Pupil$class, $author$project$Api$Object$Pupil$isSpecial);
+var $author$project$Api$Object$Campaign$pupils = function (object____) {
+	return A4(
+		$dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForCompositeField,
+		'pupils',
+		_List_Nil,
+		object____,
+		A2($elm$core$Basics$composeR, $elm$core$Basics$identity, $elm$json$Json$Decode$list));
+};
 var $author$project$Api$Object$Campaign$title = A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField, 'String', 'title', _List_Nil, $elm$json$Json$Decode$string);
-var $author$project$Main$queryCampaignList2 = $author$project$Api$Query$campaignList(
-	A3($dillonkearns$elm_graphql$Graphql$SelectionSet$map2, $author$project$Data$Campaign2, $author$project$Api$Object$Campaign$id, $author$project$Api$Object$Campaign$title));
+var $author$project$Data$campaingSelectionSet = A6(
+	$dillonkearns$elm_graphql$Graphql$SelectionSet$map5,
+	$author$project$Data$Campaign2,
+	$author$project$Api$Object$Campaign$id,
+	$author$project$Api$Object$Campaign$title,
+	$author$project$Api$Object$Campaign$days($author$project$Data$daySelectionSet),
+	$author$project$Api$Object$Campaign$events($author$project$Data$eventSelectionSet),
+	$author$project$Api$Object$Campaign$pupils($author$project$Data$pupilSelectionSet));
+var $author$project$NewCampaign$Model = F2(
+	function (title, numOfDays) {
+		return {ak: numOfDays, l: title};
+	});
+var $author$project$NewCampaign$init = A2($author$project$NewCampaign$Model, '', 2);
+var $author$project$NewDay$Model = function (title) {
+	return {l: title};
+};
+var $author$project$NewDay$init = $author$project$NewDay$Model('');
+var $author$project$NewEvent$Model = F3(
+	function (title, capacity, maxSpecialPupils) {
+		return {W: capacity, aa: maxSpecialPupils, l: title};
+	});
+var $author$project$NewEvent$init = A3($author$project$NewEvent$Model, '', 12, 2);
 var $dillonkearns$elm_graphql$Graphql$Http$Query = F2(
 	function (a, b) {
 		return {$: 0, a: a, b: b};
@@ -5922,29 +6085,23 @@ var $dillonkearns$elm_graphql$Graphql$Document$decoder = function (_v0) {
 var $dillonkearns$elm_graphql$Graphql$Http$queryRequest = F2(
 	function (baseUrl, query) {
 		return {
-			N: baseUrl,
-			Y: A2($dillonkearns$elm_graphql$Graphql$Http$Query, $elm$core$Maybe$Nothing, query),
-			a1: $dillonkearns$elm_graphql$Graphql$Document$decoder(query),
-			i: _List_Nil,
-			z: $elm$core$Maybe$Nothing,
-			B: _List_Nil,
-			l: $elm$core$Maybe$Nothing,
-			F: false
+			V: baseUrl,
+			aj: A2($dillonkearns$elm_graphql$Graphql$Http$Query, $elm$core$Maybe$Nothing, query),
+			O: $dillonkearns$elm_graphql$Graphql$Document$decoder(query),
+			j: _List_Nil,
+			E: $elm$core$Maybe$Nothing,
+			G: _List_Nil,
+			n: $elm$core$Maybe$Nothing,
+			K: false
 		};
 	});
 var $author$project$Shared$queryUrl = '/query';
-var $author$project$Main$GotCampaignList = function (a) {
-	return {$: 5, a: a};
-};
-var $author$project$Main$resultFn = function (res) {
-	return $author$project$Main$GotCampaignList(res);
-};
 var $elm$http$Http$Request = function (a) {
 	return {$: 1, a: a};
 };
 var $elm$http$Http$State = F2(
 	function (reqs, subs) {
-		return {aD: reqs, aH: subs};
+		return {aR: reqs, aV: subs};
 	});
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: -2};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
@@ -6530,7 +6687,7 @@ var $elm$http$Http$updateReqs = F3(
 					return A2(
 						$elm$core$Task$andThen,
 						function (pid) {
-							var _v4 = req.aJ;
+							var _v4 = req.aX;
 							if (_v4.$ === 1) {
 								return A3($elm$http$Http$updateReqs, router, otherCmds, reqs);
 							} else {
@@ -6560,7 +6717,7 @@ var $elm$http$Http$onEffects = F4(
 				return $elm$core$Task$succeed(
 					A2($elm$http$Http$State, reqs, subs));
 			},
-			A3($elm$http$Http$updateReqs, router, cmds, state.aD));
+			A3($elm$http$Http$updateReqs, router, cmds, state.aR));
 	});
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
@@ -6603,7 +6760,7 @@ var $elm$http$Http$onSelfMsg = F3(
 				A2(
 					$elm$core$List$filterMap,
 					A3($elm$http$Http$maybeSend, router, tracker, progress),
-					state.aH)));
+					state.aV)));
 	});
 var $elm$http$Http$Cancel = function (a) {
 	return {$: 0, a: a};
@@ -6617,14 +6774,14 @@ var $elm$http$Http$cmdMap = F2(
 			var r = cmd.a;
 			return $elm$http$Http$Request(
 				{
-					aQ: r.aQ,
-					aS: r.aS,
-					a1: A2(_Http_mapExpect, func, r.a1),
-					i: r.i,
-					v: r.v,
-					l: r.l,
-					aJ: r.aJ,
-					bt: r.bt
+					a2: r.a2,
+					y: r.y,
+					O: A2(_Http_mapExpect, func, r.O),
+					j: r.j,
+					z: r.z,
+					n: r.n,
+					aX: r.aX,
+					C: r.C
 				});
 		}
 	});
@@ -6647,12 +6804,12 @@ var $elm$http$Http$subscription = _Platform_leaf('Http');
 var $elm$http$Http$request = function (r) {
 	return $elm$http$Http$command(
 		$elm$http$Http$Request(
-			{aQ: false, aS: r.aS, a1: r.a1, i: r.i, v: r.v, l: r.l, aJ: r.aJ, bt: r.bt}));
+			{a2: false, y: r.y, O: r.O, j: r.j, z: r.z, n: r.n, aX: r.aX, C: r.C}));
 };
 var $elm$http$Http$riskyRequest = function (r) {
 	return $elm$http$Http$command(
 		$elm$http$Http$Request(
-			{aQ: true, aS: r.aS, a1: r.a1, i: r.i, v: r.v, l: r.l, aJ: r.aJ, bt: r.bt}));
+			{a2: true, y: r.y, O: r.O, j: r.j, z: r.z, n: r.n, aX: r.aX, C: r.C}));
 };
 var $dillonkearns$elm_graphql$Graphql$Http$GraphqlError = F2(
 	function (a, b) {
@@ -6816,7 +6973,7 @@ var $elm$core$Array$get = F2(
 	});
 var $lukewestby$elm_string_interpolate$String$Interpolate$applyInterpolation = F2(
 	function (replacements, _v0) {
-		var match = _v0.ba;
+		var match = _v0.bj;
 		var ordinalString = A2(
 			$elm$core$Basics$composeL,
 			$elm$core$String$dropLeft(1),
@@ -6868,13 +7025,13 @@ var $elm$core$Array$fromList = function (list) {
 };
 var $elm$regex$Regex$Match = F4(
 	function (match, index, number, submatches) {
-		return {a5: index, ba: match, bf: number, bq: submatches};
+		return {be: index, bj: match, bm: number, bx: submatches};
 	});
 var $elm$regex$Regex$fromStringWith = _Regex_fromStringWith;
 var $elm$regex$Regex$fromString = function (string) {
 	return A2(
 		$elm$regex$Regex$fromStringWith,
-		{aU: false, bd: false},
+		{a4: false, bl: false},
 		string);
 };
 var $elm$regex$Regex$never = _Regex_never;
@@ -6895,10 +7052,7 @@ var $lukewestby$elm_string_interpolate$String$Interpolate$interpolate = F2(
 var $elm$core$Set$Set_elm_builtin = $elm$core$Basics$identity;
 var $elm$core$Set$empty = $elm$core$Dict$empty;
 var $j_maas$elm_ordered_containers$OrderedDict$OrderedDict = $elm$core$Basics$identity;
-var $j_maas$elm_ordered_containers$OrderedDict$empty = {b: $elm$core$Dict$empty, g: _List_Nil};
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
+var $j_maas$elm_ordered_containers$OrderedDict$empty = {a: $elm$core$Dict$empty, g: _List_Nil};
 var $elm$core$List$concatMap = F2(
 	function (f, list) {
 		return $elm$core$List$concat(
@@ -7031,7 +7185,7 @@ var $dillonkearns$elm_graphql$Graphql$Document$Field$findConflictingTypeFields =
 				$elm$core$List$filterMap,
 				function (field) {
 					if (field.$ === 1) {
-						var typeString = field.a.aK;
+						var typeString = field.a.aY;
 						return $elm$core$Maybe$Just(
 							_Utils_Tuple2(
 								$dillonkearns$elm_graphql$Graphql$RawField$name(field),
@@ -7058,7 +7212,7 @@ var $dillonkearns$elm_graphql$Graphql$Document$Field$findConflictingTypeFields =
 var $j_maas$elm_ordered_containers$OrderedDict$get = F2(
 	function (key, _v0) {
 		var orderedDict = _v0;
-		return A2($elm$core$Dict$get, key, orderedDict.b);
+		return A2($elm$core$Dict$get, key, orderedDict.a);
 	});
 var $elm$core$Dict$member = F2(
 	function (key, dict) {
@@ -7092,7 +7246,7 @@ var $elm$core$List$filter = F2(
 var $j_maas$elm_ordered_containers$OrderedDict$insert = F3(
 	function (key, value, _v0) {
 		var orderedDict = _v0;
-		var filteredOrder = A2($elm$core$Dict$member, key, orderedDict.b) ? A2(
+		var filteredOrder = A2($elm$core$Dict$member, key, orderedDict.a) ? A2(
 			$elm$core$List$filter,
 			function (k) {
 				return !_Utils_eq(k, key);
@@ -7103,7 +7257,7 @@ var $j_maas$elm_ordered_containers$OrderedDict$insert = F3(
 			_List_fromArray(
 				[key]));
 		return {
-			b: A3($elm$core$Dict$insert, key, value, orderedDict.b),
+			a: A3($elm$core$Dict$insert, key, value, orderedDict.a),
 			g: newOrder
 		};
 	});
@@ -7111,8 +7265,8 @@ var $j_maas$elm_ordered_containers$OrderedDict$remove = F2(
 	function (key, _v0) {
 		var orderedDict = _v0;
 		return {
-			b: A2($elm$core$Dict$remove, key, orderedDict.b),
-			g: A2($elm$core$Dict$member, key, orderedDict.b) ? A2(
+			a: A2($elm$core$Dict$remove, key, orderedDict.a),
+			g: A2($elm$core$Dict$member, key, orderedDict.a) ? A2(
 				$elm$core$List$filter,
 				function (k) {
 					return !_Utils_eq(k, key);
@@ -7123,7 +7277,7 @@ var $j_maas$elm_ordered_containers$OrderedDict$remove = F2(
 var $j_maas$elm_ordered_containers$OrderedDict$update = F3(
 	function (key, alter, original) {
 		var orderedDict = original;
-		var _v0 = A2($elm$core$Dict$get, key, orderedDict.b);
+		var _v0 = A2($elm$core$Dict$get, key, orderedDict.a);
 		if (!_v0.$) {
 			var oldItem = _v0.a;
 			var _v1 = alter(
@@ -7131,12 +7285,12 @@ var $j_maas$elm_ordered_containers$OrderedDict$update = F3(
 			if (!_v1.$) {
 				var newItem = _v1.a;
 				return {
-					b: A3(
+					a: A3(
 						$elm$core$Dict$update,
 						key,
 						$elm$core$Basics$always(
 							$elm$core$Maybe$Just(newItem)),
-						orderedDict.b),
+						orderedDict.a),
 					g: orderedDict.g
 				};
 			} else {
@@ -7262,7 +7416,7 @@ var $j_maas$elm_ordered_containers$OrderedDict$values = function (_v0) {
 	return A2(
 		$elm$core$List$filterMap,
 		function (key) {
-			return A2($elm$core$Dict$get, key, orderedDict.b);
+			return A2($elm$core$Dict$get, key, orderedDict.a);
 		},
 		orderedDict.g);
 };
@@ -7272,7 +7426,7 @@ var $dillonkearns$elm_graphql$Graphql$Document$Field$mergedFields = function (ch
 };
 var $dillonkearns$elm_graphql$Graphql$RawField$typename = A2(
 	$dillonkearns$elm_graphql$Graphql$RawField$Leaf,
-	{an: '__typename', aK: ''},
+	{aC: '__typename', aY: ''},
 	_List_Nil);
 var $dillonkearns$elm_graphql$Graphql$Document$Field$nonemptyChildren = function (children) {
 	return $elm$core$List$isEmpty(children) ? A2($elm$core$List$cons, $dillonkearns$elm_graphql$Graphql$RawField$typename, children) : children;
@@ -7321,7 +7475,7 @@ var $dillonkearns$elm_graphql$Graphql$Document$Field$serialize = F4(
 								children)))) + ('\n' + ($dillonkearns$elm_graphql$Graphql$Document$Indent$generate(indentationLevel) + '}')));
 					}
 				} else {
-					var fieldName = field.a.an;
+					var fieldName = field.a.aC;
 					var args = field.b;
 					return $elm$core$Maybe$Just(
 						_Utils_ap(
@@ -7503,7 +7657,7 @@ var $dillonkearns$elm_graphql$Graphql$Http$QueryHelper$build = F5(
 			var serializedQuery = _v2.a;
 			var operationNameParamForPostRequest = _v2.b;
 			return {
-				aS: $elm$http$Http$jsonBody(
+				y: $elm$http$Http$jsonBody(
 					$elm$json$Json$Encode$object(
 						A2(
 							$elm$core$List$cons,
@@ -7511,11 +7665,11 @@ var $dillonkearns$elm_graphql$Graphql$Http$QueryHelper$build = F5(
 								'query',
 								$elm$json$Json$Encode$string(serializedQuery)),
 							operationNameParamForPostRequest))),
-				v: 1,
-				bt: A2($dillonkearns$elm_graphql$Graphql$Http$QueryParams$urlWithQueryParams, queryParams, url)
+				z: 1,
+				C: A2($dillonkearns$elm_graphql$Graphql$Http$QueryParams$urlWithQueryParams, queryParams, url)
 			};
 		} else {
-			return {aS: $elm$http$Http$emptyBody, v: 0, bt: urlForGetRequest};
+			return {y: $elm$http$Http$emptyBody, z: 0, C: urlForGetRequest};
 		}
 	});
 var $dillonkearns$elm_graphql$Graphql$Http$GraphqlError$ParsedData = function (a) {
@@ -7527,7 +7681,7 @@ var $dillonkearns$elm_graphql$Graphql$Http$GraphqlError$UnparsedData = function 
 var $elm$json$Json$Decode$andThen = _Json_andThen;
 var $dillonkearns$elm_graphql$Graphql$Http$GraphqlError$GraphqlError = F3(
 	function (message, locations, details) {
-		return {Y: details, a9: locations, bc: message};
+		return {aj: details, bi: locations, bk: message};
 	});
 var $elm$core$Dict$fromList = function (assocs) {
 	return A3(
@@ -7549,14 +7703,13 @@ var $elm$json$Json$Decode$dict = function (decoder) {
 };
 var $dillonkearns$elm_graphql$Graphql$Http$GraphqlError$Location = F2(
 	function (line, column) {
-		return {aY: column, a8: line};
+		return {a7: column, bh: line};
 	});
 var $dillonkearns$elm_graphql$Graphql$Http$GraphqlError$locationDecoder = A3(
 	$elm$json$Json$Decode$map2,
 	$dillonkearns$elm_graphql$Graphql$Http$GraphqlError$Location,
 	A2($elm$json$Json$Decode$field, 'line', $elm$json$Json$Decode$int),
 	A2($elm$json$Json$Decode$field, 'column', $elm$json$Json$Decode$int));
-var $elm$json$Json$Decode$map3 = _Json_map3;
 var $elm$json$Json$Decode$maybe = function (decoder) {
 	return $elm$json$Json$Decode$oneOf(
 		_List_fromArray(
@@ -7585,10 +7738,6 @@ var $dillonkearns$elm_graphql$Graphql$Http$GraphqlError$decoder = A2(
 					$elm$json$Json$Decode$map,
 					$elm$core$Dict$remove('message'),
 					$elm$json$Json$Decode$dict($elm$json$Json$Decode$value))))));
-var $elm$core$Tuple$pair = F2(
-	function (a, b) {
-		return _Utils_Tuple2(a, b);
-	});
 var $dillonkearns$elm_graphql$Graphql$Http$decodeErrorWithData = function (data) {
 	return A2(
 		$elm$json$Json$Decode$map,
@@ -7656,7 +7805,7 @@ var $dillonkearns$elm_graphql$Graphql$Document$serializeMutationWithOperationNam
 	});
 var $dillonkearns$elm_graphql$Graphql$Http$toReadyRequest = function (_v0) {
 	var request = _v0;
-	var _v1 = request.Y;
+	var _v1 = request.aj;
 	if (!_v1.$) {
 		var forcedRequestMethod = _v1.a;
 		var querySelectionSet = _v1.b;
@@ -7675,29 +7824,29 @@ var $dillonkearns$elm_graphql$Graphql$Http$toReadyRequest = function (_v0) {
 					return $elm$core$Maybe$Just(1);
 				}
 			}(),
-			request.N,
-			request.B,
-			request.z,
+			request.V,
+			request.G,
+			request.E,
 			querySelectionSet);
 		return {
-			aS: queryRequestDetails.aS,
-			a_: $dillonkearns$elm_graphql$Graphql$Http$decoderOrError(request.a1),
-			i: request.i,
-			v: function () {
-				var _v2 = queryRequestDetails.v;
+			y: queryRequestDetails.y,
+			a8: $dillonkearns$elm_graphql$Graphql$Http$decoderOrError(request.O),
+			j: request.j,
+			z: function () {
+				var _v2 = queryRequestDetails.z;
 				if (!_v2) {
 					return 'GET';
 				} else {
 					return 'Post';
 				}
 			}(),
-			l: request.l,
-			bt: queryRequestDetails.bt
+			n: request.n,
+			C: queryRequestDetails.C
 		};
 	} else {
 		var mutationSelectionSet = _v1.a;
 		var serializedMutation = function () {
-			var _v7 = request.z;
+			var _v7 = request.E;
 			if (!_v7.$) {
 				var operationName = _v7.a;
 				return A2($dillonkearns$elm_graphql$Graphql$Document$serializeMutationWithOperationName, operationName, mutationSelectionSet);
@@ -7706,7 +7855,7 @@ var $dillonkearns$elm_graphql$Graphql$Http$toReadyRequest = function (_v0) {
 			}
 		}();
 		return {
-			aS: $elm$http$Http$jsonBody(
+			y: $elm$http$Http$jsonBody(
 				$elm$json$Json$Encode$object(
 					A2(
 						$elm$core$List$append,
@@ -7717,7 +7866,7 @@ var $dillonkearns$elm_graphql$Graphql$Http$toReadyRequest = function (_v0) {
 								$elm$json$Json$Encode$string(serializedMutation))
 							]),
 						function () {
-							var _v6 = request.z;
+							var _v6 = request.E;
 							if (!_v6.$) {
 								var operationName = _v6.a;
 								return _List_fromArray(
@@ -7730,11 +7879,11 @@ var $dillonkearns$elm_graphql$Graphql$Http$toReadyRequest = function (_v0) {
 								return _List_Nil;
 							}
 						}()))),
-			a_: $dillonkearns$elm_graphql$Graphql$Http$decoderOrError(request.a1),
-			i: request.i,
-			v: 'POST',
-			l: request.l,
-			bt: A2($dillonkearns$elm_graphql$Graphql$Http$QueryParams$urlWithQueryParams, request.B, request.N)
+			a8: $dillonkearns$elm_graphql$Graphql$Http$decoderOrError(request.O),
+			j: request.j,
+			z: 'POST',
+			n: request.n,
+			C: A2($dillonkearns$elm_graphql$Graphql$Http$QueryParams$urlWithQueryParams, request.G, request.V)
 		};
 	}
 };
@@ -7743,16 +7892,16 @@ var $dillonkearns$elm_graphql$Graphql$Http$toHttpRequestRecord = F2(
 		var request = fullRequest;
 		return function (readyRequest) {
 			return {
-				aS: readyRequest.aS,
-				a1: A2(
+				y: readyRequest.y,
+				O: A2(
 					$dillonkearns$elm_graphql$Graphql$Http$expectJson,
 					A2($elm$core$Basics$composeR, $dillonkearns$elm_graphql$Graphql$Http$convertResult, resultToMessage),
-					readyRequest.a_),
-				i: readyRequest.i,
-				v: readyRequest.v,
-				l: readyRequest.l,
-				aJ: $elm$core$Maybe$Nothing,
-				bt: readyRequest.bt
+					readyRequest.a8),
+				j: readyRequest.j,
+				z: readyRequest.z,
+				n: readyRequest.n,
+				aX: $elm$core$Maybe$Nothing,
+				C: readyRequest.C
 			};
 		}(
 			$dillonkearns$elm_graphql$Graphql$Http$toReadyRequest(fullRequest));
@@ -7760,16 +7909,19 @@ var $dillonkearns$elm_graphql$Graphql$Http$toHttpRequestRecord = F2(
 var $dillonkearns$elm_graphql$Graphql$Http$send = F2(
 	function (resultToMessage, fullRequest) {
 		var request = fullRequest;
-		return (request.F ? $elm$http$Http$riskyRequest : $elm$http$Http$request)(
+		return (request.K ? $elm$http$Http$riskyRequest : $elm$http$Http$request)(
 			A2($dillonkearns$elm_graphql$Graphql$Http$toHttpRequestRecord, resultToMessage, fullRequest));
 	});
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		{p: _List_Nil, X: _List_Nil, a: $author$project$Main$Loading, Q: $author$project$NewCampaign$init, R: $author$project$NewDay$init, S: $author$project$NewEvent$init},
+		{s: _List_Nil, b: $author$project$Main$Loading, ac: $author$project$NewCampaign$init, ad: $author$project$NewDay$init, ae: $author$project$NewEvent$init},
 		A2(
 			$dillonkearns$elm_graphql$Graphql$Http$send,
-			$author$project$Main$resultFn,
-			A2($dillonkearns$elm_graphql$Graphql$Http$queryRequest, $author$project$Shared$queryUrl, $author$project$Main$queryCampaignList2)));
+			$author$project$Main$GotCampaignList,
+			A2(
+				$dillonkearns$elm_graphql$Graphql$Http$queryRequest,
+				$author$project$Shared$queryUrl,
+				$author$project$Api$Query$campaignList($author$project$Data$campaingSelectionSet))));
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
@@ -7809,25 +7961,11 @@ var $author$project$Main$Success = function (a) {
 var $elm$core$Platform$Cmd$map = _Platform_map;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Shared$parseError = function (err) {
-	switch (err.$) {
-		case 0:
-			var m = err.a;
-			return 'bad url: ' + m;
-		case 1:
-			return 'timeout';
-		case 2:
-			return 'network error';
-		case 3:
-			var code = err.a;
-			return 'bad status: ' + $elm$core$String$fromInt(code);
-		default:
-			var m = err.a;
-			return 'bad body: ' + m;
-	}
-};
 var $author$project$Shared$parseGraphqlError = function (_v0) {
 	return 'graphqlError but is not parsed';
+};
+var $author$project$Api$Mutation$AddCampaignRequiredArguments = function (title) {
+	return {l: title};
 };
 var $author$project$NewCampaign$Done = function (a) {
 	return {$: 2, a: a};
@@ -7842,149 +7980,93 @@ var $author$project$NewCampaign$Loading = function (a) {
 	return {$: 1, a: a};
 };
 var $author$project$NewCampaign$None = {$: 0};
-var $author$project$Data$Campaign = F5(
-	function (id, title, days, events, pupils) {
-		return {aZ: days, am: events, ar: id, bj: pupils, _: title};
-	});
-var $author$project$Data$Day = F3(
-	function (id, title, events) {
-		return {am: events, ar: id, _: title};
-	});
-var $author$project$Data$dayDecoder = A4(
-	$elm$json$Json$Decode$map3,
-	$author$project$Data$Day,
-	A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$int),
-	A2($elm$json$Json$Decode$field, 'title', $elm$json$Json$Decode$string),
-	A2(
-		$elm$json$Json$Decode$field,
-		'events',
-		$elm$json$Json$Decode$list(
-			A3(
-				$elm$json$Json$Decode$map2,
-				$elm$core$Tuple$pair,
-				A2(
-					$elm$json$Json$Decode$field,
-					'event',
-					A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$int)),
-				A2(
-					$elm$json$Json$Decode$field,
-					'pupils',
-					$elm$json$Json$Decode$list(
-						A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$int)))))));
-var $author$project$Data$Event = F4(
-	function (id, title, capacity, maxSpecialPupils) {
-		return {aT: capacity, ar: id, bb: maxSpecialPupils, _: title};
-	});
-var $elm$json$Json$Decode$map4 = _Json_map4;
-var $author$project$Data$eventDecoder = A5(
-	$elm$json$Json$Decode$map4,
-	$author$project$Data$Event,
-	A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$int),
-	A2($elm$json$Json$Decode$field, 'title', $elm$json$Json$Decode$string),
-	A2($elm$json$Json$Decode$field, 'capacity', $elm$json$Json$Decode$int),
-	A2($elm$json$Json$Decode$field, 'maxSpecialPupils', $elm$json$Json$Decode$int));
-var $elm$json$Json$Decode$map5 = _Json_map5;
-var $author$project$Data$Pupil = F3(
-	function (name, _class, isSpecial) {
-		return {aW: _class, a7: isSpecial, be: name};
-	});
-var $author$project$Data$pupilDecoder = A4(
-	$elm$json$Json$Decode$map3,
-	$author$project$Data$Pupil,
-	A2($elm$json$Json$Decode$field, 'name', $elm$json$Json$Decode$string),
-	A2($elm$json$Json$Decode$field, 'class', $elm$json$Json$Decode$string),
-	A2($elm$json$Json$Decode$field, 'isSpecial', $elm$json$Json$Decode$bool));
-var $author$project$Data$campaignDecoder = A6(
-	$elm$json$Json$Decode$map5,
-	$author$project$Data$Campaign,
-	A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$int),
-	A2($elm$json$Json$Decode$field, 'title', $elm$json$Json$Decode$string),
-	A2(
-		$elm$json$Json$Decode$field,
-		'days',
-		$elm$json$Json$Decode$list($author$project$Data$dayDecoder)),
-	A2(
-		$elm$json$Json$Decode$field,
-		'events',
-		$elm$json$Json$Decode$list($author$project$Data$eventDecoder)),
-	A2(
-		$elm$json$Json$Decode$field,
-		'pupils',
-		$elm$json$Json$Decode$list($author$project$Data$pupilDecoder)));
-var $elm$core$Result$mapError = F2(
-	function (f, result) {
-		if (!result.$) {
-			var v = result.a;
-			return $elm$core$Result$Ok(v);
-		} else {
-			var e = result.a;
-			return $elm$core$Result$Err(
-				f(e));
-		}
-	});
-var $elm$http$Http$BadBody = function (a) {
-	return {$: 4, a: a};
-};
-var $elm$http$Http$BadStatus = function (a) {
-	return {$: 3, a: a};
-};
-var $elm$http$Http$BadUrl = function (a) {
+var $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present = function (a) {
 	return {$: 0, a: a};
 };
-var $elm$http$Http$NetworkError = {$: 2};
-var $elm$http$Http$Timeout = {$: 1};
-var $elm$http$Http$resolve = F2(
-	function (toResult, response) {
-		switch (response.$) {
+var $dillonkearns$elm_graphql$Graphql$OptionalArgument$Absent = {$: 1};
+var $dillonkearns$elm_graphql$Graphql$Internal$Encode$list = F2(
+	function (toValue, value) {
+		return $dillonkearns$elm_graphql$Graphql$Internal$Encode$List(
+			A2($elm$core$List$map, toValue, value));
+	});
+var $dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$Argument = F2(
+	function (a, b) {
+		return {$: 0, a: a, b: b};
+	});
+var $elm$json$Json$Encode$null = _Json_encodeNull;
+var $dillonkearns$elm_graphql$Graphql$Internal$Encode$null = $dillonkearns$elm_graphql$Graphql$Internal$Encode$Json($elm$json$Json$Encode$null);
+var $dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$optional = F3(
+	function (fieldName, maybeValue, toValue) {
+		switch (maybeValue.$) {
 			case 0:
-				var url = response.a;
-				return $elm$core$Result$Err(
-					$elm$http$Http$BadUrl(url));
+				var value = maybeValue.a;
+				return $elm$core$Maybe$Just(
+					A2(
+						$dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$Argument,
+						fieldName,
+						toValue(value)));
 			case 1:
-				return $elm$core$Result$Err($elm$http$Http$Timeout);
-			case 2:
-				return $elm$core$Result$Err($elm$http$Http$NetworkError);
-			case 3:
-				var metadata = response.a;
-				return $elm$core$Result$Err(
-					$elm$http$Http$BadStatus(metadata.bo));
+				return $elm$core$Maybe$Nothing;
 			default:
-				var body = response.b;
-				return A2(
-					$elm$core$Result$mapError,
-					$elm$http$Http$BadBody,
-					toResult(body));
+				return $elm$core$Maybe$Just(
+					A2($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$Argument, fieldName, $dillonkearns$elm_graphql$Graphql$Internal$Encode$null));
 		}
 	});
-var $elm$http$Http$expectJson = F2(
-	function (toMsg, decoder) {
+var $dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required = F3(
+	function (fieldName, raw, encode) {
 		return A2(
-			$elm$http$Http$expectStringResponse,
-			toMsg,
-			$elm$http$Http$resolve(
-				function (string) {
-					return A2(
-						$elm$core$Result$mapError,
-						$elm$json$Json$Decode$errorToString,
-						A2($elm$json$Json$Decode$decodeString, decoder, string));
-				}));
+			$dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$Argument,
+			fieldName,
+			encode(raw));
 	});
-var $elm$json$Json$Encode$list = F2(
-	function (func, entries) {
-		return _Json_wrap(
-			A3(
-				$elm$core$List$foldl,
-				_Json_addEntry(func),
-				_Json_emptyArray(0),
-				entries));
-	});
-var $elm$http$Http$post = function (r) {
-	return $elm$http$Http$request(
-		{aS: r.aS, a1: r.a1, i: _List_Nil, v: 'POST', l: $elm$core$Maybe$Nothing, aJ: $elm$core$Maybe$Nothing, bt: r.bt});
+var $dillonkearns$elm_graphql$Graphql$Internal$Encode$string = function (value) {
+	return $dillonkearns$elm_graphql$Graphql$Internal$Encode$Json(
+		$elm$json$Json$Encode$string(value));
 };
-var $author$project$Data$queryDay = '\n    {\n        id\n        title\n        events {\n            event {\n                id\n            }\n            pupils {\n                id\n            }\n        }\n    }\n    ';
-var $author$project$Data$queryEvent = '\n    {\n        id\n        title\n        capacity\n        maxSpecialPupils\n    }\n    ';
-var $author$project$Data$queryCampaign = '\n    {\n        id\n        title\n        days ' + ($author$project$Data$queryDay + ('\n        events\n    ' + ($author$project$Data$queryEvent + '\n        pupils {\n            id\n            name\n            class\n            isSpecial\n            choices {\n                event {\n                    id\n                    title\n                }\n                choice\n            }\n        }\n    }\n    ')));
+var $author$project$Api$Mutation$addCampaign = F3(
+	function (fillInOptionals____, requiredArgs____, object____) {
+		var filledInOptionals____ = fillInOptionals____(
+			{am: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Absent, q: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Absent});
+		var optionalArgs____ = A2(
+			$elm$core$List$filterMap,
+			$elm$core$Basics$identity,
+			_List_fromArray(
+				[
+					A3(
+					$dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$optional,
+					'days',
+					filledInOptionals____.am,
+					$dillonkearns$elm_graphql$Graphql$Internal$Encode$list($dillonkearns$elm_graphql$Graphql$Internal$Encode$string)),
+					A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$optional, 'loginToken', filledInOptionals____.q, $dillonkearns$elm_graphql$Graphql$Internal$Encode$string)
+				]));
+		return A4(
+			$dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForCompositeField,
+			'addCampaign',
+			_Utils_ap(
+				optionalArgs____,
+				_List_fromArray(
+					[
+						A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required, 'title', requiredArgs____.l, $dillonkearns$elm_graphql$Graphql$Internal$Encode$string)
+					])),
+			object____,
+			$elm$core$Basics$identity);
+	});
+var $dillonkearns$elm_graphql$Graphql$Http$Mutation = function (a) {
+	return {$: 1, a: a};
+};
+var $dillonkearns$elm_graphql$Graphql$Http$mutationRequest = F2(
+	function (baseUrl, mutationSelectionSet) {
+		return {
+			V: baseUrl,
+			aj: $dillonkearns$elm_graphql$Graphql$Http$Mutation(mutationSelectionSet),
+			O: $dillonkearns$elm_graphql$Graphql$Document$decoder(mutationSelectionSet),
+			j: _List_Nil,
+			E: $elm$core$Maybe$Nothing,
+			G: _List_Nil,
+			n: $elm$core$Maybe$Nothing,
+			K: false
+		};
+	});
 var $author$project$NewCampaign$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -7995,12 +8077,12 @@ var $author$project$NewCampaign$update = F2(
 						var t = newData.a;
 						return _Utils_update(
 							model,
-							{_: t});
+							{l: t});
 					} else {
 						var n = newData.a;
 						return _Utils_update(
 							model,
-							{Z: n});
+							{ak: n});
 					}
 				}();
 				return _Utils_Tuple2(updatedModel, $author$project$NewCampaign$None);
@@ -8010,66 +8092,47 @@ var $author$project$NewCampaign$update = F2(
 					function (i) {
 						return 'Tag ' + $elm$core$String$fromInt(i);
 					},
-					A2($elm$core$List$range, 1, model.Z));
-				var mutationQuery = A2(
-					$elm$core$String$join,
-					' ',
-					_List_fromArray(
-						[
-							'mutation',
-							'{',
-							'addCampaign',
-							'(',
-							'title:',
-							A2(
-							$elm$json$Json$Encode$encode,
-							0,
-							$elm$json$Json$Encode$string(model._)),
-							',',
-							'days:',
-							A2(
-							$elm$json$Json$Encode$encode,
-							0,
-							A2($elm$json$Json$Encode$list, $elm$json$Json$Encode$string, dayList)),
-							')',
-							$author$project$Data$queryCampaign,
-							'}'
-						]));
-				var addCampaignDecoder = A2(
-					$elm$json$Json$Decode$field,
-					'data',
-					A2($elm$json$Json$Decode$field, 'addCampaign', $author$project$Data$campaignDecoder));
+					A2($elm$core$List$range, 1, model.ak));
+				var optionalArgs = function (args) {
+					return _Utils_update(
+						args,
+						{
+							am: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present(dayList)
+						});
+				};
 				return _Utils_Tuple2(
 					model,
 					$author$project$NewCampaign$Loading(
-						$elm$http$Http$post(
-							{
-								aS: $elm$http$Http$jsonBody(
-									$elm$json$Json$Encode$object(
-										_List_fromArray(
-											[
-												_Utils_Tuple2(
-												'query',
-												$elm$json$Json$Encode$string(mutationQuery))
-											]))),
-								a1: A2($elm$http$Http$expectJson, $author$project$NewCampaign$GotNewCampaign, addCampaignDecoder),
-								bt: $author$project$Shared$queryUrl
-							})));
+						A2(
+							$dillonkearns$elm_graphql$Graphql$Http$send,
+							$author$project$NewCampaign$GotNewCampaign,
+							A2(
+								$dillonkearns$elm_graphql$Graphql$Http$mutationRequest,
+								$author$project$Shared$queryUrl,
+								A3(
+									$author$project$Api$Mutation$addCampaign,
+									optionalArgs,
+									$author$project$Api$Mutation$AddCampaignRequiredArguments(model.l),
+									$author$project$Data$campaingSelectionSet)))));
 			default:
 				var res = msg.a;
 				if (!res.$) {
-					var camp = res.a;
+					var campaign = res.a;
 					return _Utils_Tuple2(
 						model,
-						$author$project$NewCampaign$Done(camp));
+						$author$project$NewCampaign$Done(campaign));
 				} else {
 					var err = res.a;
 					return _Utils_Tuple2(
 						model,
 						$author$project$NewCampaign$Error(
-							$author$project$Shared$parseError(err)));
+							$author$project$Shared$parseGraphqlError(err)));
 				}
 		}
+	});
+var $author$project$Api$Mutation$AddDayRequiredArguments = F2(
+	function (campaignID, title) {
+		return {L: campaignID, l: title};
 	});
 var $author$project$NewDay$Done = function (a) {
 	return {$: 2, a: a};
@@ -8085,7 +8148,39 @@ var $author$project$NewDay$Loading = function (a) {
 	return {$: 1, a: a};
 };
 var $author$project$NewDay$None = {$: 0};
-var $elm$json$Json$Encode$int = _Json_wrap;
+var $dillonkearns$elm_graphql$Graphql$Internal$Encode$fromJson = function (jsonValue) {
+	return $dillonkearns$elm_graphql$Graphql$Internal$Encode$Json(jsonValue);
+};
+var $author$project$Api$Scalar$unwrapEncoder = F2(
+	function (getter, _v0) {
+		var unwrappedCodecs = _v0;
+		return A2(
+			$elm$core$Basics$composeR,
+			getter(unwrappedCodecs).ay,
+			$dillonkearns$elm_graphql$Graphql$Internal$Encode$fromJson);
+	});
+var $author$project$Api$Mutation$addDay = F2(
+	function (requiredArgs____, object____) {
+		return A4(
+			$dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForCompositeField,
+			'addDay',
+			_List_fromArray(
+				[
+					A3(
+					$dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required,
+					'campaignID',
+					requiredArgs____.L,
+					A2(
+						$author$project$Api$Scalar$unwrapEncoder,
+						function ($) {
+							return $.a6;
+						},
+						$author$project$Api$ScalarCodecs$codecs)),
+					A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required, 'title', requiredArgs____.l, $dillonkearns$elm_graphql$Graphql$Internal$Encode$string)
+				]),
+			object____,
+			$elm$core$Basics$identity);
+	});
 var $author$project$NewDay$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -8095,81 +8190,52 @@ var $author$project$NewDay$update = F2(
 					var t = newData;
 					return _Utils_update(
 						model,
-						{_: t});
+						{l: t});
 				}();
 				return _Utils_Tuple2(updatedModel, $author$project$NewDay$None);
 			case 1:
-				var c = msg.a;
-				var mutationQuery = A2(
-					$elm$core$String$join,
-					' ',
-					_List_fromArray(
-						[
-							'mutation',
-							'{',
-							'addDay',
-							'(',
-							'campaignID:',
-							A2(
-							$elm$json$Json$Encode$encode,
-							0,
-							$elm$json$Json$Encode$int(c.ar)),
-							', title:',
-							A2(
-							$elm$json$Json$Encode$encode,
-							0,
-							$elm$json$Json$Encode$string(model._)),
-							')',
-							$author$project$Data$queryDay,
-							'}'
-						]));
-				var addDayDecoder = A2(
-					$elm$json$Json$Decode$field,
-					'data',
-					A2($elm$json$Json$Decode$field, 'addDay', $author$project$Data$dayDecoder));
+				var campaign = msg.a;
 				return _Utils_Tuple2(
 					model,
 					$author$project$NewDay$Loading(
-						$elm$http$Http$post(
-							{
-								aS: $elm$http$Http$jsonBody(
-									$elm$json$Json$Encode$object(
-										_List_fromArray(
-											[
-												_Utils_Tuple2(
-												'query',
-												$elm$json$Json$Encode$string(mutationQuery))
-											]))),
-								a1: A2(
-									$elm$http$Http$expectJson,
-									$author$project$NewDay$GotNewDay(c),
-									addDayDecoder),
-								bt: $author$project$Shared$queryUrl
-							})));
+						A2(
+							$dillonkearns$elm_graphql$Graphql$Http$send,
+							$author$project$NewDay$GotNewDay(campaign),
+							A2(
+								$dillonkearns$elm_graphql$Graphql$Http$mutationRequest,
+								$author$project$Shared$queryUrl,
+								A2(
+									$author$project$Api$Mutation$addDay,
+									A2($author$project$Api$Mutation$AddDayRequiredArguments, campaign.h, model.l),
+									$author$project$Data$daySelectionSet)))));
 			default:
-				var c = msg.a;
+				var campaign = msg.a;
 				var res = msg.b;
 				if (!res.$) {
-					var d = res.a;
+					var day = res.a;
 					return _Utils_Tuple2(
 						model,
 						$author$project$NewDay$Done(
 							_Utils_update(
-								c,
+								campaign,
 								{
-									aZ: _Utils_ap(
-										c.aZ,
+									am: _Utils_ap(
+										campaign.am,
 										_List_fromArray(
-											[d]))
+											[day]))
 								})));
 				} else {
 					var err = res.a;
 					return _Utils_Tuple2(
 						model,
 						$author$project$NewDay$Error(
-							$author$project$Shared$parseError(err)));
+							$author$project$Shared$parseGraphqlError(err)));
 				}
 		}
+	});
+var $author$project$Api$Mutation$AddEventRequiredArguments = F5(
+	function (campaignID, title, dayIDs, capacity, maxSpecialPupils) {
+		return {L: campaignID, W: capacity, Z: dayIDs, aa: maxSpecialPupils, l: title};
 	});
 var $author$project$NewEvent$Done = function (a) {
 	return {$: 2, a: a};
@@ -8185,6 +8251,46 @@ var $author$project$NewEvent$Loading = function (a) {
 	return {$: 1, a: a};
 };
 var $author$project$NewEvent$None = {$: 0};
+var $elm$json$Json$Encode$int = _Json_wrap;
+var $dillonkearns$elm_graphql$Graphql$Internal$Encode$int = function (value) {
+	return $dillonkearns$elm_graphql$Graphql$Internal$Encode$Json(
+		$elm$json$Json$Encode$int(value));
+};
+var $author$project$Api$Mutation$addEvent = F2(
+	function (requiredArgs____, object____) {
+		return A4(
+			$dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForCompositeField,
+			'addEvent',
+			_List_fromArray(
+				[
+					A3(
+					$dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required,
+					'campaignID',
+					requiredArgs____.L,
+					A2(
+						$author$project$Api$Scalar$unwrapEncoder,
+						function ($) {
+							return $.a6;
+						},
+						$author$project$Api$ScalarCodecs$codecs)),
+					A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required, 'title', requiredArgs____.l, $dillonkearns$elm_graphql$Graphql$Internal$Encode$string),
+					A3(
+					$dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required,
+					'dayIDs',
+					requiredArgs____.Z,
+					$dillonkearns$elm_graphql$Graphql$Internal$Encode$list(
+						A2(
+							$author$project$Api$Scalar$unwrapEncoder,
+							function ($) {
+								return $.a6;
+							},
+							$author$project$Api$ScalarCodecs$codecs))),
+					A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required, 'capacity', requiredArgs____.W, $dillonkearns$elm_graphql$Graphql$Internal$Encode$int),
+					A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required, 'maxSpecialPupils', requiredArgs____.aa, $dillonkearns$elm_graphql$Graphql$Internal$Encode$int)
+				]),
+			object____,
+			$elm$core$Basics$identity);
+	});
 var $author$project$NewEvent$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -8196,130 +8302,63 @@ var $author$project$NewEvent$update = F2(
 							var t = newData.a;
 							return _Utils_update(
 								model,
-								{_: t});
+								{l: t});
 						case 1:
 							var c = newData.a;
 							return _Utils_update(
 								model,
-								{aT: c});
+								{W: c});
 						default:
 							var msp = newData.a;
 							return _Utils_update(
 								model,
-								{bb: msp});
+								{aa: msp});
 					}
 				}();
 				return _Utils_Tuple2(updatedModel, $author$project$NewEvent$None);
 			case 1:
-				var c = msg.a;
-				var mutationQuery = A2(
-					$elm$core$String$join,
-					' ',
-					_List_fromArray(
-						[
-							'mutation',
-							'{',
-							'addEvent',
-							'(',
-							'campaignID:',
-							A2(
-							$elm$json$Json$Encode$encode,
-							0,
-							$elm$json$Json$Encode$int(c.ar)),
-							', title:',
-							A2(
-							$elm$json$Json$Encode$encode,
-							0,
-							$elm$json$Json$Encode$string(model._)),
-							',capacity:',
-							A2(
-							$elm$json$Json$Encode$encode,
-							0,
-							$elm$json$Json$Encode$int(model.aT)),
-							', maxSpecialPupils:',
-							A2(
-							$elm$json$Json$Encode$encode,
-							0,
-							$elm$json$Json$Encode$int(model.bb)),
-							', dayIDs: []',
-							')',
-							$author$project$Data$queryEvent,
-							'}'
-						]));
-				var addEventDecoder = A2(
-					$elm$json$Json$Decode$field,
-					'data',
-					A2($elm$json$Json$Decode$field, 'addEvent', $author$project$Data$eventDecoder));
+				var campaign = msg.a;
 				return _Utils_Tuple2(
 					model,
 					$author$project$NewEvent$Loading(
-						$elm$http$Http$post(
-							{
-								aS: $elm$http$Http$jsonBody(
-									$elm$json$Json$Encode$object(
-										_List_fromArray(
-											[
-												_Utils_Tuple2(
-												'query',
-												$elm$json$Json$Encode$string(mutationQuery))
-											]))),
-								a1: A2(
-									$elm$http$Http$expectJson,
-									$author$project$NewEvent$GotNewEvent(c),
-									addEventDecoder),
-								bt: $author$project$Shared$queryUrl
-							})));
+						A2(
+							$dillonkearns$elm_graphql$Graphql$Http$send,
+							$author$project$NewEvent$GotNewEvent(campaign),
+							A2(
+								$dillonkearns$elm_graphql$Graphql$Http$mutationRequest,
+								$author$project$Shared$queryUrl,
+								A2(
+									$author$project$Api$Mutation$addEvent,
+									A5($author$project$Api$Mutation$AddEventRequiredArguments, campaign.h, model.l, _List_Nil, model.W, model.aa),
+									$author$project$Data$eventSelectionSet)))));
 			default:
-				var c = msg.a;
+				var campaign = msg.a;
 				var res = msg.b;
 				if (!res.$) {
-					var e = res.a;
+					var event = res.a;
 					return _Utils_Tuple2(
 						model,
 						$author$project$NewEvent$Done(
 							_Utils_update(
-								c,
+								campaign,
 								{
-									am: _Utils_ap(
-										c.am,
+									aB: _Utils_ap(
+										campaign.aB,
 										_List_fromArray(
-											[e]))
+											[event]))
 								})));
 				} else {
 					var err = res.a;
 					return _Utils_Tuple2(
 						model,
 						$author$project$NewEvent$Error(
-							$author$project$Shared$parseError(err)));
+							$author$project$Shared$parseGraphqlError(err)));
 				}
 		}
 	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
-			case 5:
-				var res = msg.a;
-				if (!res.$) {
-					var campaigns = res.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								X: campaigns,
-								a: $author$project$Main$Success($author$project$Main$Overview)
-							}),
-						$elm$core$Platform$Cmd$none);
-				} else {
-					var err = res.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								a: $author$project$Main$Failure(
-									$author$project$Shared$parseGraphqlError(err))
-							}),
-						$elm$core$Platform$Cmd$none);
-				}
 			case 0:
 				var res = msg.a;
 				if (!res.$) {
@@ -8328,8 +8367,8 @@ var $author$project$Main$update = F2(
 						_Utils_update(
 							model,
 							{
-								p: campaigns,
-								a: $author$project$Main$Success($author$project$Main$Overview)
+								s: campaigns,
+								b: $author$project$Main$Success($author$project$Main$Overview)
 							}),
 						$elm$core$Platform$Cmd$none);
 				} else {
@@ -8338,8 +8377,8 @@ var $author$project$Main$update = F2(
 						_Utils_update(
 							model,
 							{
-								a: $author$project$Main$Failure(
-									$author$project$Shared$parseError(err))
+								b: $author$project$Main$Failure(
+									$author$project$Shared$parseGraphqlError(err))
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
@@ -8351,7 +8390,7 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									a: $author$project$Main$Success($author$project$Main$Overview)
+									b: $author$project$Main$Success($author$project$Main$Overview)
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 1:
@@ -8359,7 +8398,7 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									a: $author$project$Main$Success($author$project$Main$NewCampaignPage)
+									b: $author$project$Main$Success($author$project$Main$NewCampaignPage)
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 2:
@@ -8368,7 +8407,7 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									a: $author$project$Main$Success(
+									b: $author$project$Main$Success(
 										$author$project$Main$NewDayPage(c))
 								}),
 							$elm$core$Platform$Cmd$none);
@@ -8378,7 +8417,7 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									a: $author$project$Main$Success(
+									b: $author$project$Main$Success(
 										$author$project$Main$NewEventPage(c))
 								}),
 							$elm$core$Platform$Cmd$none);
@@ -8388,7 +8427,7 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									a: $author$project$Main$Success(
+									b: $author$project$Main$Success(
 										$author$project$Main$CampaignPage(c))
 								}),
 							$elm$core$Platform$Cmd$none);
@@ -8398,7 +8437,7 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									a: $author$project$Main$Success(
+									b: $author$project$Main$Success(
 										$author$project$Main$PupilPage(pup))
 								}),
 							$elm$core$Platform$Cmd$none);
@@ -8407,28 +8446,28 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									a: $author$project$Main$Success($author$project$Main$NewPupils)
+									b: $author$project$Main$Success($author$project$Main$NewPupils)
 								}),
 							$elm$core$Platform$Cmd$none);
 				}
 			case 2:
 				var innerMsg = msg.a;
-				var _v4 = A2($author$project$NewCampaign$update, innerMsg, model.Q);
-				var innerModel = _v4.a;
-				var effect = _v4.b;
+				var _v3 = A2($author$project$NewCampaign$update, innerMsg, model.ac);
+				var innerModel = _v3.a;
+				var effect = _v3.b;
 				switch (effect.$) {
 					case 0:
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
-								{Q: innerModel}),
+								{ac: innerModel}),
 							$elm$core$Platform$Cmd$none);
 					case 1:
 						var innerCmd = effect.a;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
-								{a: $author$project$Main$Loading}),
+								{b: $author$project$Main$Loading}),
 							A2($elm$core$Platform$Cmd$map, $author$project$Main$NewCampaignMsg, innerCmd));
 					case 2:
 						var c = effect.a;
@@ -8436,11 +8475,11 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									p: _Utils_ap(
-										model.p,
+									s: _Utils_ap(
+										model.s,
 										_List_fromArray(
 											[c])),
-									a: $author$project$Main$Success(
+									b: $author$project$Main$Success(
 										$author$project$Main$CampaignPage(c))
 								}),
 							$elm$core$Platform$Cmd$none);
@@ -8450,28 +8489,28 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									a: $author$project$Main$Failure(err)
+									b: $author$project$Main$Failure(err)
 								}),
 							$elm$core$Platform$Cmd$none);
 				}
 			case 3:
 				var innerMsg = msg.a;
-				var _v6 = A2($author$project$NewDay$update, innerMsg, model.R);
-				var innerModel = _v6.a;
-				var effect = _v6.b;
+				var _v5 = A2($author$project$NewDay$update, innerMsg, model.ad);
+				var innerModel = _v5.a;
+				var effect = _v5.b;
 				switch (effect.$) {
 					case 0:
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
-								{R: innerModel}),
+								{ad: innerModel}),
 							$elm$core$Platform$Cmd$none);
 					case 1:
 						var innerCmd = effect.a;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
-								{a: $author$project$Main$Loading}),
+								{b: $author$project$Main$Loading}),
 							A2($elm$core$Platform$Cmd$map, $author$project$Main$NewDayMsg, innerCmd));
 					case 2:
 						var updatedCamp = effect.a;
@@ -8479,16 +8518,16 @@ var $author$project$Main$update = F2(
 							$elm$core$List$foldr,
 							F2(
 								function (camp, acc) {
-									return _Utils_eq(camp.ar, updatedCamp.ar) ? A2($elm$core$List$cons, updatedCamp, acc) : A2($elm$core$List$cons, camp, acc);
+									return _Utils_eq(camp.h, updatedCamp.h) ? A2($elm$core$List$cons, updatedCamp, acc) : A2($elm$core$List$cons, camp, acc);
 								}),
 							_List_Nil,
-							model.p);
+							model.s);
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
 								{
-									p: newCampaignList,
-									a: $author$project$Main$Success(
+									s: newCampaignList,
+									b: $author$project$Main$Success(
 										$author$project$Main$CampaignPage(updatedCamp))
 								}),
 							$elm$core$Platform$Cmd$none);
@@ -8498,28 +8537,28 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									a: $author$project$Main$Failure(err)
+									b: $author$project$Main$Failure(err)
 								}),
 							$elm$core$Platform$Cmd$none);
 				}
 			default:
 				var innerMsg = msg.a;
-				var _v8 = A2($author$project$NewEvent$update, innerMsg, model.S);
-				var innerModel = _v8.a;
-				var effect = _v8.b;
+				var _v7 = A2($author$project$NewEvent$update, innerMsg, model.ae);
+				var innerModel = _v7.a;
+				var effect = _v7.b;
 				switch (effect.$) {
 					case 0:
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
-								{S: innerModel}),
+								{ae: innerModel}),
 							$elm$core$Platform$Cmd$none);
 					case 1:
 						var innerCmd = effect.a;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
-								{a: $author$project$Main$Loading}),
+								{b: $author$project$Main$Loading}),
 							A2($elm$core$Platform$Cmd$map, $author$project$Main$NewEventMsg, innerCmd));
 					case 2:
 						var updatedCamp = effect.a;
@@ -8527,16 +8566,16 @@ var $author$project$Main$update = F2(
 							$elm$core$List$foldr,
 							F2(
 								function (camp, acc) {
-									return _Utils_eq(camp.ar, updatedCamp.ar) ? A2($elm$core$List$cons, updatedCamp, acc) : A2($elm$core$List$cons, camp, acc);
+									return _Utils_eq(camp.h, updatedCamp.h) ? A2($elm$core$List$cons, updatedCamp, acc) : A2($elm$core$List$cons, camp, acc);
 								}),
 							_List_Nil,
-							model.p);
+							model.s);
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
 								{
-									p: newCampaignList,
-									a: $author$project$Main$Success(
+									s: newCampaignList,
+									b: $author$project$Main$Success(
 										$author$project$Main$CampaignPage(updatedCamp))
 								}),
 							$elm$core$Platform$Cmd$none);
@@ -8546,7 +8585,7 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
-									a: $author$project$Main$Failure(err)
+									b: $author$project$Main$Failure(err)
 								}),
 							$elm$core$Platform$Cmd$none);
 				}
@@ -8621,7 +8660,7 @@ var $author$project$Main$dayView = function (d) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(d._)
+						$elm$html$Html$text(d.l)
 					])),
 			_Utils_ap(events, unassignedPupils)));
 };
@@ -8660,7 +8699,7 @@ var $author$project$Main$eventView = function (e) {
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text(e._)
+										$elm$html$Html$text(e.l)
 									]))
 							])),
 						A2(
@@ -8698,7 +8737,7 @@ var $author$project$Main$eventView = function (e) {
 										_List_fromArray(
 											[
 												$elm$html$Html$text(
-												$elm$core$String$fromInt(e.aT))
+												$elm$core$String$fromInt(e.W))
 											]))
 									]))
 							])),
@@ -8737,7 +8776,7 @@ var $author$project$Main$eventView = function (e) {
 										_List_fromArray(
 											[
 												$elm$html$Html$text(
-												$elm$core$String$fromInt(e.bb))
+												$elm$core$String$fromInt(e.aa))
 											]))
 									]))
 							]))
@@ -8768,7 +8807,7 @@ var $author$project$Main$SwitchToPupil = function (a) {
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$html$Html$li = _VirtualDom_node('li');
 var $author$project$Main$pupilToStr = function (p) {
-	return p.be + (' (Klasse ' + (p.aW + ')'));
+	return p.ab + (' (Klasse ' + (p.Y + ')'));
 };
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$pupilUl = function (pupList) {
@@ -8811,7 +8850,7 @@ var $author$project$Main$campaignView = function (c) {
 				]),
 			_List_fromArray(
 				[
-					$elm$html$Html$text(c._)
+					$elm$html$Html$text(c.l)
 				])),
 			A2(
 			$elm$html$Html$div,
@@ -8820,7 +8859,7 @@ var $author$project$Main$campaignView = function (c) {
 					$elm$html$Html$Attributes$class('block')
 				]),
 			_Utils_ap(
-				A2($elm$core$List$map, $author$project$Main$dayView, c.aZ),
+				A2($elm$core$List$map, $author$project$Main$dayView, c.am),
 				_List_fromArray(
 					[
 						A2(
@@ -8856,7 +8895,7 @@ var $author$project$Main$campaignView = function (c) {
 							$elm$html$Html$text('Alle Angebote')
 						])),
 				_Utils_ap(
-					A2($elm$core$List$map, $author$project$Main$eventView, c.am),
+					A2($elm$core$List$map, $author$project$Main$eventView, c.aB),
 					_List_fromArray(
 						[
 							A2(
@@ -8891,7 +8930,7 @@ var $author$project$Main$campaignView = function (c) {
 						[
 							$elm$html$Html$text('Alle Schüler/innen')
 						])),
-					$author$project$Main$pupilUl(c.bj),
+					$author$project$Main$pupilUl(c.bq),
 					A2(
 					$elm$html$Html$button,
 					_List_fromArray(
@@ -9172,7 +9211,7 @@ var $author$project$NewCampaign$view = function (model) {
 															$elm$html$Html$Attributes$required(true),
 															$elm$html$Html$Events$onInput(
 															A2($elm$core$Basics$composeR, $author$project$NewCampaign$Title, $author$project$NewCampaign$NewCampaignFormDataMsg)),
-															$elm$html$Html$Attributes$value(model._)
+															$elm$html$Html$Attributes$value(model.l)
 														]),
 													_List_Nil)
 												]))
@@ -9211,7 +9250,7 @@ var $author$project$NewCampaign$view = function (model) {
 																	$elm$core$Maybe$withDefault(0),
 																	A2($elm$core$Basics$composeR, $author$project$NewCampaign$NumOfDays, $author$project$NewCampaign$NewCampaignFormDataMsg)))),
 															$elm$html$Html$Attributes$value(
-															$elm$core$String$fromInt(model.Z))
+															$elm$core$String$fromInt(model.ak))
 														]),
 													_List_Nil)
 												])),
@@ -9324,7 +9363,7 @@ var $author$project$NewDay$view = F2(
 																$elm$html$Html$Attributes$required(true),
 																$elm$html$Html$Events$onInput(
 																A2($elm$core$Basics$composeR, $elm$core$Basics$identity, $author$project$NewDay$NewDayFormDataMsg)),
-																$elm$html$Html$Attributes$value(model._)
+																$elm$html$Html$Attributes$value(model.l)
 															]),
 														_List_Nil)
 													]))
@@ -9437,7 +9476,7 @@ var $author$project$NewEvent$view = F2(
 																$elm$html$Html$Attributes$required(true),
 																$elm$html$Html$Events$onInput(
 																A2($elm$core$Basics$composeR, $author$project$NewEvent$Title, $author$project$NewEvent$NewEventFormDataMsg)),
-																$elm$html$Html$Attributes$value(model._)
+																$elm$html$Html$Attributes$value(model.l)
 															]),
 														_List_Nil)
 													]))
@@ -9475,7 +9514,7 @@ var $author$project$NewEvent$view = F2(
 																		$elm$core$Maybe$withDefault(0),
 																		A2($elm$core$Basics$composeR, $author$project$NewEvent$Capacity, $author$project$NewEvent$NewEventFormDataMsg)))),
 																$elm$html$Html$Attributes$value(
-																$elm$core$String$fromInt(model.aT))
+																$elm$core$String$fromInt(model.W))
 															]),
 														_List_Nil)
 													])),
@@ -9523,7 +9562,7 @@ var $author$project$NewEvent$view = F2(
 																		$elm$core$Maybe$withDefault(0),
 																		A2($elm$core$Basics$composeR, $author$project$NewEvent$MaxSpecialPupils, $author$project$NewEvent$NewEventFormDataMsg)))),
 																$elm$html$Html$Attributes$value(
-																$elm$core$String$fromInt(model.bb))
+																$elm$core$String$fromInt(model.aa))
 															]),
 														_List_Nil)
 													])),
@@ -9582,7 +9621,7 @@ var $author$project$Main$view = function (model) {
 								$elm$html$Html$Attributes$class('section')
 							]),
 						function () {
-							var _v0 = model.a;
+							var _v0 = model.b;
 							switch (_v0.$) {
 								case 0:
 									return _List_fromArray(
@@ -9631,10 +9670,10 @@ var $author$project$Main$view = function (model) {
 																	]),
 																_List_fromArray(
 																	[
-																		$elm$html$Html$text(c._)
+																		$elm$html$Html$text(c.l)
 																	]));
 														},
-														model.p)),
+														model.s)),
 													A2(
 													$elm$html$Html$button,
 													_List_fromArray(
@@ -9646,16 +9685,7 @@ var $author$project$Main$view = function (model) {
 													_List_fromArray(
 														[
 															$elm$html$Html$text('Neue Kampagne')
-														])),
-													A2(
-													$elm$html$Html$div,
-													_List_Nil,
-													A2(
-														$elm$core$List$map,
-														function (c) {
-															return $elm$html$Html$text(c._);
-														},
-														model.X))
+														]))
 												]);
 										case 1:
 											var c = p.a;
@@ -9664,19 +9694,19 @@ var $author$project$Main$view = function (model) {
 											return A2(
 												$elm$core$List$map,
 												$elm$html$Html$map($author$project$Main$NewCampaignMsg),
-												$author$project$NewCampaign$view(model.Q));
+												$author$project$NewCampaign$view(model.ac));
 										case 3:
 											var c = p.a;
 											return A2(
 												$elm$core$List$map,
 												$elm$html$Html$map($author$project$Main$NewDayMsg),
-												A2($author$project$NewDay$view, c, model.R));
+												A2($author$project$NewDay$view, c, model.ad));
 										case 4:
 											var c = p.a;
 											return A2(
 												$elm$core$List$map,
 												$elm$html$Html$map($author$project$Main$NewEventMsg),
-												A2($author$project$NewEvent$view, c, model.S));
+												A2($author$project$NewEvent$view, c, model.ae));
 										case 5:
 											var pup = p.a;
 											return $author$project$Main$pupilView(pup);
@@ -9689,6 +9719,6 @@ var $author$project$Main$view = function (model) {
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
-	{a6: $author$project$Main$init, br: $author$project$Main$subscriptions, bs: $author$project$Main$update, bu: $author$project$Main$view});
+	{bf: $author$project$Main$init, by: $author$project$Main$subscriptions, bz: $author$project$Main$update, bA: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(0))(0)}});}(this));

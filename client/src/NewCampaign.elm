@@ -76,9 +76,10 @@ update msg model =
             in
             ( model
             , Loading <|
-                Api.Mutation.addCampaign optionalArgs (Api.Mutation.AddCampaignRequiredArguments model.title) Data.campaingSelectionSet
+                (Api.Mutation.addCampaign optionalArgs (Api.Mutation.AddCampaignRequiredArguments model.title) Data.campaingSelectionSet
                     |> Graphql.Http.mutationRequest Shared.queryUrl
                     |> Graphql.Http.send GotNewCampaign
+                )
             )
 
         GotNewCampaign res ->

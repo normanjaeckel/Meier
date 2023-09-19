@@ -169,15 +169,15 @@ updateEvent fillInOptionals____ requiredArgs____ object____ =
     Object.selectionForCompositeField "updateEvent" (optionalArgs____ ++ [ Argument.required "id" requiredArgs____.id (Api.ScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ]) object____ Basics.identity
 
 
-type alias DeleteDayRequiredArguments =
+type alias DeleteEventRequiredArguments =
     { id : Api.ScalarCodecs.Id }
 
 
-deleteDay :
-    DeleteDayRequiredArguments
+deleteEvent :
+    DeleteEventRequiredArguments
     -> SelectionSet Bool RootMutation
-deleteDay requiredArgs____ =
-    Object.selectionForField "Bool" "deleteDay" [ Argument.required "id" requiredArgs____.id (Api.ScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ] Decode.bool
+deleteEvent requiredArgs____ =
+    Object.selectionForField "Bool" "deleteEvent" [ Argument.required "id" requiredArgs____.id (Api.ScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ] Decode.bool
 
 
 type alias AddPupilOptionalArguments =

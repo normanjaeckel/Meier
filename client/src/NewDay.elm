@@ -59,9 +59,10 @@ update msg model =
         SendNewDayForm campaign ->
             ( model
             , Loading <|
-                Api.Mutation.addDay (Api.Mutation.AddDayRequiredArguments campaign.id model.title) Data.daySelectionSet
+                (Api.Mutation.addDay (Api.Mutation.AddDayRequiredArguments campaign.id model.title) Data.daySelectionSet
                     |> Graphql.Http.mutationRequest Shared.queryUrl
                     |> Graphql.Http.send (GotNewDay campaign)
+                )
             )
 
         GotNewDay campaign res ->
