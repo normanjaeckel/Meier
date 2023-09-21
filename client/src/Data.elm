@@ -10,6 +10,7 @@ module Data exposing
     , campaingSelectionSet
     , daySelectionSet
     , eventSelectionSet
+    , pupilSelectionSet
     )
 
 import Api.Object

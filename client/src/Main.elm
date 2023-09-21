@@ -4,12 +4,13 @@ import Api.Query
 import Browser
 import Data exposing (Campaign, Day, Event, Pupil)
 import Graphql.Http
-import Html exposing (Html, a, button, div, form, h1, h2, h3, li, main_, nav, p, section, span, text, ul)
-import Html.Attributes exposing (class, type_)
+import Html exposing (Html, a, button, div, h1, h2, h3, li, main_, nav, p, section, span, text, ul)
+import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import NewCampaign
 import NewDay
 import NewEvent
+import NewPupil
 import Shared exposing (classes, parseGraphqlError)
 
 
@@ -33,6 +34,7 @@ type alias Model =
     , newCampaign : NewCampaign.Model
     , newDay : NewDay.Model
     , newEvent : NewEvent.Model
+    , newPupil : NewPupil.Model
     }
 
 
@@ -43,6 +45,7 @@ init _ =
       , newCampaign = NewCampaign.init
       , newDay = NewDay.init
       , newEvent = NewEvent.init
+      , newPupil = NewPupil.init
       }
     , Api.Query.campaignList Data.campaingSelectionSet
         |> Graphql.Http.queryRequest Shared.queryUrl
@@ -62,8 +65,8 @@ type Page
     | NewCampaignPage
     | NewDayPage Campaign
     | NewEventPage Campaign
+    | NewPupilPage Campaign
     | PupilPage Pupil
-    | NewPupils
 
 
 
@@ -76,6 +79,7 @@ type Msg
     | NewCampaignMsg NewCampaign.Msg
     | NewDayMsg NewDay.Msg
     | NewEventMsg NewEvent.Msg
+    | NewPupilMsg NewPupil.Msg
 
 
 type SwitchTo
@@ -83,9 +87,9 @@ type SwitchTo
     | SwitchToNewCampaign
     | SwitchToNewDay Campaign
     | SwitchToNewEvent Campaign
+    | SwitchToNewPupil Campaign
     | SwitchToPage Campaign
     | SwitchToPupil Pupil
-    | SwitchToNewPupils
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -113,14 +117,14 @@ update msg model =
                 SwitchToNewEvent c ->
                     ( { model | connection = Success <| NewEventPage c }, Cmd.none )
 
+                SwitchToNewPupil c ->
+                    ( { model | connection = Success <| NewPupilPage c }, Cmd.none )
+
                 SwitchToPage c ->
                     ( { model | connection = Success <| CampaignPage c }, Cmd.none )
 
                 SwitchToPupil pup ->
                     ( { model | connection = Success <| PupilPage pup }, Cmd.none )
-
-                SwitchToNewPupils ->
-                    ( { model | connection = Success NewPupils }, Cmd.none )
 
         NewCampaignMsg innerMsg ->
             let
@@ -204,6 +208,38 @@ update msg model =
                 NewEvent.Error err ->
                     ( { model | connection = Failure err }, Cmd.none )
 
+        NewPupilMsg innerMsg ->
+            let
+                ( innerModel, effect ) =
+                    NewPupil.update innerMsg model.newPupil
+            in
+            case effect of
+                NewPupil.None ->
+                    ( { model | newPupil = innerModel }, Cmd.none )
+
+                NewPupil.Loading innerCmd ->
+                    ( { model | connection = Loading }, innerCmd |> Cmd.map NewPupilMsg )
+
+                NewPupil.Done updatedCamp ->
+                    let
+                        newCampaignList : List Campaign
+                        newCampaignList =
+                            model.campaigns
+                                |> List.foldr
+                                    (\camp acc ->
+                                        if camp.id == updatedCamp.id then
+                                            updatedCamp :: acc
+
+                                        else
+                                            camp :: acc
+                                    )
+                                    []
+                    in
+                    ( { model | connection = Success <| CampaignPage updatedCamp, campaigns = newCampaignList }, Cmd.none )
+
+                NewPupil.Error err ->
+                    ( { model | connection = Failure err }, Cmd.none )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
@@ -257,11 +293,11 @@ view model =
                             NewEventPage c ->
                                 NewEvent.view c model.newEvent |> List.map (Html.map NewEventMsg)
 
+                            NewPupilPage c ->
+                                NewPupil.view c model.newPupil |> List.map (Html.map NewPupilMsg)
+
                             PupilPage pup ->
                                 pupilView pup
-
-                            NewPupils ->
-                                newPupilsView
                 )
             ]
         ]
@@ -296,7 +332,7 @@ campaignView c =
     , div [ class "block" ]
         [ h2 [ classes "title is-5" ] [ text "Alle Schüler/innen" ]
         , c.pupils |> pupilUl
-        , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewPupils ] [ text "Neue Schüler/innen" ]
+        , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewPupil c ] [ text "Neue Schüler/innen" ]
         ]
     ]
 
@@ -362,17 +398,4 @@ pupilView : Pupil -> List (Html Msg)
 pupilView pup =
     [ h1 [ classes "title is-3" ] [ text <| pupilToStr pup ]
     , p [] [ text "Lorem ipsum ..." ]
-    ]
-
-
-newPupilsView : List (Html Msg)
-newPupilsView =
-    [ h1 [ classes "title is-3" ] [ text "Neue Schüler/innen hinzufügen" ]
-    , p [] [ text "Lorem ipsum" ]
-    , form []
-        [ div [ class "field" ] []
-        , div [ class "field" ]
-            [ button [ classes "button is-primary", type_ "submit" ] [ text "Hinzufügen" ]
-            ]
-        ]
     ]
