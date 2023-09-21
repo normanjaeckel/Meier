@@ -8,8 +8,8 @@ import Api.Enum.Choice
 import Api.Interface
 import Api.Object
 import Api.Scalar
-import Api.ScalarCodecs
 import Api.Union
+import CustomScalarCodecs
 import Graphql.Internal.Builder.Argument as Argument exposing (Argument)
 import Graphql.Internal.Builder.Object as Object
 import Graphql.Internal.Encode as Encode exposing (Value)
@@ -26,7 +26,7 @@ buildEventChoiceInput required____ =
 
 
 type alias EventChoiceInputRequiredFields =
-    { eventID : Api.ScalarCodecs.Id
+    { eventID : CustomScalarCodecs.Id
     , choice : Api.Enum.Choice.Choice
     }
 
@@ -34,7 +34,7 @@ type alias EventChoiceInputRequiredFields =
 {-| Type for the EventChoiceInput input object.
 -}
 type alias EventChoiceInput =
-    { eventID : Api.ScalarCodecs.Id
+    { eventID : CustomScalarCodecs.Id
     , choice : Api.Enum.Choice.Choice
     }
 
@@ -44,4 +44,4 @@ type alias EventChoiceInput =
 encodeEventChoiceInput : EventChoiceInput -> Value
 encodeEventChoiceInput input____ =
     Encode.maybeObject
-        [ ( "eventID", (Api.ScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) input____.eventID |> Just ), ( "choice", Encode.enum Api.Enum.Choice.toString input____.choice |> Just ) ]
+        [ ( "eventID", (CustomScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) input____.eventID |> Just ), ( "choice", Encode.enum Api.Enum.Choice.toString input____.choice |> Just ) ]

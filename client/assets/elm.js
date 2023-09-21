@@ -5818,41 +5818,21 @@ var $author$project$Data$Day = F3(
 var $author$project$Api$Object$EventPupil$event = function (object____) {
 	return A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForCompositeField, 'event', _List_Nil, object____, $elm$core$Basics$identity);
 };
-var $author$project$Api$Scalar$Id = $elm$core$Basics$identity;
-var $elm$json$Json$Decode$bool = _Json_decodeBool;
-var $elm$json$Json$Decode$float = _Json_decodeFloat;
-var $elm$core$String$fromFloat = _String_fromNumber;
-var $elm$json$Json$Decode$int = _Json_decodeInt;
-var $elm$json$Json$Decode$string = _Json_decodeString;
-var $dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$scalarDecoder = $elm$json$Json$Decode$oneOf(
-	_List_fromArray(
-		[
-			$elm$json$Json$Decode$string,
-			A2($elm$json$Json$Decode$map, $elm$core$String$fromFloat, $elm$json$Json$Decode$float),
-			A2($elm$json$Json$Decode$map, $elm$core$String$fromInt, $elm$json$Json$Decode$int),
-			A2(
-			$elm$json$Json$Decode$map,
-			function (bool) {
-				return bool ? 'true' : 'false';
-			},
-			$elm$json$Json$Decode$bool)
-		]));
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $author$project$Api$Scalar$defaultCodecs = {
-	a6: {
-		a8: A2($elm$json$Json$Decode$map, $elm$core$Basics$identity, $dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$scalarDecoder),
-		ay: function (_v0) {
-			var raw = _v0;
-			return $elm$json$Json$Encode$string(raw);
-		}
-	}
-};
 var $author$project$Api$Scalar$Codecs = $elm$core$Basics$identity;
 var $author$project$Api$Scalar$defineCodecs = function (definitions) {
 	return definitions;
 };
-var $author$project$Api$ScalarCodecs$codecs = $author$project$Api$Scalar$defineCodecs(
-	{a6: $author$project$Api$Scalar$defaultCodecs.a6});
+var $elm$json$Json$Decode$int = _Json_decodeInt;
+var $elm$json$Json$Encode$int = _Json_wrap;
+var $author$project$CustomScalarCodecs$codecs = $author$project$Api$Scalar$defineCodecs(
+	{
+		a6: {
+			a8: $elm$json$Json$Decode$int,
+			ay: function (v) {
+				return $elm$json$Json$Encode$int(v);
+			}
+		}
+	});
 var $dillonkearns$elm_graphql$Graphql$RawField$Leaf = F2(
 	function (a, b) {
 		return {$: 1, a: a, b: b};
@@ -5887,16 +5867,16 @@ var $author$project$Api$Scalar$unwrapCodecs = function (_v0) {
 };
 var $author$project$Api$Object$Event$id = A4(
 	$dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField,
-	'ScalarCodecs.Id',
+	'CustomScalarCodecs.Id',
 	'id',
 	_List_Nil,
-	$author$project$Api$Scalar$unwrapCodecs($author$project$Api$ScalarCodecs$codecs).a6.a8);
+	$author$project$Api$Scalar$unwrapCodecs($author$project$CustomScalarCodecs$codecs).a6.a8);
 var $author$project$Api$Object$Pupil$id = A4(
 	$dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField,
-	'ScalarCodecs.Id',
+	'CustomScalarCodecs.Id',
 	'id',
 	_List_Nil,
-	$author$project$Api$Scalar$unwrapCodecs($author$project$Api$ScalarCodecs$codecs).a6.a8);
+	$author$project$Api$Scalar$unwrapCodecs($author$project$CustomScalarCodecs$codecs).a6.a8);
 var $dillonkearns$elm_graphql$Graphql$SelectionSet$map2 = F3(
 	function (combine, _v0, _v1) {
 		var selectionFields1 = _v0.a;
@@ -5935,10 +5915,10 @@ var $author$project$Api$Object$Day$events = function (object____) {
 };
 var $author$project$Api$Object$Day$id = A4(
 	$dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField,
-	'ScalarCodecs.Id',
+	'CustomScalarCodecs.Id',
 	'id',
 	_List_Nil,
-	$author$project$Api$Scalar$unwrapCodecs($author$project$Api$ScalarCodecs$codecs).a6.a8);
+	$author$project$Api$Scalar$unwrapCodecs($author$project$CustomScalarCodecs$codecs).a6.a8);
 var $elm$core$List$concat = function (lists) {
 	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
 };
@@ -5958,6 +5938,7 @@ var $dillonkearns$elm_graphql$Graphql$SelectionSet$map3 = F4(
 					[selectionFields1, selectionFields2, selectionFields3])),
 			A4($elm$json$Json$Decode$map3, combine, selectionDecoder1, selectionDecoder2, selectionDecoder3));
 	});
+var $elm$json$Json$Decode$string = _Json_decodeString;
 var $author$project$Api$Object$Day$title = A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField, 'String', 'title', _List_Nil, $elm$json$Json$Decode$string);
 var $author$project$Data$daySelectionSet = A4(
 	$dillonkearns$elm_graphql$Graphql$SelectionSet$map3,
@@ -6009,10 +5990,10 @@ var $author$project$Api$Object$Campaign$events = function (object____) {
 };
 var $author$project$Api$Object$Campaign$id = A4(
 	$dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField,
-	'ScalarCodecs.Id',
+	'CustomScalarCodecs.Id',
 	'id',
 	_List_Nil,
-	$author$project$Api$Scalar$unwrapCodecs($author$project$Api$ScalarCodecs$codecs).a6.a8);
+	$author$project$Api$Scalar$unwrapCodecs($author$project$CustomScalarCodecs$codecs).a6.a8);
 var $elm$json$Json$Decode$map5 = _Json_map5;
 var $dillonkearns$elm_graphql$Graphql$SelectionSet$map5 = F6(
 	function (combine, _v0, _v1, _v2, _v3, _v4) {
@@ -6038,6 +6019,7 @@ var $author$project$Data$Pupil = F4(
 		return {Y: _class, h: id, bg: isSpecial, ab: name};
 	});
 var $author$project$Api$Object$Pupil$class = A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField, 'String', 'class', _List_Nil, $elm$json$Json$Decode$string);
+var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $author$project$Api$Object$Pupil$isSpecial = A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField, 'Bool', 'isSpecial', _List_Nil, $elm$json$Json$Decode$bool);
 var $author$project$Api$Object$Pupil$name = A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField, 'String', 'name', _List_Nil, $elm$json$Json$Decode$string);
 var $author$project$Data$pupilSelectionSet = A5($dillonkearns$elm_graphql$Graphql$SelectionSet$map4, $author$project$Data$Pupil, $author$project$Api$Object$Pupil$id, $author$project$Api$Object$Pupil$name, $author$project$Api$Object$Pupil$class, $author$project$Api$Object$Pupil$isSpecial);
@@ -7575,6 +7557,7 @@ var $dillonkearns$elm_graphql$Graphql$Document$serializeQueryWithOperationName =
 		var decoder_ = _v0.b;
 		return A3($dillonkearns$elm_graphql$Graphql$Document$serializeWithOperationName, 'query', operationName, fields);
 	});
+var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$url$Url$percentEncode = _Url_percentEncode;
 var $dillonkearns$elm_graphql$Graphql$Http$QueryParams$replace = F2(
 	function (old, _new) {
@@ -8202,7 +8185,7 @@ var $author$project$Api$Mutation$addDay = F2(
 						function ($) {
 							return $.a6;
 						},
-						$author$project$Api$ScalarCodecs$codecs)),
+						$author$project$CustomScalarCodecs$codecs)),
 					A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required, 'title', requiredArgs____.l, $dillonkearns$elm_graphql$Graphql$Internal$Encode$string)
 				]),
 			object____,
@@ -8278,7 +8261,6 @@ var $author$project$NewEvent$Loading = function (a) {
 	return {$: 1, a: a};
 };
 var $author$project$NewEvent$None = {$: 0};
-var $elm$json$Json$Encode$int = _Json_wrap;
 var $dillonkearns$elm_graphql$Graphql$Internal$Encode$int = function (value) {
 	return $dillonkearns$elm_graphql$Graphql$Internal$Encode$Json(
 		$elm$json$Json$Encode$int(value));
@@ -8299,7 +8281,7 @@ var $author$project$Api$Mutation$addEvent = F2(
 						function ($) {
 							return $.a6;
 						},
-						$author$project$Api$ScalarCodecs$codecs)),
+						$author$project$CustomScalarCodecs$codecs)),
 					A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required, 'title', requiredArgs____.l, $dillonkearns$elm_graphql$Graphql$Internal$Encode$string),
 					A3(
 					$dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required,
@@ -8311,7 +8293,7 @@ var $author$project$Api$Mutation$addEvent = F2(
 							function ($) {
 								return $.a6;
 							},
-							$author$project$Api$ScalarCodecs$codecs))),
+							$author$project$CustomScalarCodecs$codecs))),
 					A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required, 'capacity', requiredArgs____.W, $dillonkearns$elm_graphql$Graphql$Internal$Encode$int),
 					A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required, 'maxSpecialPupils', requiredArgs____.aa, $dillonkearns$elm_graphql$Graphql$Internal$Encode$int)
 				]),

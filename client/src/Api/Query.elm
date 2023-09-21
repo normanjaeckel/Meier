@@ -8,8 +8,8 @@ import Api.InputObject
 import Api.Interface
 import Api.Object
 import Api.Scalar
-import Api.ScalarCodecs
 import Api.Union
+import CustomScalarCodecs
 import Graphql.Internal.Builder.Argument as Argument exposing (Argument)
 import Graphql.Internal.Builder.Object as Object
 import Graphql.Internal.Encode as Encode exposing (Value)
@@ -20,7 +20,7 @@ import Json.Decode as Decode exposing (Decoder)
 
 
 type alias CampaignRequiredArguments =
-    { id : Api.ScalarCodecs.Id }
+    { id : CustomScalarCodecs.Id }
 
 
 campaign :
@@ -28,7 +28,7 @@ campaign :
     -> SelectionSet decodesTo Api.Object.Campaign
     -> SelectionSet decodesTo RootQuery
 campaign requiredArgs____ object____ =
-    Object.selectionForCompositeField "campaign" [ Argument.required "id" requiredArgs____.id (Api.ScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ] object____ Basics.identity
+    Object.selectionForCompositeField "campaign" [ Argument.required "id" requiredArgs____.id (CustomScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ] object____ Basics.identity
 
 
 campaignList :
