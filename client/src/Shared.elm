@@ -1,8 +1,10 @@
-module Shared exposing (classes, parseError, queryUrl)
+module Shared exposing (classes, parseGraphqlError, queryUrl)
 
+import Graphql.Http
+import Graphql.Http.GraphqlError
 import Html
 import Html.Attributes
-import Http
+import Json.Decode
 
 
 queryUrl : String
@@ -30,20 +32,50 @@ classes s =
     Html.Attributes.classList cl
 
 
-parseError : Http.Error -> String
-parseError err =
+
+-- parseError : Http.Error -> String
+-- parseError err =
+--     case err of
+--         Http.BadUrl m ->
+--             "bad url: " ++ m
+--         Http.Timeout ->
+--             "timeout"
+--         Http.NetworkError ->
+--             "network error"
+--         Http.BadStatus code ->
+--             "bad status: " ++ String.fromInt code
+--         Http.BadBody m ->
+--             "bad body: " ++ m
+
+
+parseGraphqlError : Graphql.Http.Error a -> String
+parseGraphqlError err =
     case err of
-        Http.BadUrl m ->
-            "bad url: " ++ m
+        Graphql.Http.HttpError httpErr ->
+            case httpErr of
+                Graphql.Http.BadUrl m ->
+                    "bad url: " ++ m
 
-        Http.Timeout ->
-            "timeout"
+                Graphql.Http.Timeout ->
+                    "timeout"
 
-        Http.NetworkError ->
-            "network error"
+                Graphql.Http.NetworkError ->
+                    "network error"
 
-        Http.BadStatus code ->
-            "bad status: " ++ String.fromInt code
+                Graphql.Http.BadStatus _ code ->
+                    "bad status: " ++ code
 
-        Http.BadBody m ->
-            "bad body: " ++ m
+                Graphql.Http.BadPayload e ->
+                    "bad payload: " ++ Json.Decode.errorToString e
+
+        Graphql.Http.GraphqlError _ gErrs ->
+            let
+                errMsg : String
+                errMsg =
+                    gErrs |> List.map fn |> String.join ","
+
+                fn : Graphql.Http.GraphqlError.GraphqlError -> String
+                fn e =
+                    e.message
+            in
+            "graphql error: " ++ errMsg

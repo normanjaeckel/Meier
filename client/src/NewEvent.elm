@@ -1,12 +1,11 @@
 module NewEvent exposing (Effect(..), Model, Msg, init, update, view)
 
-import Data exposing (Campaign, Event)
+import Api.Mutation
+import Data
+import Graphql.Http
 import Html exposing (Html, button, div, form, h1, input, p, text)
 import Html.Attributes exposing (attribute, class, placeholder, required, type_, value)
 import Html.Events exposing (onInput, onSubmit)
-import Http
-import Json.Decode as D
-import Json.Encode as E
 import Shared exposing (classes)
 
 
@@ -32,8 +31,8 @@ init =
 
 type Msg
     = NewEventFormDataMsg NewEventFormDataInput
-    | SendNewEventForm Campaign
-    | GotNewEvent Campaign (Result Http.Error Event)
+    | SendNewEventForm Data.Campaign
+    | GotNewEvent Data.Campaign (Result (Graphql.Http.Error Data.Event) Data.Event)
 
 
 type NewEventFormDataInput
@@ -45,7 +44,7 @@ type NewEventFormDataInput
 type Effect
     = None
     | Loading (Cmd Msg)
-    | Done Campaign
+    | Done Data.Campaign
     | Error String
 
 
@@ -68,58 +67,29 @@ update msg model =
             in
             ( updatedModel, None )
 
-        SendNewEventForm c ->
-            let
-                mutationQuery : String
-                mutationQuery =
-                    String.join " "
-                        [ "mutation"
-                        , "{"
-                        , "addEvent"
-                        , "("
-                        , "campaignID:"
-                        , E.encode 0 <| E.int c.id
-                        , ", title:"
-                        , E.encode 0 <| E.string model.title
-                        , ",capacity:"
-                        , E.encode 0 <| E.int model.capacity
-                        , ", maxSpecialPupils:"
-                        , E.encode 0 <| E.int model.maxSpecialPupils
-                        , ", dayIDs: []"
-                        , ")"
-                        , Data.queryEvent
-                        , "}"
-                        ]
-
-                addEventDecoder : D.Decoder Event
-                addEventDecoder =
-                    D.field
-                        "data"
-                        (D.field "addEvent" Data.eventDecoder)
-            in
+        SendNewEventForm campaign ->
             ( model
             , Loading <|
-                Http.post
-                    { url = Shared.queryUrl
-                    , body = Http.jsonBody <| E.object [ ( "query", E.string mutationQuery ) ]
-                    , expect = Http.expectJson (GotNewEvent c) addEventDecoder
-                    }
+                (Api.Mutation.addEvent (Api.Mutation.AddEventRequiredArguments campaign.id model.title [] model.capacity model.maxSpecialPupils) Data.eventSelectionSet
+                    |> Graphql.Http.mutationRequest Shared.queryUrl
+                    |> Graphql.Http.send (GotNewEvent campaign)
+                )
             )
 
-        GotNewEvent c res ->
+        GotNewEvent campaign res ->
             case res of
-                Ok e ->
-                    ( model, Done { c | events = c.events ++ [ e ] } )
+                Ok event ->
+                    ( model, Done { campaign | events = campaign.events ++ [ event ] } )
 
                 Err err ->
-                    ( model, Error (Shared.parseError err) )
+                    ( model, Error (Shared.parseGraphqlError err) )
 
 
 
 -- VIEW
 
 
-view : Campaign -> Model -> List (Html Msg)
+view : Data.Campaign -> Model -> List (Html Msg)
 view c model =
     let
         labelCapacity : String

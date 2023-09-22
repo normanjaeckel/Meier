@@ -1,12 +1,12 @@
 module NewCampaign exposing (Effect(..), Model, Msg, init, update, view)
 
-import Data exposing (Campaign, queryCampaign)
+import Api.Mutation
+import Data
+import Graphql.Http
+import Graphql.OptionalArgument
 import Html exposing (Html, button, div, form, h1, input, p, text)
 import Html.Attributes exposing (attribute, class, placeholder, required, type_, value)
 import Html.Events exposing (onInput, onSubmit)
-import Http
-import Json.Decode as D
-import Json.Encode as E
 import Shared exposing (classes)
 
 
@@ -32,7 +32,7 @@ init =
 type Msg
     = NewCampaignFormDataMsg NewCampaignFormDataInput
     | SendNewCampaignForm
-    | GotNewCampaign (Result Http.Error Campaign)
+    | GotNewCampaign (Result (Graphql.Http.Error Data.Campaign) Data.Campaign)
 
 
 type NewCampaignFormDataInput
@@ -43,7 +43,7 @@ type NewCampaignFormDataInput
 type Effect
     = None
     | Loading (Cmd Msg)
-    | Done Campaign
+    | Done Data.Campaign
     | Error String
 
 
@@ -70,45 +70,25 @@ update msg model =
                     List.range 1 model.numOfDays
                         |> List.map (\i -> "Tag " ++ String.fromInt i)
 
-                mutationQuery : String
-                mutationQuery =
-                    String.join " "
-                        [ "mutation"
-                        , "{"
-                        , "addCampaign"
-                        , "("
-                        , "title:"
-                        , E.encode 0 <| E.string model.title
-                        , ","
-                        , "days:"
-                        , E.encode 0 <| E.list E.string dayList
-                        , ")"
-                        , queryCampaign
-                        , "}"
-                        ]
-
-                addCampaignDecoder : D.Decoder Campaign
-                addCampaignDecoder =
-                    D.field
-                        "data"
-                        (D.field "addCampaign" Data.campaignDecoder)
+                optionalArgs : Api.Mutation.AddCampaignOptionalArguments -> Api.Mutation.AddCampaignOptionalArguments
+                optionalArgs args =
+                    { args | days = Graphql.OptionalArgument.Present dayList }
             in
             ( model
             , Loading <|
-                Http.post
-                    { url = Shared.queryUrl
-                    , body = Http.jsonBody <| E.object [ ( "query", E.string mutationQuery ) ]
-                    , expect = Http.expectJson GotNewCampaign addCampaignDecoder
-                    }
+                (Api.Mutation.addCampaign optionalArgs (Api.Mutation.AddCampaignRequiredArguments model.title) Data.campaingSelectionSet
+                    |> Graphql.Http.mutationRequest Shared.queryUrl
+                    |> Graphql.Http.send GotNewCampaign
+                )
             )
 
         GotNewCampaign res ->
             case res of
-                Ok camp ->
-                    ( model, Done camp )
+                Ok campaign ->
+                    ( model, Done campaign )
 
                 Err err ->
-                    ( model, Error (Shared.parseError err) )
+                    ( model, Error (Shared.parseGraphqlError err) )
 
 
 
