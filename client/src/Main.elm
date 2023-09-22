@@ -3,14 +3,17 @@ module Main exposing (main)
 import Api.Query
 import Browser
 import Data exposing (Campaign, Day, Event, Pupil)
+import Event.Edit
+import Event.Form
+import Event.New
 import Graphql.Http
 import Html exposing (Html, a, button, div, h1, h2, h3, li, main_, nav, p, section, span, text, ul)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, name, title)
 import Html.Events exposing (onClick)
 import NewCampaign
 import NewDay
-import NewEvent
 import NewPupil
+import Platform.Cmd as Cmd
 import Shared exposing (classes, parseGraphqlError)
 
 
@@ -33,7 +36,8 @@ type alias Model =
     , campaigns : List Campaign
     , newCampaign : NewCampaign.Model
     , newDay : NewDay.Model
-    , newEvent : NewEvent.Model
+    , newEvent : Event.Form.Model
+    , editEvent : Event.Form.Model
     , newPupil : NewPupil.Model
     }
 
@@ -44,7 +48,8 @@ init _ =
       , campaigns = []
       , newCampaign = NewCampaign.init
       , newDay = NewDay.init
-      , newEvent = NewEvent.init
+      , newEvent = Event.Form.init
+      , editEvent = Event.Form.init
       , newPupil = NewPupil.init
       }
     , Api.Query.campaignList Data.campaingSelectionSet
@@ -65,6 +70,7 @@ type Page
     | NewCampaignPage
     | NewDayPage Campaign
     | NewEventPage Campaign
+    | EditEventPage Campaign Event
     | NewPupilPage Campaign
     | PupilPage Pupil
 
@@ -78,17 +84,19 @@ type Msg
     | SwitchPage SwitchTo
     | NewCampaignMsg NewCampaign.Msg
     | NewDayMsg NewDay.Msg
-    | NewEventMsg NewEvent.Msg
+    | NewEventMsg Campaign Event.New.Msg
+    | EditEventMsg Campaign Event Event.Edit.Msg
     | NewPupilMsg NewPupil.Msg
 
 
 type SwitchTo
     = SwitchToOverview
     | SwitchToNewCampaign
+    | SwitchToCampaign Campaign
     | SwitchToNewDay Campaign
     | SwitchToNewEvent Campaign
+    | SwitchToEditEvent Campaign Event
     | SwitchToNewPupil Campaign
-    | SwitchToPage Campaign
     | SwitchToPupil Pupil
 
 
@@ -117,10 +125,20 @@ update msg model =
                 SwitchToNewEvent c ->
                     ( { model | connection = Success <| NewEventPage c }, Cmd.none )
 
+                SwitchToEditEvent c e ->
+                    let
+                        editEvent =
+                            Event.Form.Model
+                                e.title
+                                e.capacity
+                                e.maxSpecialPupils
+                    in
+                    ( { model | connection = Success <| EditEventPage c e, editEvent = editEvent }, Cmd.none )
+
                 SwitchToNewPupil c ->
                     ( { model | connection = Success <| NewPupilPage c }, Cmd.none )
 
-                SwitchToPage c ->
+                SwitchToCampaign c ->
                     ( { model | connection = Success <| CampaignPage c }, Cmd.none )
 
                 SwitchToPupil pup ->
@@ -128,30 +146,36 @@ update msg model =
 
         NewCampaignMsg innerMsg ->
             let
-                ( innerModel, effect ) =
+                ( updatedModel, effect ) =
                     NewCampaign.update innerMsg model.newCampaign
             in
             case effect of
                 NewCampaign.None ->
-                    ( { model | newCampaign = innerModel }, Cmd.none )
+                    ( { model | newCampaign = updatedModel }, Cmd.none )
 
                 NewCampaign.Loading innerCmd ->
                     ( { model | connection = Loading }, innerCmd |> Cmd.map NewCampaignMsg )
 
                 NewCampaign.Done c ->
-                    ( { model | connection = Success <| CampaignPage c, campaigns = model.campaigns ++ [ c ] }, Cmd.none )
+                    ( { model
+                        | connection = Success <| CampaignPage c
+                        , campaigns = model.campaigns ++ [ c ]
+                        , newCampaign = NewCampaign.init
+                      }
+                    , Cmd.none
+                    )
 
                 NewCampaign.Error err ->
                     ( { model | connection = Failure err }, Cmd.none )
 
         NewDayMsg innerMsg ->
             let
-                ( innerModel, effect ) =
+                ( updatedModel, effect ) =
                     NewDay.update innerMsg model.newDay
             in
             case effect of
                 NewDay.None ->
-                    ( { model | newDay = innerModel }, Cmd.none )
+                    ( { model | newDay = updatedModel }, Cmd.none )
 
                 NewDay.Loading innerCmd ->
                     ( { model | connection = Loading }, innerCmd |> Cmd.map NewDayMsg )
@@ -171,24 +195,30 @@ update msg model =
                                     )
                                     []
                     in
-                    ( { model | connection = Success <| CampaignPage updatedCamp, campaigns = newCampaignList }, Cmd.none )
+                    ( { model
+                        | connection = Success <| CampaignPage updatedCamp
+                        , campaigns = newCampaignList
+                        , newDay = NewDay.init
+                      }
+                    , Cmd.none
+                    )
 
                 NewDay.Error err ->
                     ( { model | connection = Failure err }, Cmd.none )
 
-        NewEventMsg innerMsg ->
+        NewEventMsg c innerMsg ->
             let
-                ( innerModel, effect ) =
-                    NewEvent.update innerMsg model.newEvent
+                ( updatedModel, effect ) =
+                    Event.New.update c innerMsg model.newEvent
             in
             case effect of
-                NewEvent.None ->
-                    ( { model | newEvent = innerModel }, Cmd.none )
+                Event.New.None ->
+                    ( { model | newEvent = updatedModel }, Cmd.none )
 
-                NewEvent.Loading innerCmd ->
-                    ( { model | connection = Loading }, innerCmd |> Cmd.map NewEventMsg )
+                Event.New.Loading innerCmd ->
+                    ( { model | connection = Loading }, innerCmd |> Cmd.map (NewEventMsg c) )
 
-                NewEvent.Done updatedCamp ->
+                Event.New.Done updatedCamp ->
                     let
                         newCampaignList : List Campaign
                         newCampaignList =
@@ -203,19 +233,63 @@ update msg model =
                                     )
                                     []
                     in
-                    ( { model | connection = Success <| CampaignPage updatedCamp, campaigns = newCampaignList }, Cmd.none )
+                    ( { model
+                        | connection = Success <| CampaignPage updatedCamp
+                        , campaigns = newCampaignList
+                        , newEvent = Event.Form.init
+                      }
+                    , Cmd.none
+                    )
 
-                NewEvent.Error err ->
+                Event.New.Error err ->
+                    ( { model | connection = Failure err }, Cmd.none )
+
+        EditEventMsg c e innerMsg ->
+            let
+                ( updatedModel, effect ) =
+                    Event.Edit.update c e innerMsg model.editEvent
+            in
+            case effect of
+                Event.Edit.None ->
+                    ( { model | editEvent = updatedModel }, Cmd.none )
+
+                Event.Edit.Loading innerCmd ->
+                    ( { model | connection = Loading }, innerCmd |> Cmd.map (EditEventMsg c e) )
+
+                Event.Edit.Done updatedCamp ->
+                    let
+                        newCampaignList : List Campaign
+                        newCampaignList =
+                            model.campaigns
+                                |> List.foldr
+                                    (\camp acc ->
+                                        if camp.id == updatedCamp.id then
+                                            updatedCamp :: acc
+
+                                        else
+                                            camp :: acc
+                                    )
+                                    []
+                    in
+                    ( { model
+                        | connection = Success <| CampaignPage updatedCamp
+                        , campaigns = newCampaignList
+                        , editEvent = Event.Form.init
+                      }
+                    , Cmd.none
+                    )
+
+                Event.Edit.Error err ->
                     ( { model | connection = Failure err }, Cmd.none )
 
         NewPupilMsg innerMsg ->
             let
-                ( innerModel, effect ) =
+                ( updatedModel, effect ) =
                     NewPupil.update innerMsg model.newPupil
             in
             case effect of
                 NewPupil.None ->
-                    ( { model | newPupil = innerModel }, Cmd.none )
+                    ( { model | newPupil = updatedModel }, Cmd.none )
 
                 NewPupil.Loading innerCmd ->
                     ( { model | connection = Loading }, innerCmd |> Cmd.map NewPupilMsg )
@@ -235,7 +309,13 @@ update msg model =
                                     )
                                     []
                     in
-                    ( { model | connection = Success <| CampaignPage updatedCamp, campaigns = newCampaignList }, Cmd.none )
+                    ( { model
+                        | connection = Success <| CampaignPage updatedCamp
+                        , campaigns = newCampaignList
+                        , newPupil = NewPupil.init
+                      }
+                    , Cmd.none
+                    )
 
                 NewPupil.Error err ->
                     ( { model | connection = Failure err }, Cmd.none )
@@ -273,7 +353,7 @@ view model =
                                             (\c ->
                                                 button
                                                     [ class "button"
-                                                    , onClick <| SwitchPage <| SwitchToPage c
+                                                    , onClick <| SwitchPage <| SwitchToCampaign c
                                                     ]
                                                     [ text c.title ]
                                             )
@@ -291,7 +371,10 @@ view model =
                                 NewDay.view c model.newDay |> List.map (Html.map NewDayMsg)
 
                             NewEventPage c ->
-                                NewEvent.view c model.newEvent |> List.map (Html.map NewEventMsg)
+                                campaignView c ++ (Event.New.view model.newEvent |> List.map (Html.map (NewEventMsg c)))
+
+                            EditEventPage c e ->
+                                campaignView c ++ (Event.Edit.view e model.editEvent |> List.map (Html.map (EditEventMsg c e)))
 
                             NewPupilPage c ->
                                 NewPupil.view c model.newPupil |> List.map (Html.map NewPupilMsg)
@@ -326,7 +409,7 @@ campaignView c =
         )
     , div [ class "block" ]
         (h2 [ classes "title is-5" ] [ text "Alle Angebote" ]
-            :: (c.events |> List.map eventView)
+            :: (c.events |> List.map (eventView c))
             ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewEvent c ] [ text "Neues Angebot" ] ]
         )
     , div [ class "block" ]
@@ -362,8 +445,8 @@ dayView d =
         (h2 [ classes "title is-5" ] [ text d.title ] :: events ++ unassignedPupils)
 
 
-eventView : Event -> Html Msg
-eventView e =
+eventView : Campaign -> Event -> Html Msg
+eventView c e =
     div [ class "block" ]
         [ div [ classes "field is-grouped is-grouped-multiline" ]
             [ div [ class "control" ]
@@ -379,6 +462,11 @@ eventView e =
                 [ div [ classes "tags has-addons" ]
                     [ span [ class "tag" ] [ text "bes." ]
                     , span [ classes "tag is-primary" ] [ text <| String.fromInt e.maxSpecialPupils ]
+                    ]
+                ]
+            , a [ title "Bearbeiten", onClick <| SwitchPage <| SwitchToEditEvent c e ]
+                [ span [ class "icon" ]
+                    [ Html.node "ion-icon" [ name "create-outline" ] []
                     ]
                 ]
             ]
