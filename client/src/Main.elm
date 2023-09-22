@@ -184,6 +184,7 @@ update msg model =
                     let
                         newCampaignList : List Campaign
                         newCampaignList =
+                            -- TODO: use recursion here
                             model.campaigns
                                 |> List.foldr
                                     (\camp acc ->
@@ -222,6 +223,7 @@ update msg model =
                     let
                         newCampaignList : List Campaign
                         newCampaignList =
+                            -- TODO: use recursion here
                             model.campaigns
                                 |> List.foldr
                                     (\camp acc ->
@@ -298,6 +300,7 @@ update msg model =
                     let
                         newCampaignList : List Campaign
                         newCampaignList =
+                            -- TODO: use recursion here
                             model.campaigns
                                 |> List.foldr
                                     (\camp acc ->

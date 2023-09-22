@@ -8006,6 +8006,9 @@ var $author$project$Event$Edit$Loading = function (a) {
 	return {$: 1, a: a};
 };
 var $author$project$Event$Edit$None = {$: 0};
+var $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present = function (a) {
+	return {$: 0, a: a};
+};
 var $author$project$Api$Mutation$UpdateEventRequiredArguments = function (id) {
 	return {h: id};
 };
@@ -8170,10 +8173,16 @@ var $author$project$Event$Edit$update = F4(
 					return _Utils_Tuple2(updatedModel, $author$project$Event$Edit$None);
 				case 1:
 					var optionalArgs = function (args) {
-						return args;
+						return _Utils_update(
+							args,
+							{
+								aa: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present(updatedModel.aa),
+								af: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present(updatedModel.af),
+								m: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present(updatedModel.m)
+							});
 					};
 					return _Utils_Tuple2(
-						model,
+						updatedModel,
 						$author$project$Event$Edit$Loading(
 							A2(
 								$dillonkearns$elm_graphql$Graphql$Http$send,
@@ -8188,7 +8197,7 @@ var $author$project$Event$Edit$update = F4(
 										$author$project$Data$eventSelectionSet)))));
 				default:
 					return _Utils_Tuple2(
-						model,
+						updatedModel,
 						$author$project$Event$Edit$Done(campaign));
 			}
 		} else {
@@ -8276,7 +8285,7 @@ var $author$project$Event$New$update = F3(
 					return _Utils_Tuple2(updatedModel, $author$project$Event$New$None);
 				case 1:
 					return _Utils_Tuple2(
-						model,
+						updatedModel,
 						$author$project$Event$New$Loading(
 							A2(
 								$dillonkearns$elm_graphql$Graphql$Http$send,
@@ -8286,11 +8295,11 @@ var $author$project$Event$New$update = F3(
 									$author$project$Shared$queryUrl,
 									A2(
 										$author$project$Api$Mutation$addEvent,
-										A5($author$project$Api$Mutation$AddEventRequiredArguments, campaign.h, model.m, _List_Nil, model.aa, model.af),
+										A5($author$project$Api$Mutation$AddEventRequiredArguments, campaign.h, updatedModel.m, _List_Nil, updatedModel.aa, updatedModel.af),
 										$author$project$Data$eventSelectionSet)))));
 				default:
 					return _Utils_Tuple2(
-						model,
+						updatedModel,
 						$author$project$Event$New$Done(campaign));
 			}
 		} else {
@@ -8333,9 +8342,6 @@ var $author$project$NewCampaign$Loading = function (a) {
 	return {$: 1, a: a};
 };
 var $author$project$NewCampaign$None = {$: 0};
-var $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present = function (a) {
-	return {$: 0, a: a};
-};
 var $author$project$Api$Mutation$addCampaign = F3(
 	function (fillInOptionals____, requiredArgs____, object____) {
 		var filledInOptionals____ = fillInOptionals____(

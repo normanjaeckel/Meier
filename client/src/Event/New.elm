@@ -33,16 +33,24 @@ update campaign msg model =
                     ( updatedModel, None )
 
                 Event.Form.Send ->
-                    ( model
+                    ( updatedModel
                     , Loading <|
-                        (Api.Mutation.addEvent (Api.Mutation.AddEventRequiredArguments campaign.id model.title [] model.capacity model.maxSpecialPupils) Data.eventSelectionSet
+                        (Api.Mutation.addEvent
+                            (Api.Mutation.AddEventRequiredArguments
+                                campaign.id
+                                updatedModel.title
+                                []
+                                updatedModel.capacity
+                                updatedModel.maxSpecialPupils
+                            )
+                            Data.eventSelectionSet
                             |> Graphql.Http.mutationRequest Shared.queryUrl
                             |> Graphql.Http.send GotNewEvent
                         )
                     )
 
                 Event.Form.Close ->
-                    ( model, Done campaign )
+                    ( updatedModel, Done campaign )
 
         GotNewEvent res ->
             case res of

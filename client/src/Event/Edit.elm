@@ -4,6 +4,7 @@ import Api.Mutation
 import Data
 import Event.Form
 import Graphql.Http
+import Graphql.OptionalArgument
 import Html exposing (Html)
 import Shared
 
@@ -36,9 +37,13 @@ update campaign e msg model =
                     let
                         optionalArgs : Api.Mutation.UpdateEventOptionalArguments -> Api.Mutation.UpdateEventOptionalArguments
                         optionalArgs args =
-                            args
+                            { args
+                                | title = Graphql.OptionalArgument.Present updatedModel.title
+                                , capacity = Graphql.OptionalArgument.Present updatedModel.capacity
+                                , maxSpecialPupils = Graphql.OptionalArgument.Present updatedModel.maxSpecialPupils
+                            }
                     in
-                    ( model
+                    ( updatedModel
                     , Loading <|
                         (Api.Mutation.updateEvent optionalArgs (Api.Mutation.UpdateEventRequiredArguments e.id) Data.eventSelectionSet
                             |> Graphql.Http.mutationRequest Shared.queryUrl
@@ -47,7 +52,7 @@ update campaign e msg model =
                     )
 
                 Event.Form.Close ->
-                    ( model, Done campaign )
+                    ( updatedModel, Done campaign )
 
         GotUpdatedEvent res ->
             case res of
