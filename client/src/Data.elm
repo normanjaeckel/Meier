@@ -19,8 +19,8 @@ import Api.Object.Day
 import Api.Object.Event
 import Api.Object.EventPupil
 import Api.Object.Pupil
-import CustomScalarCodecs
 import Graphql.SelectionSet
+import IdScalarCodecs
 
 
 type alias Campaign =
@@ -33,7 +33,7 @@ type alias Campaign =
 
 
 type alias CampaignId =
-    CustomScalarCodecs.Id
+    IdScalarCodecs.Id
 
 
 campaingSelectionSet : Graphql.SelectionSet.SelectionSet Campaign Api.Object.Campaign
@@ -54,7 +54,7 @@ type alias Day =
 
 
 type alias DayId =
-    CustomScalarCodecs.Id
+    IdScalarCodecs.Id
 
 
 daySelectionSet : Graphql.SelectionSet.SelectionSet Day Api.Object.Day
@@ -81,7 +81,7 @@ type alias Event =
 
 
 type alias EventId =
-    CustomScalarCodecs.Id
+    IdScalarCodecs.Id
 
 
 eventSelectionSet : Graphql.SelectionSet.SelectionSet Event Api.Object.Event
@@ -102,7 +102,7 @@ type alias Pupil =
 
 
 type alias PupilId =
-    CustomScalarCodecs.Id
+    IdScalarCodecs.Id
 
 
 pupilSelectionSet : Graphql.SelectionSet.SelectionSet Pupil Api.Object.Pupil

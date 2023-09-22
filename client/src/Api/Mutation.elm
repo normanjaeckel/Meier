@@ -9,13 +9,13 @@ import Api.Interface
 import Api.Object
 import Api.Scalar
 import Api.Union
-import CustomScalarCodecs
 import Graphql.Internal.Builder.Argument as Argument exposing (Argument)
 import Graphql.Internal.Builder.Object as Object
 import Graphql.Internal.Encode as Encode exposing (Value)
 import Graphql.Operation exposing (RootMutation, RootQuery, RootSubscription)
 import Graphql.OptionalArgument exposing (OptionalArgument(..))
 import Graphql.SelectionSet exposing (SelectionSet)
+import IdScalarCodecs
 import Json.Decode as Decode exposing (Decoder)
 
 
@@ -53,7 +53,7 @@ type alias UpdateCampaignOptionalArguments =
 
 
 type alias UpdateCampaignRequiredArguments =
-    { id : CustomScalarCodecs.Id }
+    { id : IdScalarCodecs.Id }
 
 
 updateCampaign :
@@ -70,22 +70,22 @@ updateCampaign fillInOptionals____ requiredArgs____ object____ =
             [ Argument.optional "title" filledInOptionals____.title Encode.string, Argument.optional "loginToken" filledInOptionals____.loginToken Encode.string ]
                 |> List.filterMap Basics.identity
     in
-    Object.selectionForCompositeField "updateCampaign" (optionalArgs____ ++ [ Argument.required "id" requiredArgs____.id (CustomScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ]) object____ Basics.identity
+    Object.selectionForCompositeField "updateCampaign" (optionalArgs____ ++ [ Argument.required "id" requiredArgs____.id (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ]) object____ Basics.identity
 
 
 type alias DeleteCampaignRequiredArguments =
-    { id : CustomScalarCodecs.Id }
+    { id : IdScalarCodecs.Id }
 
 
 deleteCampaign :
     DeleteCampaignRequiredArguments
     -> SelectionSet Bool RootMutation
 deleteCampaign requiredArgs____ =
-    Object.selectionForField "Bool" "deleteCampaign" [ Argument.required "id" requiredArgs____.id (CustomScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ] Decode.bool
+    Object.selectionForField "Bool" "deleteCampaign" [ Argument.required "id" requiredArgs____.id (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ] Decode.bool
 
 
 type alias AddDayRequiredArguments =
-    { campaignID : CustomScalarCodecs.Id
+    { campaignID : IdScalarCodecs.Id
     , title : String
     }
 
@@ -95,11 +95,11 @@ addDay :
     -> SelectionSet decodesTo Api.Object.Day
     -> SelectionSet decodesTo RootMutation
 addDay requiredArgs____ object____ =
-    Object.selectionForCompositeField "addDay" [ Argument.required "campaignID" requiredArgs____.campaignID (CustomScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId), Argument.required "title" requiredArgs____.title Encode.string ] object____ Basics.identity
+    Object.selectionForCompositeField "addDay" [ Argument.required "campaignID" requiredArgs____.campaignID (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId), Argument.required "title" requiredArgs____.title Encode.string ] object____ Basics.identity
 
 
 type alias UpdateDayRequiredArguments =
-    { id : CustomScalarCodecs.Id
+    { id : IdScalarCodecs.Id
     , title : String
     }
 
@@ -109,24 +109,24 @@ updateDay :
     -> SelectionSet decodesTo Api.Object.Day
     -> SelectionSet decodesTo RootMutation
 updateDay requiredArgs____ object____ =
-    Object.selectionForCompositeField "updateDay" [ Argument.required "id" requiredArgs____.id (CustomScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId), Argument.required "title" requiredArgs____.title Encode.string ] object____ Basics.identity
+    Object.selectionForCompositeField "updateDay" [ Argument.required "id" requiredArgs____.id (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId), Argument.required "title" requiredArgs____.title Encode.string ] object____ Basics.identity
 
 
 type alias DeleteDayRequiredArguments =
-    { id : CustomScalarCodecs.Id }
+    { id : IdScalarCodecs.Id }
 
 
 deleteDay :
     DeleteDayRequiredArguments
     -> SelectionSet Bool RootMutation
 deleteDay requiredArgs____ =
-    Object.selectionForField "Bool" "deleteDay" [ Argument.required "id" requiredArgs____.id (CustomScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ] Decode.bool
+    Object.selectionForField "Bool" "deleteDay" [ Argument.required "id" requiredArgs____.id (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ] Decode.bool
 
 
 type alias AddEventRequiredArguments =
-    { campaignID : CustomScalarCodecs.Id
+    { campaignID : IdScalarCodecs.Id
     , title : String
-    , dayIDs : List CustomScalarCodecs.Id
+    , dayIDs : List IdScalarCodecs.Id
     , capacity : Int
     , maxSpecialPupils : Int
     }
@@ -137,19 +137,19 @@ addEvent :
     -> SelectionSet decodesTo Api.Object.Event
     -> SelectionSet decodesTo RootMutation
 addEvent requiredArgs____ object____ =
-    Object.selectionForCompositeField "addEvent" [ Argument.required "campaignID" requiredArgs____.campaignID (CustomScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId), Argument.required "title" requiredArgs____.title Encode.string, Argument.required "dayIDs" requiredArgs____.dayIDs ((CustomScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) |> Encode.list), Argument.required "capacity" requiredArgs____.capacity Encode.int, Argument.required "maxSpecialPupils" requiredArgs____.maxSpecialPupils Encode.int ] object____ Basics.identity
+    Object.selectionForCompositeField "addEvent" [ Argument.required "campaignID" requiredArgs____.campaignID (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId), Argument.required "title" requiredArgs____.title Encode.string, Argument.required "dayIDs" requiredArgs____.dayIDs ((IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) |> Encode.list), Argument.required "capacity" requiredArgs____.capacity Encode.int, Argument.required "maxSpecialPupils" requiredArgs____.maxSpecialPupils Encode.int ] object____ Basics.identity
 
 
 type alias UpdateEventOptionalArguments =
     { title : OptionalArgument String
-    , dayIDs : OptionalArgument (List CustomScalarCodecs.Id)
+    , dayIDs : OptionalArgument (List IdScalarCodecs.Id)
     , capacity : OptionalArgument Int
     , maxSpecialPupils : OptionalArgument Int
     }
 
 
 type alias UpdateEventRequiredArguments =
-    { id : CustomScalarCodecs.Id }
+    { id : IdScalarCodecs.Id }
 
 
 updateEvent :
@@ -163,21 +163,21 @@ updateEvent fillInOptionals____ requiredArgs____ object____ =
             fillInOptionals____ { title = Absent, dayIDs = Absent, capacity = Absent, maxSpecialPupils = Absent }
 
         optionalArgs____ =
-            [ Argument.optional "title" filledInOptionals____.title Encode.string, Argument.optional "dayIDs" filledInOptionals____.dayIDs ((CustomScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) |> Encode.list), Argument.optional "capacity" filledInOptionals____.capacity Encode.int, Argument.optional "maxSpecialPupils" filledInOptionals____.maxSpecialPupils Encode.int ]
+            [ Argument.optional "title" filledInOptionals____.title Encode.string, Argument.optional "dayIDs" filledInOptionals____.dayIDs ((IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) |> Encode.list), Argument.optional "capacity" filledInOptionals____.capacity Encode.int, Argument.optional "maxSpecialPupils" filledInOptionals____.maxSpecialPupils Encode.int ]
                 |> List.filterMap Basics.identity
     in
-    Object.selectionForCompositeField "updateEvent" (optionalArgs____ ++ [ Argument.required "id" requiredArgs____.id (CustomScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ]) object____ Basics.identity
+    Object.selectionForCompositeField "updateEvent" (optionalArgs____ ++ [ Argument.required "id" requiredArgs____.id (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ]) object____ Basics.identity
 
 
 type alias DeleteEventRequiredArguments =
-    { id : CustomScalarCodecs.Id }
+    { id : IdScalarCodecs.Id }
 
 
 deleteEvent :
     DeleteEventRequiredArguments
     -> SelectionSet Bool RootMutation
 deleteEvent requiredArgs____ =
-    Object.selectionForField "Bool" "deleteEvent" [ Argument.required "id" requiredArgs____.id (CustomScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ] Decode.bool
+    Object.selectionForField "Bool" "deleteEvent" [ Argument.required "id" requiredArgs____.id (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ] Decode.bool
 
 
 type alias AddPupilOptionalArguments =
@@ -187,7 +187,7 @@ type alias AddPupilOptionalArguments =
 
 
 type alias AddPupilRequiredArguments =
-    { campaignID : CustomScalarCodecs.Id
+    { campaignID : IdScalarCodecs.Id
     , name : String
     , class : String
     }
@@ -207,7 +207,7 @@ addPupil fillInOptionals____ requiredArgs____ object____ =
             [ Argument.optional "loginToken" filledInOptionals____.loginToken Encode.string, Argument.optional "special" filledInOptionals____.special Encode.bool ]
                 |> List.filterMap Basics.identity
     in
-    Object.selectionForCompositeField "addPupil" (optionalArgs____ ++ [ Argument.required "campaignID" requiredArgs____.campaignID (CustomScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId), Argument.required "name" requiredArgs____.name Encode.string, Argument.required "class" requiredArgs____.class Encode.string ]) object____ Basics.identity
+    Object.selectionForCompositeField "addPupil" (optionalArgs____ ++ [ Argument.required "campaignID" requiredArgs____.campaignID (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId), Argument.required "name" requiredArgs____.name Encode.string, Argument.required "class" requiredArgs____.class Encode.string ]) object____ Basics.identity
 
 
 type alias UpdatePupilOptionalArguments =
@@ -219,7 +219,7 @@ type alias UpdatePupilOptionalArguments =
 
 
 type alias UpdatePupilRequiredArguments =
-    { id : CustomScalarCodecs.Id }
+    { id : IdScalarCodecs.Id }
 
 
 updatePupil :
@@ -236,24 +236,24 @@ updatePupil fillInOptionals____ requiredArgs____ object____ =
             [ Argument.optional "name" filledInOptionals____.name Encode.string, Argument.optional "class" filledInOptionals____.class Encode.string, Argument.optional "special" filledInOptionals____.special Encode.bool, Argument.optional "loginToken" filledInOptionals____.loginToken Encode.string ]
                 |> List.filterMap Basics.identity
     in
-    Object.selectionForCompositeField "updatePupil" (optionalArgs____ ++ [ Argument.required "id" requiredArgs____.id (CustomScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ]) object____ Basics.identity
+    Object.selectionForCompositeField "updatePupil" (optionalArgs____ ++ [ Argument.required "id" requiredArgs____.id (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ]) object____ Basics.identity
 
 
 type alias DeletePupilRequiredArguments =
-    { id : CustomScalarCodecs.Id }
+    { id : IdScalarCodecs.Id }
 
 
 deletePupil :
     DeletePupilRequiredArguments
     -> SelectionSet Bool RootMutation
 deletePupil requiredArgs____ =
-    Object.selectionForField "Bool" "deletePupil" [ Argument.required "id" requiredArgs____.id (CustomScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ] Decode.bool
+    Object.selectionForField "Bool" "deletePupil" [ Argument.required "id" requiredArgs____.id (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ] Decode.bool
 
 
 type alias AssignPupilRequiredArguments =
-    { pupilID : CustomScalarCodecs.Id
-    , eventID : CustomScalarCodecs.Id
-    , dayID : CustomScalarCodecs.Id
+    { pupilID : IdScalarCodecs.Id
+    , eventID : IdScalarCodecs.Id
+    , dayID : IdScalarCodecs.Id
     }
 
 
@@ -262,11 +262,11 @@ assignPupil :
     -> SelectionSet decodesTo Api.Object.Day
     -> SelectionSet decodesTo RootMutation
 assignPupil requiredArgs____ object____ =
-    Object.selectionForCompositeField "assignPupil" [ Argument.required "pupilID" requiredArgs____.pupilID (CustomScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId), Argument.required "eventID" requiredArgs____.eventID (CustomScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId), Argument.required "dayID" requiredArgs____.dayID (CustomScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ] object____ Basics.identity
+    Object.selectionForCompositeField "assignPupil" [ Argument.required "pupilID" requiredArgs____.pupilID (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId), Argument.required "eventID" requiredArgs____.eventID (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId), Argument.required "dayID" requiredArgs____.dayID (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ] object____ Basics.identity
 
 
 type alias PupilChoiceRequiredArguments =
-    { pupilID : CustomScalarCodecs.Id
+    { pupilID : IdScalarCodecs.Id
     , choices : List Api.InputObject.EventChoiceInput
     }
 
@@ -277,4 +277,4 @@ pupilChoice :
     PupilChoiceRequiredArguments
     -> SelectionSet Bool RootMutation
 pupilChoice requiredArgs____ =
-    Object.selectionForField "Bool" "pupilChoice" [ Argument.required "pupilID" requiredArgs____.pupilID (CustomScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId), Argument.required "choices" requiredArgs____.choices (Api.InputObject.encodeEventChoiceInput |> Encode.list) ] Decode.bool
+    Object.selectionForField "Bool" "pupilChoice" [ Argument.required "pupilID" requiredArgs____.pupilID (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId), Argument.required "choices" requiredArgs____.choices (Api.InputObject.encodeEventChoiceInput |> Encode.list) ] Decode.bool

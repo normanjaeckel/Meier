@@ -10,9 +10,9 @@ module Api.VerifyScalarCodecs exposing (..)
 -}
 
 import Api.Scalar
-import CustomScalarCodecs
+import IdScalarCodecs
 
 
-verify : Api.Scalar.Codecs CustomScalarCodecs.Id
+verify : Api.Scalar.Codecs IdScalarCodecs.Id
 verify =
-    CustomScalarCodecs.codecs
+    IdScalarCodecs.codecs
