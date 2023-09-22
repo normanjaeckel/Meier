@@ -11,7 +11,7 @@ type resolver struct {
 	db *sticky.Sticky[model.Model]
 }
 
-func (r *resolver) Campaign(args struct{ ID int32 }) (model.CampaignResolver, error) {
+func (r *resolver) Campaign(args struct{ ID model.ID }) (model.CampaignResolver, error) {
 	var campaign model.CampaignResolver
 	var err error
 	r.db.Read(func(m model.Model) {
@@ -78,7 +78,7 @@ func (r *resolver) AddCampaign(
 
 func (r *resolver) UpdateCampaign(
 	args struct {
-		ID         int
+		ID         model.ID
 		Title      *string
 		LoginToken *string
 	},
@@ -94,7 +94,7 @@ func (r *resolver) UpdateCampaign(
 	}
 
 	err := r.db.Write(func(m model.Model) sticky.Event[model.Model] {
-		return m.CampaignUpdate(args.ID, title, loginToken)
+		return m.CampaignUpdate(int(args.ID), title, loginToken)
 	})
 	if err != nil {
 		return model.CampaignResolver{}, fmt.Errorf("write: %w", err)
@@ -103,7 +103,7 @@ func (r *resolver) UpdateCampaign(
 	var campaign model.CampaignResolver
 	r.db.Read(func(m model.Model) {
 		// TODO: This contains a model outside of read. This could be a race condition.
-		campaign, err = m.Campaign(args.ID)
+		campaign, err = m.Campaign(int(args.ID))
 	})
 
 	return campaign, err
@@ -111,11 +111,11 @@ func (r *resolver) UpdateCampaign(
 
 func (r *resolver) DeleteCampaign(
 	args struct {
-		ID int
+		ID model.ID
 	},
 ) (bool, error) {
 	err := r.db.Write(func(m model.Model) sticky.Event[model.Model] {
-		return m.CampaignDelete(args.ID)
+		return m.CampaignDelete(int(args.ID))
 	})
 	if err != nil {
 		return false, fmt.Errorf("write: %w", err)
@@ -151,12 +151,12 @@ func (r *resolver) AddDay(
 
 func (r *resolver) UpdateDay(
 	args struct {
-		ID    int
+		ID    model.ID
 		Title string
 	},
 ) (model.DayResolver, error) {
 	err := r.db.Write(func(m model.Model) sticky.Event[model.Model] {
-		return m.DayUpdate(args.ID, args.Title)
+		return m.DayUpdate(int(args.ID), args.Title)
 	})
 	if err != nil {
 		return model.DayResolver{}, fmt.Errorf("write: %w", err)
@@ -165,7 +165,7 @@ func (r *resolver) UpdateDay(
 	var day model.DayResolver
 	r.db.Read(func(m model.Model) {
 		// TODO: This contains a model outside of read. This could be a race condition.
-		day, err = m.Day(args.ID)
+		day, err = m.Day(int(args.ID))
 	})
 
 	return day, err
@@ -173,11 +173,11 @@ func (r *resolver) UpdateDay(
 
 func (r *resolver) DeleteDay(
 	args struct {
-		ID int
+		ID model.ID
 	},
 ) (bool, error) {
 	err := r.db.Write(func(m model.Model) sticky.Event[model.Model] {
-		return m.DayDelete(args.ID)
+		return m.DayDelete(int(args.ID))
 	})
 	if err != nil {
 		return false, fmt.Errorf("write: %w", err)
@@ -221,7 +221,7 @@ func (r *resolver) AddEvent(
 
 func (r *resolver) UpdateEvent(
 	args struct {
-		ID               int
+		ID               model.ID
 		Title            *string
 		DayIDs           *[]model.ID
 		Capacity         *int32
@@ -252,7 +252,7 @@ func (r *resolver) UpdateEvent(
 			maxSpecialPupils = int(*args.MaxSpecialPupils)
 		}
 
-		return m.EventUpdate(args.ID, title, dayIDs, capacity, maxSpecialPupils)
+		return m.EventUpdate(int(args.ID), title, dayIDs, capacity, maxSpecialPupils)
 	})
 	if err != nil {
 		return model.EventResolver{}, fmt.Errorf("write: %w", err)
@@ -261,7 +261,7 @@ func (r *resolver) UpdateEvent(
 	var event model.EventResolver
 	r.db.Read(func(m model.Model) {
 		// TODO: This contains a model outside of read. This could be a race condition.
-		event, err = m.Event(args.ID)
+		event, err = m.Event(int(args.ID))
 	})
 
 	return event, err
@@ -269,11 +269,11 @@ func (r *resolver) UpdateEvent(
 
 func (r *resolver) DeleteEvent(
 	args struct {
-		ID int
+		ID model.ID
 	},
 ) (bool, error) {
 	err := r.db.Write(func(m model.Model) sticky.Event[model.Model] {
-		return m.EventDelete(args.ID)
+		return m.EventDelete(int(args.ID))
 	})
 	if err != nil {
 		return false, fmt.Errorf("write: %w", err)
@@ -317,7 +317,7 @@ func (r *resolver) AddPupil(
 
 func (r *resolver) UpdatePupil(
 	args struct {
-		ID         int
+		ID         model.ID
 		Name       *string
 		LoginToken *string
 		Class      *string
@@ -345,7 +345,7 @@ func (r *resolver) UpdatePupil(
 			special = *args.Special
 		}
 
-		return m.PupilUpdate(args.ID, name, loginToken, class, special)
+		return m.PupilUpdate(int(args.ID), name, loginToken, class, special)
 	})
 	if err != nil {
 		return model.PupilResolver{}, fmt.Errorf("write: %w", err)
@@ -354,7 +354,7 @@ func (r *resolver) UpdatePupil(
 	var pupil model.PupilResolver
 	r.db.Read(func(m model.Model) {
 		// TODO: This contains a model outside of read. This could be a race condition.
-		pupil, err = m.Pupil(args.ID)
+		pupil, err = m.Pupil(int(args.ID))
 	})
 
 	return pupil, err
@@ -362,11 +362,11 @@ func (r *resolver) UpdatePupil(
 
 func (r *resolver) DeletePupil(
 	args struct {
-		ID int
+		ID model.ID
 	},
 ) (bool, error) {
 	err := r.db.Write(func(m model.Model) sticky.Event[model.Model] {
-		return m.PupilDelete(args.ID)
+		return m.PupilDelete(int(args.ID))
 	})
 	if err != nil {
 		return false, fmt.Errorf("write: %w", err)
