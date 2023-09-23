@@ -1,7 +1,6 @@
 module EventForm exposing (Action(..), Effect(..), Model, Msg, init, update, view)
 
 import Api.Mutation
-import Api.Object.EventChoice exposing (event)
 import Data
 import Graphql.Http
 import Graphql.OptionalArgument

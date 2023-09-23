@@ -124,6 +124,7 @@ update msg model =
 
                 SwitchToEditEvent c e ->
                     let
+                        eventForm : EventForm.Model
                         eventForm =
                             EventForm.Model
                                 e.title
