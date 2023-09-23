@@ -1,6 +1,7 @@
 module EventForm exposing (Action(..), Effect(..), Model, Msg, init, update, view)
 
 import Api.Mutation
+import Api.Object.EventChoice exposing (event)
 import Data
 import Graphql.Http
 import Graphql.OptionalArgument
@@ -36,6 +37,7 @@ type Msg
     | CloseForm
     | GotNewEvent (Result (Graphql.Http.Error Data.Event) Data.Event)
     | GotUpdatedEvent (Result (Graphql.Http.Error Data.Event) Data.Event)
+    | GotDeleteEvent Data.EventId (Result (Graphql.Http.Error Bool) Bool)
 
 
 type FormMsg
@@ -117,8 +119,13 @@ update campaign msg model =
                     )
 
                 Delete eventId ->
-                    -- TODO: Use mutation deleteEvent here
-                    ()
+                    ( model
+                    , Loading <|
+                        (Api.Mutation.deleteEvent (Api.Mutation.DeleteEventRequiredArguments eventId)
+                            |> Graphql.Http.mutationRequest Shared.queryUrl
+                            |> Graphql.Http.send (GotDeleteEvent eventId)
+                        )
+                    )
 
         CloseForm ->
             ( model, Done campaign )
@@ -141,6 +148,28 @@ update campaign msg model =
                                 event :: rest ->
                                     if event.id == eventFromServer.id then
                                         eventFromServer :: rest
+
+                                    else
+                                        event :: walkToUpdate rest
+
+                                [] ->
+                                    []
+                    in
+                    ( model, Done { campaign | events = walkToUpdate campaign.events } )
+
+                Err err ->
+                    ( model, Error (Shared.parseGraphqlError err) )
+
+        GotDeleteEvent eventToBeDeletedId res ->
+            case res of
+                Ok _ ->
+                    let
+                        walkToUpdate : List Data.Event -> List Data.Event
+                        walkToUpdate events =
+                            case events of
+                                event :: rest ->
+                                    if event.id == eventToBeDeletedId then
+                                        rest
 
                                     else
                                         event :: walkToUpdate rest
@@ -181,7 +210,7 @@ viewDelete action model =
                 , button [ class "delete", attribute "aria-label" "close", onClick CloseForm ] []
                 ]
             , section [ class "modal-card-body" ]
-                [ p [] [ text "Wollen Sie das Angebot ... wirklich löschen?" ]
+                [ p [] [ text <| "Wollen Sie das Angebot " ++ model.title ++ "wirklich löschen?" ]
                 ]
             , footer [ class "modal-card-foot" ]
                 [ button [ classes "button is-success", onClick <| SendEventForm action ] [ text "Löschen" ]

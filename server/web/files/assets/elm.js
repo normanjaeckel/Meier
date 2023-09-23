@@ -3992,7 +3992,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.y);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.z);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
@@ -4434,8 +4434,8 @@ var _Http_toTask = F3(function(router, toTask, request)
 
 		_Http_configureRequest(xhr, request);
 
-		request.y.a && xhr.setRequestHeader('Content-Type', request.y.a);
-		xhr.send(request.y.b);
+		request.z.a && xhr.setRequestHeader('Content-Type', request.z.a);
+		xhr.send(request.z.b);
 
 		return function() { xhr.c = true; xhr.abort(); };
 	});
@@ -6762,7 +6762,7 @@ var $elm$http$Http$cmdMap = F2(
 			return $elm$http$Http$Request(
 				{
 					a3: r.a3,
-					y: r.y,
+					z: r.z,
 					P: A2(_Http_mapExpect, func, r.P),
 					j: r.j,
 					A: r.A,
@@ -6791,12 +6791,12 @@ var $elm$http$Http$subscription = _Platform_leaf('Http');
 var $elm$http$Http$request = function (r) {
 	return $elm$http$Http$command(
 		$elm$http$Http$Request(
-			{a3: false, y: r.y, P: r.P, j: r.j, A: r.A, n: r.n, aY: r.aY, D: r.D}));
+			{a3: false, z: r.z, P: r.P, j: r.j, A: r.A, n: r.n, aY: r.aY, D: r.D}));
 };
 var $elm$http$Http$riskyRequest = function (r) {
 	return $elm$http$Http$command(
 		$elm$http$Http$Request(
-			{a3: true, y: r.y, P: r.P, j: r.j, A: r.A, n: r.n, aY: r.aY, D: r.D}));
+			{a3: true, z: r.z, P: r.P, j: r.j, A: r.A, n: r.n, aY: r.aY, D: r.D}));
 };
 var $dillonkearns$elm_graphql$Graphql$Http$GraphqlError = F2(
 	function (a, b) {
@@ -7645,7 +7645,7 @@ var $dillonkearns$elm_graphql$Graphql$Http$QueryHelper$build = F5(
 			var serializedQuery = _v2.a;
 			var operationNameParamForPostRequest = _v2.b;
 			return {
-				y: $elm$http$Http$jsonBody(
+				z: $elm$http$Http$jsonBody(
 					$elm$json$Json$Encode$object(
 						A2(
 							$elm$core$List$cons,
@@ -7657,7 +7657,7 @@ var $dillonkearns$elm_graphql$Graphql$Http$QueryHelper$build = F5(
 				D: A2($dillonkearns$elm_graphql$Graphql$Http$QueryParams$urlWithQueryParams, queryParams, url)
 			};
 		} else {
-			return {y: $elm$http$Http$emptyBody, A: 0, D: urlForGetRequest};
+			return {z: $elm$http$Http$emptyBody, A: 0, D: urlForGetRequest};
 		}
 	});
 var $dillonkearns$elm_graphql$Graphql$Http$GraphqlError$ParsedData = function (a) {
@@ -7817,7 +7817,7 @@ var $dillonkearns$elm_graphql$Graphql$Http$toReadyRequest = function (_v0) {
 			request.F,
 			querySelectionSet);
 		return {
-			y: queryRequestDetails.y,
+			z: queryRequestDetails.z,
 			a9: $dillonkearns$elm_graphql$Graphql$Http$decoderOrError(request.P),
 			j: request.j,
 			A: function () {
@@ -7843,7 +7843,7 @@ var $dillonkearns$elm_graphql$Graphql$Http$toReadyRequest = function (_v0) {
 			}
 		}();
 		return {
-			y: $elm$http$Http$jsonBody(
+			z: $elm$http$Http$jsonBody(
 				$elm$json$Json$Encode$object(
 					A2(
 						$elm$core$List$append,
@@ -7880,7 +7880,7 @@ var $dillonkearns$elm_graphql$Graphql$Http$toHttpRequestRecord = F2(
 		var request = fullRequest;
 		return function (readyRequest) {
 			return {
-				y: readyRequest.y,
+				z: readyRequest.z,
 				P: A2(
 					$dillonkearns$elm_graphql$Graphql$Http$expectJson,
 					A2($elm$core$Basics$composeR, $dillonkearns$elm_graphql$Graphql$Http$convertResult, resultToMessage),
@@ -7902,7 +7902,7 @@ var $dillonkearns$elm_graphql$Graphql$Http$send = F2(
 	});
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		{o: _List_Nil, a: $author$project$Main$Loading, z: $author$project$EventForm$init, R: $author$project$NewCampaign$init, S: $author$project$NewDay$init, T: $author$project$NewPupil$init},
+		{o: _List_Nil, a: $author$project$Main$Loading, v: $author$project$EventForm$init, R: $author$project$NewCampaign$init, S: $author$project$NewDay$init, T: $author$project$NewPupil$init},
 		A2(
 			$dillonkearns$elm_graphql$Graphql$Http$send,
 			$author$project$Main$GotCampaignList,
@@ -7919,6 +7919,10 @@ var $author$project$Main$subscriptions = function (_v0) {
 var $author$project$Main$CampaignPage = function (a) {
 	return {$: 1, a: a};
 };
+var $author$project$Main$DeleteEventPage = F2(
+	function (a, b) {
+		return {$: 6, a: a, b: b};
+	});
 var $author$project$Main$EditEventPage = F2(
 	function (a, b) {
 		return {$: 5, a: a, b: b};
@@ -7947,11 +7951,11 @@ var $author$project$Main$NewPupilMsg = function (a) {
 	return {$: 5, a: a};
 };
 var $author$project$Main$NewPupilPage = function (a) {
-	return {$: 6, a: a};
+	return {$: 7, a: a};
 };
 var $author$project$Main$Overview = {$: 0};
 var $author$project$Main$PupilPage = function (a) {
-	return {$: 7, a: a};
+	return {$: 8, a: a};
 };
 var $author$project$Main$Success = function (a) {
 	return {$: 2, a: a};
@@ -7993,12 +7997,19 @@ var $author$project$Api$Mutation$AddEventRequiredArguments = F5(
 	function (campaignID, title, dayIDs, capacity, maxSpecialPupils) {
 		return {M: campaignID, _: capacity, ac: dayIDs, ae: maxSpecialPupils, l: title};
 	});
+var $author$project$Api$Mutation$DeleteEventRequiredArguments = function (id) {
+	return {h: id};
+};
 var $author$project$EventForm$Done = function (a) {
 	return {$: 2, a: a};
 };
 var $author$project$EventForm$Error = function (a) {
 	return {$: 3, a: a};
 };
+var $author$project$EventForm$GotDeleteEvent = F2(
+	function (a, b) {
+		return {$: 5, a: a, b: b};
+	});
 var $author$project$EventForm$GotNewEvent = function (a) {
 	return {$: 3, a: a};
 };
@@ -8085,6 +8096,26 @@ var $author$project$Api$Mutation$addEvent = F2(
 			object____,
 			$elm$core$Basics$identity);
 	});
+var $author$project$Api$Mutation$deleteEvent = function (requiredArgs____) {
+	return A4(
+		$dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField,
+		'Bool',
+		'deleteEvent',
+		_List_fromArray(
+			[
+				A3(
+				$dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required,
+				'id',
+				requiredArgs____.h,
+				A2(
+					$author$project$Api$Scalar$unwrapEncoder,
+					function ($) {
+						return $.a7;
+					},
+					$author$project$IdScalarCodecs$codecs))
+			]),
+		$elm$json$Json$Decode$bool);
+};
 var $dillonkearns$elm_graphql$Graphql$Http$Mutation = function (a) {
 	return {$: 1, a: a};
 };
@@ -8193,45 +8224,59 @@ var $author$project$EventForm$update = F3(
 				return _Utils_Tuple2(updatedModel, $author$project$EventForm$None);
 			case 1:
 				var action = msg.a;
-				if (!action.$) {
-					return _Utils_Tuple2(
-						model,
-						$author$project$EventForm$Loading(
-							A2(
-								$dillonkearns$elm_graphql$Graphql$Http$send,
-								$author$project$EventForm$GotNewEvent,
+				switch (action.$) {
+					case 0:
+						return _Utils_Tuple2(
+							model,
+							$author$project$EventForm$Loading(
 								A2(
-									$dillonkearns$elm_graphql$Graphql$Http$mutationRequest,
-									$author$project$Shared$queryUrl,
+									$dillonkearns$elm_graphql$Graphql$Http$send,
+									$author$project$EventForm$GotNewEvent,
 									A2(
-										$author$project$Api$Mutation$addEvent,
-										A5($author$project$Api$Mutation$AddEventRequiredArguments, campaign.h, model.l, _List_Nil, model._, model.ae),
-										$author$project$Data$eventSelectionSet)))));
-				} else {
-					var eventId = action.a;
-					var optionalArgs = function (args) {
-						return _Utils_update(
-							args,
-							{
-								_: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present(model._),
-								ae: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present(model.ae),
-								l: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present(model.l)
-							});
-					};
-					return _Utils_Tuple2(
-						model,
-						$author$project$EventForm$Loading(
-							A2(
-								$dillonkearns$elm_graphql$Graphql$Http$send,
-								$author$project$EventForm$GotUpdatedEvent,
+										$dillonkearns$elm_graphql$Graphql$Http$mutationRequest,
+										$author$project$Shared$queryUrl,
+										A2(
+											$author$project$Api$Mutation$addEvent,
+											A5($author$project$Api$Mutation$AddEventRequiredArguments, campaign.h, model.l, _List_Nil, model._, model.ae),
+											$author$project$Data$eventSelectionSet)))));
+					case 1:
+						var eventId = action.a;
+						var optionalArgs = function (args) {
+							return _Utils_update(
+								args,
+								{
+									_: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present(model._),
+									ae: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present(model.ae),
+									l: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present(model.l)
+								});
+						};
+						return _Utils_Tuple2(
+							model,
+							$author$project$EventForm$Loading(
 								A2(
-									$dillonkearns$elm_graphql$Graphql$Http$mutationRequest,
-									$author$project$Shared$queryUrl,
-									A3(
-										$author$project$Api$Mutation$updateEvent,
-										optionalArgs,
-										$author$project$Api$Mutation$UpdateEventRequiredArguments(eventId),
-										$author$project$Data$eventSelectionSet)))));
+									$dillonkearns$elm_graphql$Graphql$Http$send,
+									$author$project$EventForm$GotUpdatedEvent,
+									A2(
+										$dillonkearns$elm_graphql$Graphql$Http$mutationRequest,
+										$author$project$Shared$queryUrl,
+										A3(
+											$author$project$Api$Mutation$updateEvent,
+											optionalArgs,
+											$author$project$Api$Mutation$UpdateEventRequiredArguments(eventId),
+											$author$project$Data$eventSelectionSet)))));
+					default:
+						var eventId = action.a;
+						return _Utils_Tuple2(
+							model,
+							$author$project$EventForm$Loading(
+								A2(
+									$dillonkearns$elm_graphql$Graphql$Http$send,
+									$author$project$EventForm$GotDeleteEvent(eventId),
+									A2(
+										$dillonkearns$elm_graphql$Graphql$Http$mutationRequest,
+										$author$project$Shared$queryUrl,
+										$author$project$Api$Mutation$deleteEvent(
+											$author$project$Api$Mutation$DeleteEventRequiredArguments(eventId))))));
 				}
 			case 2:
 				return _Utils_Tuple2(
@@ -8259,7 +8304,7 @@ var $author$project$EventForm$update = F3(
 						$author$project$EventForm$Error(
 							$author$project$Shared$parseGraphqlError(err)));
 				}
-			default:
+			case 4:
 				var res = msg.a;
 				if (!res.$) {
 					var eventFromServer = res.a;
@@ -8268,6 +8313,37 @@ var $author$project$EventForm$update = F3(
 							var event = events.a;
 							var rest = events.b;
 							return _Utils_eq(event.h, eventFromServer.h) ? A2($elm$core$List$cons, eventFromServer, rest) : A2(
+								$elm$core$List$cons,
+								event,
+								walkToUpdate(rest));
+						} else {
+							return _List_Nil;
+						}
+					};
+					return _Utils_Tuple2(
+						model,
+						$author$project$EventForm$Done(
+							_Utils_update(
+								campaign,
+								{
+									aC: walkToUpdate(campaign.aC)
+								})));
+				} else {
+					var err = res.a;
+					return _Utils_Tuple2(
+						model,
+						$author$project$EventForm$Error(
+							$author$project$Shared$parseGraphqlError(err)));
+				}
+			default:
+				var eventToBeDeletedId = msg.a;
+				var res = msg.b;
+				if (!res.$) {
+					var walkToUpdate = function (events) {
+						if (events.b) {
+							var event = events.a;
+							var rest = events.b;
+							return _Utils_eq(event.h, eventToBeDeletedId) ? rest : A2(
 								$elm$core$List$cons,
 								event,
 								walkToUpdate(rest));
@@ -8697,10 +8773,21 @@ var $author$project$Main$update = F2(
 								{
 									a: $author$project$Main$Success(
 										A2($author$project$Main$EditEventPage, c, e.h)),
-									z: eventForm
+									v: eventForm
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 6:
+						var c = s.a;
+						var e = s.b;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									a: $author$project$Main$Success(
+										A2($author$project$Main$DeleteEventPage, c, e.h))
+								}),
+							$elm$core$Platform$Cmd$none);
+					case 7:
 						var c = s.a;
 						return _Utils_Tuple2(
 							_Utils_update(
@@ -8827,7 +8914,7 @@ var $author$project$Main$update = F2(
 			case 4:
 				var campaign = msg.a;
 				var innerMsg = msg.b;
-				var _v7 = A3($author$project$EventForm$update, campaign, innerMsg, model.z);
+				var _v7 = A3($author$project$EventForm$update, campaign, innerMsg, model.v);
 				var updatedModel = _v7.a;
 				var effect = _v7.b;
 				switch (effect.$) {
@@ -8835,7 +8922,7 @@ var $author$project$Main$update = F2(
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
-								{z: updatedModel}),
+								{v: updatedModel}),
 							$elm$core$Platform$Cmd$none);
 					case 1:
 						var innerCmd = effect.a;
@@ -8864,7 +8951,7 @@ var $author$project$Main$update = F2(
 									o: newCampaignList,
 									a: $author$project$Main$Success(
 										$author$project$Main$CampaignPage(updatedCamp)),
-									z: $author$project$EventForm$init
+									v: $author$project$EventForm$init
 								}),
 							$elm$core$Platform$Cmd$none);
 					default:
@@ -8928,6 +9015,9 @@ var $author$project$Main$update = F2(
 				}
 		}
 	});
+var $author$project$EventForm$Delete = function (a) {
+	return {$: 2, a: a};
+};
 var $author$project$EventForm$Edit = function (a) {
 	return {$: 1, a: a};
 };
@@ -8947,7 +9037,7 @@ var $author$project$Main$SwitchToNewEvent = function (a) {
 	return {$: 4, a: a};
 };
 var $author$project$Main$SwitchToNewPupil = function (a) {
-	return {$: 6, a: a};
+	return {$: 7, a: a};
 };
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -9007,6 +9097,10 @@ var $author$project$Main$dayView = function (d) {
 					])),
 			_Utils_ap(events, unassignedPupils)));
 };
+var $author$project$Main$SwitchToDeleteEvent = F2(
+	function (a, b) {
+		return {$: 6, a: a, b: b};
+	});
 var $author$project$Main$SwitchToEditEvent = F2(
 	function (a, b) {
 		return {$: 5, a: a, b: b};
@@ -9181,13 +9275,42 @@ var $author$project$Main$eventView = F2(
 												]),
 											_List_Nil)
 										]))
+								])),
+							A2(
+							$elm$html$Html$a,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$title('Löschen'),
+									$elm$html$Html$Events$onClick(
+									$author$project$Main$SwitchPage(
+										A2($author$project$Main$SwitchToDeleteEvent, c, e)))
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$span,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('icon')
+										]),
+									_List_fromArray(
+										[
+											A3(
+											$elm$html$Html$node,
+											'ion-icon',
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$name('trash-outline')
+												]),
+											_List_Nil)
+										]))
 								]))
 						]))
 				]));
 	});
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $author$project$Main$SwitchToPupil = function (a) {
-	return {$: 7, a: a};
+	return {$: 8, a: a};
 };
 var $elm$html$Html$li = _VirtualDom_node('li');
 var $author$project$Main$pupilToStr = function (p) {
@@ -9395,9 +9518,6 @@ var $author$project$Main$pupilView = function (pup) {
 };
 var $elm$html$Html$section = _VirtualDom_node('section');
 var $author$project$EventForm$CloseForm = {$: 2};
-var $author$project$EventForm$FormMsg = function (a) {
-	return {$: 0, a: a};
-};
 var $author$project$EventForm$SendEventForm = function (a) {
 	return {$: 1, a: a};
 };
@@ -9410,6 +9530,115 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 	});
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $elm$html$Html$footer = _VirtualDom_node('footer');
+var $elm$html$Html$header = _VirtualDom_node('header');
+var $author$project$EventForm$viewDelete = F2(
+	function (action, model) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$author$project$Shared$classes('modal is-active')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('modal-background'),
+							$elm$html$Html$Events$onClick($author$project$EventForm$CloseForm)
+						]),
+					_List_Nil),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('modal-card')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$header,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('modal-card-head')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$p,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('modal-card-title')
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Angebot löschen')
+										])),
+									A2(
+									$elm$html$Html$button,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('delete'),
+											A2($elm$html$Html$Attributes$attribute, 'aria-label', 'close'),
+											$elm$html$Html$Events$onClick($author$project$EventForm$CloseForm)
+										]),
+									_List_Nil)
+								])),
+							A2(
+							$elm$html$Html$section,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('modal-card-body')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$p,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Wollen Sie das Angebot ' + (model.l + 'wirklich löschen?'))
+										]))
+								])),
+							A2(
+							$elm$html$Html$footer,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('modal-card-foot')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$button,
+									_List_fromArray(
+										[
+											$author$project$Shared$classes('button is-success'),
+											$elm$html$Html$Events$onClick(
+											$author$project$EventForm$SendEventForm(action))
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Löschen')
+										])),
+									A2(
+									$elm$html$Html$button,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('button'),
+											$elm$html$Html$Events$onClick($author$project$EventForm$CloseForm)
+										]),
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Abbrechen')
+										]))
+								]))
+						]))
+				]));
+	});
+var $author$project$EventForm$FormMsg = function (a) {
+	return {$: 0, a: a};
+};
 var $elm$html$Html$form = _VirtualDom_node('form');
 var $author$project$EventForm$Capacity = function (a) {
 	return {$: 1, a: a};
@@ -9601,7 +9830,6 @@ var $author$project$EventForm$formFields = function (model) {
 				]))
 		]);
 };
-var $elm$html$Html$header = _VirtualDom_node('header');
 var $elm$html$Html$Events$alwaysPreventDefault = function (msg) {
 	return _Utils_Tuple2(msg, true);
 };
@@ -9624,123 +9852,124 @@ var $elm$html$Html$Events$onSubmit = function (msg) {
 			$elm$html$Html$Events$alwaysPreventDefault,
 			$elm$json$Json$Decode$succeed(msg)));
 };
+var $author$project$EventForm$viewNewAndEdit = F3(
+	function (headline, action, model) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$author$project$Shared$classes('modal is-active')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('modal-background'),
+							$elm$html$Html$Events$onClick($author$project$EventForm$CloseForm)
+						]),
+					_List_Nil),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('modal-card')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$form,
+							_List_fromArray(
+								[
+									$elm$html$Html$Events$onSubmit(
+									$author$project$EventForm$SendEventForm(action))
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$html$Html$header,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('modal-card-head')
+										]),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$p,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('modal-card-title')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text(headline)
+												])),
+											A2(
+											$elm$html$Html$button,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('delete'),
+													A2($elm$html$Html$Attributes$attribute, 'aria-label', 'close'),
+													$elm$html$Html$Events$onClick($author$project$EventForm$CloseForm)
+												]),
+											_List_Nil)
+										])),
+									A2(
+									$elm$html$Html$section,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('modal-card-body')
+										]),
+									A2(
+										$elm$core$List$map,
+										$elm$html$Html$map($author$project$EventForm$FormMsg),
+										$author$project$EventForm$formFields(model))),
+									A2(
+									$elm$html$Html$footer,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('modal-card-foot')
+										]),
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$button,
+											_List_fromArray(
+												[
+													$author$project$Shared$classes('button is-success'),
+													$elm$html$Html$Attributes$type_('submit')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text('Speichern')
+												])),
+											A2(
+											$elm$html$Html$button,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('button'),
+													$elm$html$Html$Events$onClick($author$project$EventForm$CloseForm)
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text('Abbrechen')
+												]))
+										]))
+								]))
+						]))
+				]));
+	});
 var $author$project$EventForm$view = F2(
 	function (action, model) {
-		var headline = function () {
-			if (!action.$) {
-				return 'Neues Angebot hinzufügen';
-			} else {
-				return 'Angebot bearbeiten';
-			}
-		}();
-		return _List_fromArray(
-			[
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$author$project$Shared$classes('modal is-active')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('modal-background'),
-								$elm$html$Html$Events$onClick($author$project$EventForm$CloseForm)
-							]),
-						_List_Nil),
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('modal-card')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$form,
-								_List_fromArray(
-									[
-										$elm$html$Html$Events$onSubmit(
-										$author$project$EventForm$SendEventForm(action))
-									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$header,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('modal-card-head')
-											]),
-										_List_fromArray(
-											[
-												A2(
-												$elm$html$Html$p,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('modal-card-title')
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text(headline)
-													])),
-												A2(
-												$elm$html$Html$button,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('delete'),
-														A2($elm$html$Html$Attributes$attribute, 'aria-label', 'close'),
-														$elm$html$Html$Events$onClick($author$project$EventForm$CloseForm)
-													]),
-												_List_Nil)
-											])),
-										A2(
-										$elm$html$Html$section,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('modal-card-body')
-											]),
-										A2(
-											$elm$core$List$map,
-											$elm$html$Html$map($author$project$EventForm$FormMsg),
-											$author$project$EventForm$formFields(model))),
-										A2(
-										$elm$html$Html$footer,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('modal-card-foot')
-											]),
-										_List_fromArray(
-											[
-												A2(
-												$elm$html$Html$button,
-												_List_fromArray(
-													[
-														$author$project$Shared$classes('button is-success'),
-														$elm$html$Html$Attributes$type_('submit')
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text('Speichern')
-													])),
-												A2(
-												$elm$html$Html$button,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('button'),
-														$elm$html$Html$Events$onClick($author$project$EventForm$CloseForm)
-													]),
-												_List_fromArray(
-													[
-														$elm$html$Html$text('Abbrechen')
-													]))
-											]))
-									]))
-							]))
-					]))
-			]);
+		switch (action.$) {
+			case 0:
+				return A3($author$project$EventForm$viewNewAndEdit, 'Neues Angebot hinzufügen', action, model);
+			case 1:
+				return A3($author$project$EventForm$viewNewAndEdit, 'Angebot bearbeiten', action, model);
+			default:
+				return A2($author$project$EventForm$viewDelete, action, model);
+		}
 	});
 var $author$project$NewCampaign$NewCampaignFormDataMsg = function (a) {
 	return {$: 0, a: a};
@@ -10297,25 +10526,44 @@ var $author$project$Main$view = function (model) {
 											var c = p.a;
 											return _Utils_ap(
 												$author$project$Main$campaignView(c),
-												A2(
-													$elm$core$List$map,
-													$elm$html$Html$map(
-														$author$project$Main$EventFormMsg(c)),
-													A2($author$project$EventForm$view, $author$project$EventForm$New, model.z)));
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$map,
+														$author$project$Main$EventFormMsg(c),
+														A2($author$project$EventForm$view, $author$project$EventForm$New, model.v))
+													]));
 										case 5:
 											var c = p.a;
 											var e = p.b;
 											return _Utils_ap(
 												$author$project$Main$campaignView(c),
-												A2(
-													$elm$core$List$map,
-													$elm$html$Html$map(
-														$author$project$Main$EventFormMsg(c)),
-													A2(
-														$author$project$EventForm$view,
-														$author$project$EventForm$Edit(e),
-														model.z)));
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$map,
+														$author$project$Main$EventFormMsg(c),
+														A2(
+															$author$project$EventForm$view,
+															$author$project$EventForm$Edit(e),
+															model.v))
+													]));
 										case 6:
+											var c = p.a;
+											var e = p.b;
+											return _Utils_ap(
+												$author$project$Main$campaignView(c),
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$map,
+														$author$project$Main$EventFormMsg(c),
+														A2(
+															$author$project$EventForm$view,
+															$author$project$EventForm$Delete(e),
+															model.v))
+													]));
+										case 7:
 											var c = p.a;
 											return A2(
 												$elm$core$List$map,
