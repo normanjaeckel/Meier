@@ -10,8 +10,8 @@ import Html.Attributes exposing (class, name, title)
 import Html.Events exposing (onClick)
 import NewCampaign
 import NewDay
-import NewPupil
 import Platform.Cmd as Cmd
+import PupilForm
 import Shared exposing (classes, parseGraphqlError)
 
 
@@ -35,7 +35,7 @@ type alias Model =
     , newCampaign : NewCampaign.Model
     , newDay : NewDay.Model
     , eventForm : EventForm.Model
-    , newPupil : NewPupil.Model
+    , pupilForm : PupilForm.Model
     }
 
 
@@ -46,7 +46,7 @@ init _ =
       , newCampaign = NewCampaign.init
       , newDay = NewDay.init
       , eventForm = EventForm.init
-      , newPupil = NewPupil.init
+      , pupilForm = PupilForm.init
       }
     , Api.Query.campaignList Data.campaingSelectionSet
         |> Graphql.Http.queryRequest Shared.queryUrl
@@ -69,6 +69,8 @@ type Page
     | EditEventPage Campaign Data.EventId
     | DeleteEventPage Campaign Data.EventId
     | NewPupilPage Campaign
+    | EditPupilPage Campaign Data.PupilId
+    | DeletePupilPage Campaign Data.PupilId
     | PupilPage Pupil
 
 
@@ -82,7 +84,7 @@ type Msg
     | NewCampaignMsg NewCampaign.Msg
     | NewDayMsg NewDay.Msg
     | EventFormMsg Campaign EventForm.Msg
-    | NewPupilMsg NewPupil.Msg
+    | PupilFormMsg Campaign PupilForm.Msg
 
 
 type SwitchTo
@@ -94,6 +96,8 @@ type SwitchTo
     | SwitchToEditEvent Campaign Event
     | SwitchToDeleteEvent Campaign Event
     | SwitchToNewPupil Campaign
+    | SwitchToEditPupil Campaign Pupil
+    | SwitchToDeletePupil Campaign Pupil
     | SwitchToPupil Pupil
 
 
@@ -138,6 +142,20 @@ update msg model =
 
                 SwitchToNewPupil c ->
                     ( { model | connection = Success <| NewPupilPage c }, Cmd.none )
+
+                SwitchToEditPupil c p ->
+                    let
+                        pupilForm : PupilForm.Model
+                        pupilForm =
+                            PupilForm.Model
+                                p.name
+                                p.class
+                                p.isSpecial
+                    in
+                    ( { model | connection = Success <| EditPupilPage c p.id, pupilForm = pupilForm }, Cmd.none )
+
+                SwitchToDeletePupil c p ->
+                    ( { model | connection = Success <| DeletePupilPage c p.id }, Cmd.none )
 
                 SwitchToCampaign c ->
                     ( { model | connection = Success <| CampaignPage c }, Cmd.none )
@@ -247,23 +265,23 @@ update msg model =
                 EventForm.Error err ->
                     ( { model | connection = Failure err }, Cmd.none )
 
-        NewPupilMsg innerMsg ->
+        PupilFormMsg campaign innerMsg ->
             let
                 ( updatedModel, effect ) =
-                    NewPupil.update innerMsg model.newPupil
+                    PupilForm.update campaign innerMsg model.pupilForm
             in
             case effect of
-                NewPupil.None ->
-                    ( { model | newPupil = updatedModel }, Cmd.none )
+                PupilForm.None ->
+                    ( { model | pupilForm = updatedModel }, Cmd.none )
 
-                NewPupil.Loading innerCmd ->
-                    ( { model | connection = Loading }, innerCmd |> Cmd.map NewPupilMsg )
+                PupilForm.Loading innerCmd ->
+                    ( { model | connection = Loading }, innerCmd |> Cmd.map (PupilFormMsg campaign) )
 
-                NewPupil.Done updatedCamp ->
+                PupilForm.Done updatedCamp ->
                     let
                         newCampaignList : List Campaign
                         newCampaignList =
-                            -- TODO: use recursion here
+                            -- TODO: use recursion here and reuse fn from above
                             model.campaigns
                                 |> List.foldr
                                     (\camp acc ->
@@ -278,12 +296,12 @@ update msg model =
                     ( { model
                         | connection = Success <| CampaignPage updatedCamp
                         , campaigns = newCampaignList
-                        , newPupil = NewPupil.init
+                        , pupilForm = PupilForm.init
                       }
                     , Cmd.none
                     )
 
-                NewPupil.Error err ->
+                PupilForm.Error err ->
                     ( { model | connection = Failure err }, Cmd.none )
 
 
@@ -339,14 +357,20 @@ view model =
                             NewEventPage c ->
                                 campaignView c ++ [ EventForm.view EventForm.New model.eventForm |> Html.map (EventFormMsg c) ]
 
-                            EditEventPage c e ->
-                                campaignView c ++ [ EventForm.view (EventForm.Edit e) model.eventForm |> Html.map (EventFormMsg c) ]
+                            EditEventPage c eventId ->
+                                campaignView c ++ [ EventForm.view (EventForm.Edit eventId) model.eventForm |> Html.map (EventFormMsg c) ]
 
-                            DeleteEventPage c e ->
-                                campaignView c ++ [ EventForm.view (EventForm.Delete e) model.eventForm |> Html.map (EventFormMsg c) ]
+                            DeleteEventPage c eventId ->
+                                campaignView c ++ [ EventForm.view (EventForm.Delete eventId) model.eventForm |> Html.map (EventFormMsg c) ]
 
                             NewPupilPage c ->
-                                NewPupil.view c model.newPupil |> List.map (Html.map NewPupilMsg)
+                                campaignView c ++ [ PupilForm.view PupilForm.New model.pupilForm |> Html.map (PupilFormMsg c) ]
+
+                            EditPupilPage c pupilId ->
+                                campaignView c ++ [ PupilForm.view (PupilForm.Edit pupilId) model.pupilForm |> Html.map (PupilFormMsg c) ]
+
+                            DeletePupilPage c pupilId ->
+                                campaignView c ++ [ PupilForm.view (PupilForm.Delete pupilId) model.pupilForm |> Html.map (PupilFormMsg c) ]
 
                             PupilPage pup ->
                                 pupilView pup

@@ -199,26 +199,6 @@ view action model =
             viewDelete action model
 
 
-viewDelete : Action -> Model -> Html Msg
-viewDelete action model =
-    div [ classes "modal is-active" ]
-        [ div [ class "modal-background", onClick CloseForm ] []
-        , div [ class "modal-card" ]
-            [ header [ class "modal-card-head" ]
-                [ p [ class "modal-card-title" ] [ text "Angebot löschen" ]
-                , button [ class "delete", attribute "aria-label" "close", onClick CloseForm ] []
-                ]
-            , section [ class "modal-card-body" ]
-                [ p [] [ text <| "Wollen Sie das Angebot " ++ model.title ++ "wirklich löschen?" ]
-                ]
-            , footer [ class "modal-card-foot" ]
-                [ button [ classes "button is-success", onClick <| SendEventForm action ] [ text "Löschen" ]
-                , button [ class "button", onClick CloseForm ] [ text "Abbrechen" ]
-                ]
-            ]
-        ]
-
-
 viewNewAndEdit : String -> Action -> Model -> Html Msg
 viewNewAndEdit headline action model =
     div [ classes "modal is-active" ]
@@ -296,3 +276,23 @@ formFields model =
         , p [ class "help" ] [ text labelMaxSpecialPupils ]
         ]
     ]
+
+
+viewDelete : Action -> Model -> Html Msg
+viewDelete action model =
+    div [ classes "modal is-active" ]
+        [ div [ class "modal-background", onClick CloseForm ] []
+        , div [ class "modal-card" ]
+            [ header [ class "modal-card-head" ]
+                [ p [ class "modal-card-title" ] [ text "Angebot löschen" ]
+                , button [ class "delete", attribute "aria-label" "close", onClick CloseForm ] []
+                ]
+            , section [ class "modal-card-body" ]
+                [ p [] [ text <| "Wollen Sie das Angebot " ++ model.title ++ "wirklich löschen?" ]
+                ]
+            , footer [ class "modal-card-foot" ]
+                [ button [ classes "button is-success", onClick <| SendEventForm action ] [ text "Löschen" ]
+                , button [ class "button", onClick CloseForm ] [ text "Abbrechen" ]
+                ]
+            ]
+        ]
