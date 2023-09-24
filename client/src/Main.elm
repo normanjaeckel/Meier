@@ -3,13 +3,13 @@ module Main exposing (main)
 import Api.Query
 import Browser
 import Data exposing (Campaign, Day, Event, Pupil)
+import DayForm
 import EventForm
 import Graphql.Http
 import Html exposing (Html, a, button, div, h1, h2, h3, li, main_, nav, p, section, span, text, ul)
 import Html.Attributes exposing (class, name, title)
 import Html.Events exposing (onClick)
 import NewCampaign
-import NewDay
 import Platform.Cmd as Cmd
 import PupilForm
 import Shared exposing (classes, parseGraphqlError)
@@ -33,7 +33,7 @@ type alias Model =
     { connection : Connection
     , campaigns : List Campaign
     , newCampaign : NewCampaign.Model
-    , newDay : NewDay.Model
+    , dayForm : DayForm.Model
     , eventForm : EventForm.Model
     , pupilForm : PupilForm.Model
     }
@@ -44,7 +44,7 @@ init _ =
     ( { connection = Loading
       , campaigns = []
       , newCampaign = NewCampaign.init
-      , newDay = NewDay.init
+      , dayForm = DayForm.init
       , eventForm = EventForm.init
       , pupilForm = PupilForm.init
       }
@@ -64,14 +64,20 @@ type Page
     = Overview
     | CampaignPage Campaign
     | NewCampaignPage
-    | NewDayPage Campaign
+    | FormPage FormPage
+    | PupilPage Pupil
+
+
+type FormPage
+    = NewDayPage Campaign
+    | EditDayPage Campaign Data.DayId
+    | DeleteDayPage Campaign Data.DayId
     | NewEventPage Campaign
     | EditEventPage Campaign Data.EventId
     | DeleteEventPage Campaign Data.EventId
     | NewPupilPage Campaign
     | EditPupilPage Campaign Data.PupilId
     | DeletePupilPage Campaign Data.PupilId
-    | PupilPage Pupil
 
 
 
@@ -82,7 +88,7 @@ type Msg
     = GotCampaignList (Result (Graphql.Http.Error (List Campaign)) (List Campaign))
     | SwitchPage SwitchTo
     | NewCampaignMsg NewCampaign.Msg
-    | NewDayMsg NewDay.Msg
+    | DayFormMsg Campaign DayForm.Msg
     | EventFormMsg Campaign EventForm.Msg
     | PupilFormMsg Campaign PupilForm.Msg
 
@@ -92,6 +98,8 @@ type SwitchTo
     | SwitchToNewCampaign
     | SwitchToCampaign Campaign
     | SwitchToNewDay Campaign
+    | SwitchToEditDay Campaign Day
+    | SwitchToDeleteDay Campaign Day
     | SwitchToNewEvent Campaign
     | SwitchToEditEvent Campaign Event
     | SwitchToDeleteEvent Campaign Event
@@ -120,48 +128,60 @@ update msg model =
                 SwitchToNewCampaign ->
                     ( { model | connection = Success NewCampaignPage }, Cmd.none )
 
-                SwitchToNewDay c ->
-                    ( { model | connection = Success <| NewDayPage c }, Cmd.none )
+                SwitchToNewDay campaign ->
+                    ( { model | connection = Success <| FormPage <| NewDayPage campaign }, Cmd.none )
 
-                SwitchToNewEvent c ->
-                    ( { model | connection = Success <| NewEventPage c }, Cmd.none )
+                SwitchToEditDay campaign day ->
+                    let
+                        dayForm : DayForm.Model
+                        dayForm =
+                            DayForm.Model
+                                day.title
+                    in
+                    ( { model | connection = Success <| FormPage <| EditDayPage campaign day.id, dayForm = dayForm }, Cmd.none )
 
-                SwitchToEditEvent c e ->
+                SwitchToDeleteDay c day ->
+                    ( { model | connection = Success <| FormPage <| DeleteDayPage c day.id }, Cmd.none )
+
+                SwitchToNewEvent campaign ->
+                    ( { model | connection = Success <| FormPage <| NewEventPage campaign }, Cmd.none )
+
+                SwitchToEditEvent campaign event ->
                     let
                         eventForm : EventForm.Model
                         eventForm =
                             EventForm.Model
-                                e.title
-                                e.capacity
-                                e.maxSpecialPupils
+                                event.title
+                                event.capacity
+                                event.maxSpecialPupils
                     in
-                    ( { model | connection = Success <| EditEventPage c e.id, eventForm = eventForm }, Cmd.none )
+                    ( { model | connection = Success <| FormPage <| EditEventPage campaign event.id, eventForm = eventForm }, Cmd.none )
 
-                SwitchToDeleteEvent c e ->
-                    ( { model | connection = Success <| DeleteEventPage c e.id }, Cmd.none )
+                SwitchToDeleteEvent campaign event ->
+                    ( { model | connection = Success <| FormPage <| DeleteEventPage campaign event.id }, Cmd.none )
 
-                SwitchToNewPupil c ->
-                    ( { model | connection = Success <| NewPupilPage c }, Cmd.none )
+                SwitchToNewPupil campaign ->
+                    ( { model | connection = Success <| FormPage <| NewPupilPage campaign }, Cmd.none )
 
-                SwitchToEditPupil c p ->
+                SwitchToEditPupil campaign pupil ->
                     let
                         pupilForm : PupilForm.Model
                         pupilForm =
                             PupilForm.Model
-                                p.name
-                                p.class
-                                p.isSpecial
+                                pupil.name
+                                pupil.class
+                                pupil.isSpecial
                     in
-                    ( { model | connection = Success <| EditPupilPage c p.id, pupilForm = pupilForm }, Cmd.none )
+                    ( { model | connection = Success <| FormPage <| EditPupilPage campaign pupil.id, pupilForm = pupilForm }, Cmd.none )
 
-                SwitchToDeletePupil c p ->
-                    ( { model | connection = Success <| DeletePupilPage c p.id }, Cmd.none )
+                SwitchToDeletePupil campaign pupil ->
+                    ( { model | connection = Success <| FormPage <| DeletePupilPage campaign pupil.id }, Cmd.none )
 
-                SwitchToCampaign c ->
-                    ( { model | connection = Success <| CampaignPage c }, Cmd.none )
+                SwitchToCampaign campaign ->
+                    ( { model | connection = Success <| CampaignPage campaign }, Cmd.none )
 
-                SwitchToPupil pup ->
-                    ( { model | connection = Success <| PupilPage pup }, Cmd.none )
+                SwitchToPupil pupil ->
+                    ( { model | connection = Success <| PupilPage pupil }, Cmd.none )
 
         NewCampaignMsg innerMsg ->
             let
@@ -187,19 +207,19 @@ update msg model =
                 NewCampaign.Error err ->
                     ( { model | connection = Failure err }, Cmd.none )
 
-        NewDayMsg innerMsg ->
+        DayFormMsg campaign innerMsg ->
             let
                 ( updatedModel, effect ) =
-                    NewDay.update innerMsg model.newDay
+                    DayForm.update campaign innerMsg model.dayForm
             in
             case effect of
-                NewDay.None ->
-                    ( { model | newDay = updatedModel }, Cmd.none )
+                DayForm.None ->
+                    ( { model | dayForm = updatedModel }, Cmd.none )
 
-                NewDay.Loading innerCmd ->
-                    ( { model | connection = Loading }, innerCmd |> Cmd.map NewDayMsg )
+                DayForm.Loading innerCmd ->
+                    ( { model | connection = Loading }, innerCmd |> Cmd.map (DayFormMsg campaign) )
 
-                NewDay.Done updatedCamp ->
+                DayForm.Done updatedCamp ->
                     let
                         newCampaignList : List Campaign
                         newCampaignList =
@@ -218,12 +238,12 @@ update msg model =
                     ( { model
                         | connection = Success <| CampaignPage updatedCamp
                         , campaigns = newCampaignList
-                        , newDay = NewDay.init
+                        , dayForm = DayForm.init
                       }
                     , Cmd.none
                     )
 
-                NewDay.Error err ->
+                DayForm.Error err ->
                     ( { model | connection = Failure err }, Cmd.none )
 
         EventFormMsg campaign innerMsg ->
@@ -351,26 +371,34 @@ view model =
                             NewCampaignPage ->
                                 NewCampaign.view model.newCampaign |> List.map (Html.map NewCampaignMsg)
 
-                            NewDayPage c ->
-                                NewDay.view c model.newDay |> List.map (Html.map NewDayMsg)
+                            FormPage fp ->
+                                case fp of
+                                    NewDayPage c ->
+                                        campaignView c ++ [ DayForm.view DayForm.New model.dayForm |> Html.map (DayFormMsg c) ]
 
-                            NewEventPage c ->
-                                campaignView c ++ [ EventForm.view EventForm.New model.eventForm |> Html.map (EventFormMsg c) ]
+                                    EditDayPage c dayId ->
+                                        campaignView c ++ [ DayForm.view (DayForm.Edit dayId) model.dayForm |> Html.map (DayFormMsg c) ]
 
-                            EditEventPage c eventId ->
-                                campaignView c ++ [ EventForm.view (EventForm.Edit eventId) model.eventForm |> Html.map (EventFormMsg c) ]
+                                    DeleteDayPage c dayId ->
+                                        campaignView c ++ [ DayForm.view (DayForm.Delete dayId) model.dayForm |> Html.map (DayFormMsg c) ]
 
-                            DeleteEventPage c eventId ->
-                                campaignView c ++ [ EventForm.view (EventForm.Delete eventId) model.eventForm |> Html.map (EventFormMsg c) ]
+                                    NewEventPage c ->
+                                        campaignView c ++ [ EventForm.view EventForm.New model.eventForm |> Html.map (EventFormMsg c) ]
 
-                            NewPupilPage c ->
-                                campaignView c ++ [ PupilForm.view PupilForm.New model.pupilForm |> Html.map (PupilFormMsg c) ]
+                                    EditEventPage c eventId ->
+                                        campaignView c ++ [ EventForm.view (EventForm.Edit eventId) model.eventForm |> Html.map (EventFormMsg c) ]
 
-                            EditPupilPage c pupilId ->
-                                campaignView c ++ [ PupilForm.view (PupilForm.Edit pupilId) model.pupilForm |> Html.map (PupilFormMsg c) ]
+                                    DeleteEventPage c eventId ->
+                                        campaignView c ++ [ EventForm.view (EventForm.Delete eventId) model.eventForm |> Html.map (EventFormMsg c) ]
 
-                            DeletePupilPage c pupilId ->
-                                campaignView c ++ [ PupilForm.view (PupilForm.Delete pupilId) model.pupilForm |> Html.map (PupilFormMsg c) ]
+                                    NewPupilPage c ->
+                                        campaignView c ++ [ PupilForm.view PupilForm.New model.pupilForm |> Html.map (PupilFormMsg c) ]
+
+                                    EditPupilPage c pupilId ->
+                                        campaignView c ++ [ PupilForm.view (PupilForm.Edit pupilId) model.pupilForm |> Html.map (PupilFormMsg c) ]
+
+                                    DeletePupilPage c pupilId ->
+                                        campaignView c ++ [ PupilForm.view (PupilForm.Delete pupilId) model.pupilForm |> Html.map (PupilFormMsg c) ]
 
                             PupilPage pup ->
                                 pupilView pup
@@ -397,7 +425,7 @@ campaignView : Campaign -> List (Html Msg)
 campaignView c =
     [ h1 [ classes "title is-3" ] [ text c.title ]
     , div [ class "block" ]
-        ((c.days |> List.map dayView)
+        ((c.days |> List.map (dayView c))
             ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewDay c ] [ text "Neuer Tag" ] ]
         )
     , div [ class "block" ]
@@ -413,8 +441,8 @@ campaignView c =
     ]
 
 
-dayView : Day -> Html Msg
-dayView d =
+dayView : Campaign -> Day -> Html Msg
+dayView campaign day =
     let
         events : List (Html Msg)
         events =
@@ -435,34 +463,48 @@ dayView d =
         --     ]
     in
     div [ class "block" ]
-        (h2 [ classes "title is-5" ] [ text d.title ] :: events ++ unassignedPupils)
+        [ div [ classes "field is-grouped is-grouped-multiline" ]
+            [ div [ class "control" ]
+                (h2 [ classes "title is-5" ] [ text day.title ] :: events ++ unassignedPupils)
+            , a [ title "Bearbeiten", onClick <| SwitchPage <| SwitchToEditDay campaign day ]
+                [ span [ class "icon" ]
+                    [ Html.node "ion-icon" [ name "create-outline" ] []
+                    ]
+                ]
+            , a [ title "Löschen", onClick <| SwitchPage <| SwitchToDeleteDay campaign day ]
+                [ span [ class "icon" ]
+                    [ Html.node "ion-icon" [ name "trash-outline" ] []
+                    ]
+                ]
+            ]
+        ]
 
 
 eventView : Campaign -> Event -> Html Msg
-eventView c e =
+eventView campaign event =
     div [ class "block" ]
         [ div [ classes "field is-grouped is-grouped-multiline" ]
             [ div [ class "control" ]
-                [ h3 [ classes "subtitle is-5" ] [ text e.title ]
+                [ h3 [ classes "subtitle is-5" ] [ text event.title ]
                 ]
             , div [ class "control" ]
                 [ div [ classes "tags has-addons" ]
                     [ span [ class "tag" ] [ text "max." ]
-                    , span [ classes "tag is-primary" ] [ text <| String.fromInt e.capacity ]
+                    , span [ classes "tag is-primary" ] [ text <| String.fromInt event.capacity ]
                     ]
                 ]
             , div [ class "control" ]
                 [ div [ classes "tags has-addons" ]
                     [ span [ class "tag" ] [ text "bes." ]
-                    , span [ classes "tag is-primary" ] [ text <| String.fromInt e.maxSpecialPupils ]
+                    , span [ classes "tag is-primary" ] [ text <| String.fromInt event.maxSpecialPupils ]
                     ]
                 ]
-            , a [ title "Bearbeiten", onClick <| SwitchPage <| SwitchToEditEvent c e ]
+            , a [ title "Bearbeiten", onClick <| SwitchPage <| SwitchToEditEvent campaign event ]
                 [ span [ class "icon" ]
                     [ Html.node "ion-icon" [ name "create-outline" ] []
                     ]
                 ]
-            , a [ title "Löschen", onClick <| SwitchPage <| SwitchToDeleteEvent c e ]
+            , a [ title "Löschen", onClick <| SwitchPage <| SwitchToDeleteEvent campaign event ]
                 [ span [ class "icon" ]
                     [ Html.node "ion-icon" [ name "trash-outline" ] []
                     ]
