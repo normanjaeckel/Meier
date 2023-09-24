@@ -243,9 +243,7 @@ func (e eventDayUpdate) Execute(model Model, time time.Time) Model {
 		return model
 	}
 
-	model.days[e.ID] = day{
-		title: e.Title,
-	}
+	model.days[e.ID].title = e.Title
 	return model
 }
 
