@@ -10185,7 +10185,7 @@ var $author$project$DayForm$viewDelete = function (day) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Wollen Sie den Tag ' + (day.l + 'wirklich löschen?'))
+										$elm$html$Html$text('Wollen Sie den Tag ' + (day.l + ' wirklich löschen?'))
 									]))
 							])),
 						A2(
@@ -10388,6 +10388,7 @@ var $author$project$DayForm$viewNewAndEdit = F3(
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$class('delete'),
+													$elm$html$Html$Attributes$type_('button'),
 													A2($elm$html$Html$Attributes$attribute, 'aria-label', 'close'),
 													$elm$html$Html$Events$onClick($author$project$DayForm$CloseForm)
 												]),
@@ -10427,6 +10428,7 @@ var $author$project$DayForm$viewNewAndEdit = F3(
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$class('button'),
+													$elm$html$Html$Attributes$type_('button'),
 													$elm$html$Html$Events$onClick($author$project$DayForm$CloseForm)
 												]),
 											_List_fromArray(
@@ -10442,7 +10444,7 @@ var $author$project$DayForm$view = F2(
 	function (action, model) {
 		switch (action.$) {
 			case 0:
-				return A3($author$project$DayForm$viewNewAndEdit, 'Neues Tag hinzufügen', action, model);
+				return A3($author$project$DayForm$viewNewAndEdit, 'Neuen Tag hinzufügen', action, model);
 			case 1:
 				return A3($author$project$DayForm$viewNewAndEdit, 'Tag bearbeiten', action, model);
 			default:
@@ -10502,6 +10504,7 @@ var $author$project$EventForm$viewDelete = function (event) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$class('delete'),
+										$elm$html$Html$Attributes$type_('button'),
 										A2($elm$html$Html$Attributes$attribute, 'aria-label', 'close'),
 										$elm$html$Html$Events$onClick($author$project$EventForm$CloseForm)
 									]),
@@ -10520,7 +10523,7 @@ var $author$project$EventForm$viewDelete = function (event) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Wollen Sie das Angebot ' + (event.l + 'wirklich löschen?'))
+										$elm$html$Html$text('Wollen Sie das Angebot ' + (event.l + ' wirklich löschen?'))
 									]))
 							])),
 						A2(
@@ -10549,6 +10552,7 @@ var $author$project$EventForm$viewDelete = function (event) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$class('button'),
+										$elm$html$Html$Attributes$type_('button'),
 										$elm$html$Html$Events$onClick($author$project$EventForm$CloseForm)
 									]),
 								_List_fromArray(
@@ -11035,6 +11039,7 @@ var $author$project$PupilForm$viewDelete = function (pupil) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$class('delete'),
+										$elm$html$Html$Attributes$type_('button'),
 										A2($elm$html$Html$Attributes$attribute, 'aria-label', 'close'),
 										$elm$html$Html$Events$onClick($author$project$PupilForm$CloseForm)
 									]),
@@ -11053,7 +11058,7 @@ var $author$project$PupilForm$viewDelete = function (pupil) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Wollen Sie den/die Schüler/in ' + (pupil.af + 'wirklich löschen?'))
+										$elm$html$Html$text('Wollen Sie den/die Schüler/in ' + (pupil.af + ' wirklich löschen?'))
 									]))
 							])),
 						A2(
@@ -11082,6 +11087,7 @@ var $author$project$PupilForm$viewDelete = function (pupil) {
 								_List_fromArray(
 									[
 										$elm$html$Html$Attributes$class('button'),
+										$elm$html$Html$Attributes$type_('button'),
 										$elm$html$Html$Events$onClick($author$project$PupilForm$CloseForm)
 									]),
 								_List_fromArray(

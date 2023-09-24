@@ -166,7 +166,7 @@ view : Action -> Model -> Html Msg
 view action model =
     case action of
         New ->
-            viewNewAndEdit "Neues Tag hinzufügen" action model
+            viewNewAndEdit "Neuen Tag hinzufügen" action model
 
         Edit _ ->
             viewNewAndEdit "Tag bearbeiten" action model
@@ -183,13 +183,13 @@ viewNewAndEdit headline action model =
             [ form [ onSubmit <| SendDayForm action ]
                 [ header [ class "modal-card-head" ]
                     [ p [ class "modal-card-title" ] [ text headline ]
-                    , button [ class "delete", attribute "aria-label" "close", onClick CloseForm ] []
+                    , button [ class "delete", type_ "button", attribute "aria-label" "close", onClick CloseForm ] []
                     ]
                 , section [ class "modal-card-body" ]
                     (formFields model |> List.map (Html.map FormMsg))
                 , footer [ class "modal-card-foot" ]
                     [ button [ classes "button is-success", type_ "submit" ] [ text "Speichern" ]
-                    , button [ class "button", onClick CloseForm ] [ text "Abbrechen" ]
+                    , button [ class "button", type_ "button", onClick CloseForm ] [ text "Abbrechen" ]
                     ]
                 ]
             ]
@@ -225,7 +225,7 @@ viewDelete day =
                 , button [ class "delete", attribute "aria-label" "close", onClick CloseForm ] []
                 ]
             , section [ class "modal-card-body" ]
-                [ p [] [ text <| "Wollen Sie den Tag " ++ day.title ++ "wirklich löschen?" ]
+                [ p [] [ text <| "Wollen Sie den Tag " ++ day.title ++ " wirklich löschen?" ]
                 ]
             , footer [ class "modal-card-foot" ]
                 [ button [ classes "button is-success", onClick <| SendDayForm (Delete day) ] [ text "Löschen" ]
