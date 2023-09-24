@@ -422,21 +422,21 @@ navbar =
 
 
 campaignView : Campaign -> List (Html Msg)
-campaignView c =
-    [ h1 [ classes "title is-3" ] [ text c.title ]
+campaignView campaign =
+    [ h1 [ classes "title is-3" ] [ text campaign.title ]
     , div [ class "block" ]
-        ((c.days |> List.map (dayView c))
-            ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewDay c ] [ text "Neuer Tag" ] ]
+        ((campaign.days |> List.map (dayView campaign))
+            ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewDay campaign ] [ text "Neuer Tag" ] ]
         )
     , div [ class "block" ]
         (h2 [ classes "title is-5" ] [ text "Alle Angebote" ]
-            :: (c.events |> List.map (eventView c))
-            ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewEvent c ] [ text "Neues Angebot" ] ]
+            :: (campaign.events |> List.map (eventView campaign))
+            ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewEvent campaign ] [ text "Neues Angebot" ] ]
         )
     , div [ class "block" ]
         [ h2 [ classes "title is-5" ] [ text "Alle Schüler/innen" ]
-        , c.pupils |> pupilUl
-        , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewPupil c ] [ text "Neue Schüler/innen" ]
+        , campaign.pupils |> pupilUl campaign
+        , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewPupil campaign ] [ text "Neue Schüler/innen" ]
         ]
     ]
 
@@ -513,13 +513,29 @@ eventView campaign event =
         ]
 
 
-pupilUl : List Pupil -> Html Msg
-pupilUl pupList =
-    ul []
-        (pupList
-            |> List.map
-                (\pup -> li [] [ a [ onClick <| SwitchPage <| SwitchToPupil pup ] [ text <| pupilToStr pup ] ])
-        )
+pupilUl : Campaign -> List Pupil -> Html Msg
+pupilUl campaign pupList =
+    div [ class "block" ]
+        [ ul []
+            (pupList
+                |> List.map
+                    (\pup ->
+                        li []
+                            [ a [ onClick <| SwitchPage <| SwitchToPupil pup ] [ text <| pupilToStr pup ]
+                            , a [ title "Bearbeiten", onClick <| SwitchPage <| SwitchToEditPupil campaign pup ]
+                                [ span [ class "icon" ]
+                                    [ Html.node "ion-icon" [ name "create-outline" ] []
+                                    ]
+                                ]
+                            , a [ title "Löschen", onClick <| SwitchPage <| SwitchToDeletePupil campaign pup ]
+                                [ span [ class "icon" ]
+                                    [ Html.node "ion-icon" [ name "trash-outline" ] []
+                                    ]
+                                ]
+                            ]
+                    )
+            )
+        ]
 
 
 pupilView : Pupil -> List (Html Msg)

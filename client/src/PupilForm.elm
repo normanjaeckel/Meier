@@ -124,7 +124,7 @@ update campaign msg model =
                 Delete pupilId ->
                     ( model
                     , Loading <|
-                        (Api.Mutation.deleteEvent (Api.Mutation.DeletePupilRequiredArguments pupilId)
+                        (Api.Mutation.deletePupil (Api.Mutation.DeletePupilRequiredArguments pupilId)
                             |> Graphql.Http.mutationRequest Shared.queryUrl
                             |> Graphql.Http.send (GotDeletePupil pupilId)
                         )

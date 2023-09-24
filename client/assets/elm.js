@@ -8809,6 +8809,26 @@ var $author$project$Api$Mutation$addPupil = F3(
 			object____,
 			$elm$core$Basics$identity);
 	});
+var $author$project$Api$Mutation$deletePupil = function (requiredArgs____) {
+	return A4(
+		$dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField,
+		'Bool',
+		'deletePupil',
+		_List_fromArray(
+			[
+				A3(
+				$dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required,
+				'id',
+				requiredArgs____.h,
+				A2(
+					$author$project$Api$Scalar$unwrapEncoder,
+					function ($) {
+						return $.a7;
+					},
+					$author$project$IdScalarCodecs$codecs))
+			]),
+		$elm$json$Json$Decode$bool);
+};
 var $author$project$Api$Mutation$updatePupil = F3(
 	function (fillInOptionals____, requiredArgs____, object____) {
 		var filledInOptionals____ = fillInOptionals____(
@@ -8930,7 +8950,7 @@ var $author$project$PupilForm$update = F3(
 									A2(
 										$dillonkearns$elm_graphql$Graphql$Http$mutationRequest,
 										$author$project$Shared$queryUrl,
-										$author$project$Api$Mutation$deleteEvent(
+										$author$project$Api$Mutation$deletePupil(
 											$author$project$Api$Mutation$DeletePupilRequiredArguments(pupilId))))));
 				}
 			case 2:
@@ -9798,6 +9818,14 @@ var $author$project$Main$eventView = F2(
 				]));
 	});
 var $elm$html$Html$h1 = _VirtualDom_node('h1');
+var $author$project$Main$SwitchToDeletePupil = F2(
+	function (a, b) {
+		return {$: 11, a: a, b: b};
+	});
+var $author$project$Main$SwitchToEditPupil = F2(
+	function (a, b) {
+		return {$: 10, a: a, b: b};
+	});
 var $author$project$Main$SwitchToPupil = function (a) {
 	return {$: 12, a: a};
 };
@@ -9806,36 +9834,104 @@ var $author$project$Main$pupilToStr = function (p) {
 	return p.af + (' (Klasse ' + (p.ab + ')'));
 };
 var $elm$html$Html$ul = _VirtualDom_node('ul');
-var $author$project$Main$pupilUl = function (pupList) {
-	return A2(
-		$elm$html$Html$ul,
-		_List_Nil,
-		A2(
-			$elm$core$List$map,
-			function (pup) {
-				return A2(
-					$elm$html$Html$li,
+var $author$project$Main$pupilUl = F2(
+	function (campaign, pupList) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('block')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$ul,
 					_List_Nil,
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$a,
-							_List_fromArray(
-								[
-									$elm$html$Html$Events$onClick(
-									$author$project$Main$SwitchPage(
-										$author$project$Main$SwitchToPupil(pup)))
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text(
-									$author$project$Main$pupilToStr(pup))
-								]))
-						]));
-			},
-			pupList));
-};
-var $author$project$Main$campaignView = function (c) {
+					A2(
+						$elm$core$List$map,
+						function (pup) {
+							return A2(
+								$elm$html$Html$li,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$a,
+										_List_fromArray(
+											[
+												$elm$html$Html$Events$onClick(
+												$author$project$Main$SwitchPage(
+													$author$project$Main$SwitchToPupil(pup)))
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text(
+												$author$project$Main$pupilToStr(pup))
+											])),
+										A2(
+										$elm$html$Html$a,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$title('Bearbeiten'),
+												$elm$html$Html$Events$onClick(
+												$author$project$Main$SwitchPage(
+													A2($author$project$Main$SwitchToEditPupil, campaign, pup)))
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$span,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('icon')
+													]),
+												_List_fromArray(
+													[
+														A3(
+														$elm$html$Html$node,
+														'ion-icon',
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$name('create-outline')
+															]),
+														_List_Nil)
+													]))
+											])),
+										A2(
+										$elm$html$Html$a,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$title('Löschen'),
+												$elm$html$Html$Events$onClick(
+												$author$project$Main$SwitchPage(
+													A2($author$project$Main$SwitchToDeletePupil, campaign, pup)))
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$span,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('icon')
+													]),
+												_List_fromArray(
+													[
+														A3(
+														$elm$html$Html$node,
+														'ion-icon',
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$name('trash-outline')
+															]),
+														_List_Nil)
+													]))
+											]))
+									]));
+						},
+						pupList))
+				]));
+	});
+var $author$project$Main$campaignView = function (campaign) {
 	return _List_fromArray(
 		[
 			A2(
@@ -9846,7 +9942,7 @@ var $author$project$Main$campaignView = function (c) {
 				]),
 			_List_fromArray(
 				[
-					$elm$html$Html$text(c.l)
+					$elm$html$Html$text(campaign.l)
 				])),
 			A2(
 			$elm$html$Html$div,
@@ -9857,8 +9953,8 @@ var $author$project$Main$campaignView = function (c) {
 			_Utils_ap(
 				A2(
 					$elm$core$List$map,
-					$author$project$Main$dayView(c),
-					c.an),
+					$author$project$Main$dayView(campaign),
+					campaign.an),
 				_List_fromArray(
 					[
 						A2(
@@ -9868,7 +9964,7 @@ var $author$project$Main$campaignView = function (c) {
 								$author$project$Shared$classes('button is-primary'),
 								$elm$html$Html$Events$onClick(
 								$author$project$Main$SwitchPage(
-									$author$project$Main$SwitchToNewDay(c)))
+									$author$project$Main$SwitchToNewDay(campaign)))
 							]),
 						_List_fromArray(
 							[
@@ -9896,8 +9992,8 @@ var $author$project$Main$campaignView = function (c) {
 				_Utils_ap(
 					A2(
 						$elm$core$List$map,
-						$author$project$Main$eventView(c),
-						c.aC),
+						$author$project$Main$eventView(campaign),
+						campaign.aC),
 					_List_fromArray(
 						[
 							A2(
@@ -9907,7 +10003,7 @@ var $author$project$Main$campaignView = function (c) {
 									$author$project$Shared$classes('button is-primary'),
 									$elm$html$Html$Events$onClick(
 									$author$project$Main$SwitchPage(
-										$author$project$Main$SwitchToNewEvent(c)))
+										$author$project$Main$SwitchToNewEvent(campaign)))
 								]),
 							_List_fromArray(
 								[
@@ -9932,7 +10028,7 @@ var $author$project$Main$campaignView = function (c) {
 						[
 							$elm$html$Html$text('Alle Schüler/innen')
 						])),
-					$author$project$Main$pupilUl(c.br),
+					A2($author$project$Main$pupilUl, campaign, campaign.br),
 					A2(
 					$elm$html$Html$button,
 					_List_fromArray(
@@ -9940,7 +10036,7 @@ var $author$project$Main$campaignView = function (c) {
 							$author$project$Shared$classes('button is-primary'),
 							$elm$html$Html$Events$onClick(
 							$author$project$Main$SwitchPage(
-								$author$project$Main$SwitchToNewPupil(c)))
+								$author$project$Main$SwitchToNewPupil(campaign)))
 						]),
 					_List_fromArray(
 						[
