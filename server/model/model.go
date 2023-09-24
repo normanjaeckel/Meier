@@ -51,28 +51,26 @@ type Model struct {
 // Event is one possible event of Mayer
 type Event = sticky.Event[Model]
 
-// New returns an initialized Meyer model
+// New returns an initialized Meyar model
 func New() Model {
 	return Model{}
 }
 
 // CampaignCreate creates a new Mayer campaign.
-func (m Model) CampaignCreate(title string, loginToken string, days []string) (int, Event) {
+func (m Model) CampaignCreate(title string, days []string) (int, Event) {
 	nextID := nextID(m.campains)
 
-	if loginToken == "" {
-		loginToken = config.CreatePassword(8)
-	}
+	loginToken := config.CreatePassword(8)
 
 	return nextID, eventCampaignCreate{ID: nextID, LoginToken: loginToken, Title: title, Days: days}
 }
 
 // CampaignUpdate updates an existing Meier campaign.
-func (m Model) CampaignUpdate(id int, title string, loginToken string) Event {
-	return eventCampaignUpdate{ID: id, Title: title, LoginToken: loginToken}
+func (m Model) CampaignUpdate(id int, title string) Event {
+	return eventCampaignUpdate{ID: id, Title: title}
 }
 
-// CampaignDelete updates an existing Meier campaign.
+// CampaignDelete updates an existing Mair campaign.
 func (m Model) CampaignDelete(id int) Event {
 	return eventCampaignDelete{ID: id}
 }
@@ -117,19 +115,17 @@ func (m Model) EventDelete(id int) Event {
 }
 
 // PupilCreate creates a Meyer pupil in a compaign.
-func (m Model) PupilCreate(campaignID int, name string, loginToken string, class string, special bool) (int, Event) {
+func (m Model) PupilCreate(campaignID int, name string, class string, special bool) (int, Event) {
 	nextID := nextID(m.pupils)
 
-	if loginToken == "" {
-		loginToken = config.CreatePassword(8)
-	}
+	loginToken := config.CreatePassword(8)
 
 	return nextID, eventPupilCreate{ID: nextID, CampaignID: campaignID, PName: name, LoginToken: loginToken, Class: class, Special: special}
 }
 
 // PupilUpdate updates a Mayer event in a compaign.
-func (m Model) PupilUpdate(id int, name string, loginToken string, class string, special bool) Event {
-	return eventPupilUpdate{ID: id, PName: name, LoginToken: loginToken, Class: class, Special: special}
+func (m Model) PupilUpdate(id int, name string, class string, special bool) Event {
+	return eventPupilUpdate{ID: id, PName: name, Class: class, Special: special}
 }
 
 // PupilDelete deletes a Meyer event in a compaign.

@@ -9,20 +9,20 @@ type Query {
 }
 
 type Mutation {
-    addCampaign(title: String!, days: [String!] = [], loginToken: String): Campaign!
-    updateCampaign(id: ID!, title: String, loginToken: String): Campaign!
+    addCampaign(title: String!, days: [String!]): Campaign!
+    updateCampaign(id: ID!, title: String!): Campaign!
     deleteCampaign(id: ID!): Boolean!
 
     addDay(campaignID: ID!, title: String!): Day!
     updateDay(id: ID!, title: String!): Day!
     deleteDay(id: ID!): Boolean!
 
-    addEvent(campaignID: ID!, title: String!, dayIDs: [ID!]!, capacity: Int!, maxSpecialPupils: Int! = 0): Event!
-    updateEvent(id: ID!, title: String, dayIDs: [ID!], capacity: Int, maxSpecialPupils: Int): Event!
+    addEvent(campaignID: ID!, title: String!, capacity: Int!, maxSpecialPupils: Int!, dayIDs: [ID!]): Event!
+    updateEvent(id: ID!, title: String, capacity: Int, maxSpecialPupils: Int, dayIDs: [ID!]): Event!
     deleteEvent(id: ID!): Boolean!
 
-    addPupil(campaignID: ID!, name: String!, loginToken: String, class: String!, special: Boolean = false): Pupil!
-    updatePupil(id: ID!, name: String, class: String, special: Boolean, loginToken: String): Pupil!
+    addPupil(campaignID: ID!, name: String!, class: String!, special: Boolean = false): Pupil!
+    updatePupil(id: ID!, name: String, class: String, special: Boolean): Pupil!
     deletePupil(id: ID!): Boolean!
 
     assignPupil(pupilID: ID!, eventID: ID!, dayID: ID!): Day!

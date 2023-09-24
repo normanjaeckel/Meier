@@ -102,9 +102,8 @@ func (e eventCampaignCreate) Execute(model Model, time time.Time) Model {
 }
 
 type eventCampaignUpdate struct {
-	ID         int    `json:"id"`
-	Title      string `json:"title,omitempty"`
-	LoginToken string `json:"login_token,omitempty"`
+	ID    int    `json:"id"`
+	Title string `json:"title,omitempty"`
 }
 
 func (e eventCampaignUpdate) Name() string {
@@ -116,8 +115,8 @@ func (e eventCampaignUpdate) Validate(model Model) error {
 		return fmt.Errorf("Campaign with id %d does not exist", e.ID)
 	}
 
-	if e.Title == "" && e.LoginToken == "" {
-		return fmt.Errorf("title or loginToken has to be set")
+	if e.Title == "" {
+		return fmt.Errorf("title has to be set")
 	}
 	return nil
 }
@@ -129,10 +128,6 @@ func (e eventCampaignUpdate) Execute(model Model, time time.Time) Model {
 
 	if e.Title != "" {
 		model.campains[e.ID].title = e.Title
-	}
-
-	if e.LoginToken != "" {
-		model.campains[e.ID].loginToken = e.LoginToken
 	}
 
 	return model
@@ -473,11 +468,10 @@ func (e eventPupilCreate) Execute(model Model, time time.Time) Model {
 }
 
 type eventPupilUpdate struct {
-	ID         int    `json:"id"`
-	PName      string `json:"name,omitempty"`
-	LoginToken string `json:"login_token,omitempty"`
-	Class      string `json:"class,omitempty"`
-	Special    bool   `json:"special"` // TODO: make this an maybe type
+	ID      int    `json:"id"`
+	PName   string `json:"name,omitempty"`
+	Class   string `json:"class,omitempty"`
+	Special bool   `json:"special"` // TODO: make this an maybe type
 }
 
 func (e eventPupilUpdate) Name() string {
@@ -489,8 +483,8 @@ func (e eventPupilUpdate) Validate(model Model) error {
 		return fmt.Errorf("pupil with id %d does not exist", e.ID)
 	}
 
-	if e.PName == "" && e.Class == "" && e.LoginToken == "" {
-		return fmt.Errorf("name, class or login_token has to be set")
+	if e.PName == "" && e.Class == "" {
+		return fmt.Errorf("name or class has to be set")
 	}
 
 	return nil
@@ -507,10 +501,6 @@ func (e eventPupilUpdate) Execute(model Model, time time.Time) Model {
 
 	if e.Class != "" {
 		model.pupils[e.ID].class = e.Class
-	}
-
-	if e.LoginToken != "" {
-		model.pupils[e.ID].loginToken = e.LoginToken
 	}
 
 	model.pupils[e.ID].special = e.Special
