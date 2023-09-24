@@ -8196,18 +8196,18 @@ var $author$project$DayForm$update = F3(
 											A2($author$project$Api$Mutation$UpdateDayRequiredArguments, dayId, model.l),
 											$author$project$Data$daySelectionSet)))));
 					default:
-						var dayId = action.a;
+						var day = action.a;
 						return _Utils_Tuple2(
 							model,
 							$author$project$DayForm$Loading(
 								A2(
 									$dillonkearns$elm_graphql$Graphql$Http$send,
-									$author$project$DayForm$GotDeleteDay(dayId),
+									$author$project$DayForm$GotDeleteDay(day.h),
 									A2(
 										$dillonkearns$elm_graphql$Graphql$Http$mutationRequest,
 										$author$project$Shared$queryUrl,
 										$author$project$Api$Mutation$deleteDay(
-											$author$project$Api$Mutation$DeleteDayRequiredArguments(dayId))))));
+											$author$project$Api$Mutation$DeleteDayRequiredArguments(day.h))))));
 				}
 			case 2:
 				return _Utils_Tuple2(
@@ -8529,18 +8529,18 @@ var $author$project$EventForm$update = F3(
 											$author$project$Api$Mutation$UpdateEventRequiredArguments(eventId),
 											$author$project$Data$eventSelectionSet)))));
 					default:
-						var eventId = action.a;
+						var event = action.a;
 						return _Utils_Tuple2(
 							model,
 							$author$project$EventForm$Loading(
 								A2(
 									$dillonkearns$elm_graphql$Graphql$Http$send,
-									$author$project$EventForm$GotDeleteEvent(eventId),
+									$author$project$EventForm$GotDeleteEvent(event.h),
 									A2(
 										$dillonkearns$elm_graphql$Graphql$Http$mutationRequest,
 										$author$project$Shared$queryUrl,
 										$author$project$Api$Mutation$deleteEvent(
-											$author$project$Api$Mutation$DeleteEventRequiredArguments(eventId))))));
+											$author$project$Api$Mutation$DeleteEventRequiredArguments(event.h))))));
 				}
 			case 2:
 				return _Utils_Tuple2(
@@ -8940,18 +8940,18 @@ var $author$project$PupilForm$update = F3(
 											$author$project$Api$Mutation$UpdatePupilRequiredArguments(pupilId),
 											$author$project$Data$pupilSelectionSet)))));
 					default:
-						var pupilId = action.a;
+						var pupil = action.a;
 						return _Utils_Tuple2(
 							model,
 							$author$project$PupilForm$Loading(
 								A2(
 									$dillonkearns$elm_graphql$Graphql$Http$send,
-									$author$project$PupilForm$GotDeletePupil(pupilId),
+									$author$project$PupilForm$GotDeletePupil(pupil.h),
 									A2(
 										$dillonkearns$elm_graphql$Graphql$Http$mutationRequest,
 										$author$project$Shared$queryUrl,
 										$author$project$Api$Mutation$deletePupil(
-											$author$project$Api$Mutation$DeletePupilRequiredArguments(pupilId))))));
+											$author$project$Api$Mutation$DeletePupilRequiredArguments(pupil.h))))));
 				}
 			case 2:
 				return _Utils_Tuple2(
@@ -9114,7 +9114,7 @@ var $author$project$Main$update = F2(
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 5:
-						var c = s.a;
+						var campaign = s.a;
 						var day = s.b;
 						return _Utils_Tuple2(
 							_Utils_update(
@@ -9122,7 +9122,7 @@ var $author$project$Main$update = F2(
 								{
 									a: $author$project$Main$Success(
 										$author$project$Main$FormPage(
-											A2($author$project$Main$DeleteDayPage, c, day.h)))
+											A2($author$project$Main$DeleteDayPage, campaign, day)))
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 6:
@@ -9159,7 +9159,7 @@ var $author$project$Main$update = F2(
 								{
 									a: $author$project$Main$Success(
 										$author$project$Main$FormPage(
-											A2($author$project$Main$DeleteEventPage, campaign, event.h)))
+											A2($author$project$Main$DeleteEventPage, campaign, event)))
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 9:
@@ -9196,7 +9196,7 @@ var $author$project$Main$update = F2(
 								{
 									a: $author$project$Main$Success(
 										$author$project$Main$FormPage(
-											A2($author$project$Main$DeletePupilPage, campaign, pupil.h)))
+											A2($author$project$Main$DeletePupilPage, campaign, pupil)))
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 2:
@@ -10119,111 +10119,111 @@ var $elm$virtual_dom$VirtualDom$attribute = F2(
 var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $elm$html$Html$footer = _VirtualDom_node('footer');
 var $elm$html$Html$header = _VirtualDom_node('header');
-var $author$project$DayForm$viewDelete = F2(
-	function (action, model) {
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					$author$project$Shared$classes('modal is-active')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('modal-background'),
-							$elm$html$Html$Events$onClick($author$project$DayForm$CloseForm)
-						]),
-					_List_Nil),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('modal-card')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$header,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('modal-card-head')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$p,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('modal-card-title')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Tag löschen')
-										])),
-									A2(
-									$elm$html$Html$button,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('delete'),
-											A2($elm$html$Html$Attributes$attribute, 'aria-label', 'close'),
-											$elm$html$Html$Events$onClick($author$project$DayForm$CloseForm)
-										]),
-									_List_Nil)
-								])),
-							A2(
-							$elm$html$Html$section,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('modal-card-body')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$p,
-									_List_Nil,
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Wollen Sie den Tag ' + (model.l + 'wirklich löschen?'))
-										]))
-								])),
-							A2(
-							$elm$html$Html$footer,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('modal-card-foot')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$button,
-									_List_fromArray(
-										[
-											$author$project$Shared$classes('button is-success'),
-											$elm$html$Html$Events$onClick(
-											$author$project$DayForm$SendDayForm(action))
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Löschen')
-										])),
-									A2(
-									$elm$html$Html$button,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('button'),
-											$elm$html$Html$Events$onClick($author$project$DayForm$CloseForm)
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Abbrechen')
-										]))
-								]))
-						]))
-				]));
-	});
+var $author$project$DayForm$viewDelete = function (day) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$author$project$Shared$classes('modal is-active')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('modal-background'),
+						$elm$html$Html$Events$onClick($author$project$DayForm$CloseForm)
+					]),
+				_List_Nil),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('modal-card')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$header,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('modal-card-head')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$p,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('modal-card-title')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Tag löschen')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('delete'),
+										A2($elm$html$Html$Attributes$attribute, 'aria-label', 'close'),
+										$elm$html$Html$Events$onClick($author$project$DayForm$CloseForm)
+									]),
+								_List_Nil)
+							])),
+						A2(
+						$elm$html$Html$section,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('modal-card-body')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$p,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Wollen Sie den Tag ' + (day.l + 'wirklich löschen?'))
+									]))
+							])),
+						A2(
+						$elm$html$Html$footer,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('modal-card-foot')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$author$project$Shared$classes('button is-success'),
+										$elm$html$Html$Events$onClick(
+										$author$project$DayForm$SendDayForm(
+											$author$project$DayForm$Delete(day)))
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Löschen')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('button'),
+										$elm$html$Html$Events$onClick($author$project$DayForm$CloseForm)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Abbrechen')
+									]))
+							]))
+					]))
+			]));
+};
 var $author$project$DayForm$FormMsg = function (a) {
 	return {$: 0, a: a};
 };
@@ -10446,118 +10446,119 @@ var $author$project$DayForm$view = F2(
 			case 1:
 				return A3($author$project$DayForm$viewNewAndEdit, 'Tag bearbeiten', action, model);
 			default:
-				return A2($author$project$DayForm$viewDelete, action, model);
+				var day = action.a;
+				return $author$project$DayForm$viewDelete(day);
 		}
 	});
 var $author$project$EventForm$CloseForm = {$: 2};
 var $author$project$EventForm$SendEventForm = function (a) {
 	return {$: 1, a: a};
 };
-var $author$project$EventForm$viewDelete = F2(
-	function (action, model) {
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					$author$project$Shared$classes('modal is-active')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('modal-background'),
-							$elm$html$Html$Events$onClick($author$project$EventForm$CloseForm)
-						]),
-					_List_Nil),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('modal-card')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$header,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('modal-card-head')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$p,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('modal-card-title')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Angebot löschen')
-										])),
-									A2(
-									$elm$html$Html$button,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('delete'),
-											A2($elm$html$Html$Attributes$attribute, 'aria-label', 'close'),
-											$elm$html$Html$Events$onClick($author$project$EventForm$CloseForm)
-										]),
-									_List_Nil)
-								])),
-							A2(
-							$elm$html$Html$section,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('modal-card-body')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$p,
-									_List_Nil,
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Wollen Sie das Angebot ' + (model.l + 'wirklich löschen?'))
-										]))
-								])),
-							A2(
-							$elm$html$Html$footer,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('modal-card-foot')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$button,
-									_List_fromArray(
-										[
-											$author$project$Shared$classes('button is-success'),
-											$elm$html$Html$Events$onClick(
-											$author$project$EventForm$SendEventForm(action))
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Löschen')
-										])),
-									A2(
-									$elm$html$Html$button,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('button'),
-											$elm$html$Html$Events$onClick($author$project$EventForm$CloseForm)
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Abbrechen')
-										]))
-								]))
-						]))
-				]));
-	});
+var $author$project$EventForm$viewDelete = function (event) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$author$project$Shared$classes('modal is-active')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('modal-background'),
+						$elm$html$Html$Events$onClick($author$project$EventForm$CloseForm)
+					]),
+				_List_Nil),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('modal-card')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$header,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('modal-card-head')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$p,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('modal-card-title')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Angebot löschen')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('delete'),
+										A2($elm$html$Html$Attributes$attribute, 'aria-label', 'close'),
+										$elm$html$Html$Events$onClick($author$project$EventForm$CloseForm)
+									]),
+								_List_Nil)
+							])),
+						A2(
+						$elm$html$Html$section,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('modal-card-body')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$p,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Wollen Sie das Angebot ' + (event.l + 'wirklich löschen?'))
+									]))
+							])),
+						A2(
+						$elm$html$Html$footer,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('modal-card-foot')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$author$project$Shared$classes('button is-success'),
+										$elm$html$Html$Events$onClick(
+										$author$project$EventForm$SendEventForm(
+											$author$project$EventForm$Delete(event)))
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Löschen')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('button'),
+										$elm$html$Html$Events$onClick($author$project$EventForm$CloseForm)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Abbrechen')
+									]))
+							]))
+					]))
+			]));
+};
 var $author$project$EventForm$FormMsg = function (a) {
 	return {$: 0, a: a};
 };
@@ -10824,7 +10825,8 @@ var $author$project$EventForm$view = F2(
 			case 1:
 				return A3($author$project$EventForm$viewNewAndEdit, 'Angebot bearbeiten', action, model);
 			default:
-				return A2($author$project$EventForm$viewDelete, action, model);
+				var event = action.a;
+				return $author$project$EventForm$viewDelete(event);
 		}
 	});
 var $author$project$NewCampaign$NewCampaignFormDataMsg = function (a) {
@@ -10985,111 +10987,111 @@ var $author$project$PupilForm$CloseForm = {$: 2};
 var $author$project$PupilForm$SendPupilForm = function (a) {
 	return {$: 1, a: a};
 };
-var $author$project$PupilForm$viewDelete = F2(
-	function (action, model) {
-		return A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					$author$project$Shared$classes('modal is-active')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('modal-background'),
-							$elm$html$Html$Events$onClick($author$project$PupilForm$CloseForm)
-						]),
-					_List_Nil),
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('modal-card')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$header,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('modal-card-head')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$p,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('modal-card-title')
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Schüler/in löschen')
-										])),
-									A2(
-									$elm$html$Html$button,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('delete'),
-											A2($elm$html$Html$Attributes$attribute, 'aria-label', 'close'),
-											$elm$html$Html$Events$onClick($author$project$PupilForm$CloseForm)
-										]),
-									_List_Nil)
-								])),
-							A2(
-							$elm$html$Html$section,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('modal-card-body')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$p,
-									_List_Nil,
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Wollen Sie den/die Schüler/in ' + (model.af + 'wirklich löschen?'))
-										]))
-								])),
-							A2(
-							$elm$html$Html$footer,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('modal-card-foot')
-								]),
-							_List_fromArray(
-								[
-									A2(
-									$elm$html$Html$button,
-									_List_fromArray(
-										[
-											$author$project$Shared$classes('button is-success'),
-											$elm$html$Html$Events$onClick(
-											$author$project$PupilForm$SendPupilForm(action))
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Löschen')
-										])),
-									A2(
-									$elm$html$Html$button,
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('button'),
-											$elm$html$Html$Events$onClick($author$project$PupilForm$CloseForm)
-										]),
-									_List_fromArray(
-										[
-											$elm$html$Html$text('Abbrechen')
-										]))
-								]))
-						]))
-				]));
-	});
+var $author$project$PupilForm$viewDelete = function (pupil) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$author$project$Shared$classes('modal is-active')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('modal-background'),
+						$elm$html$Html$Events$onClick($author$project$PupilForm$CloseForm)
+					]),
+				_List_Nil),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('modal-card')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$header,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('modal-card-head')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$p,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('modal-card-title')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Schüler/in löschen')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('delete'),
+										A2($elm$html$Html$Attributes$attribute, 'aria-label', 'close'),
+										$elm$html$Html$Events$onClick($author$project$PupilForm$CloseForm)
+									]),
+								_List_Nil)
+							])),
+						A2(
+						$elm$html$Html$section,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('modal-card-body')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$p,
+								_List_Nil,
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Wollen Sie den/die Schüler/in ' + (pupil.af + 'wirklich löschen?'))
+									]))
+							])),
+						A2(
+						$elm$html$Html$footer,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('modal-card-foot')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$author$project$Shared$classes('button is-success'),
+										$elm$html$Html$Events$onClick(
+										$author$project$PupilForm$SendPupilForm(
+											$author$project$PupilForm$Delete(pupil)))
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Löschen')
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('button'),
+										$elm$html$Html$Events$onClick($author$project$PupilForm$CloseForm)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Abbrechen')
+									]))
+							]))
+					]))
+			]));
+};
 var $author$project$PupilForm$FormMsg = function (a) {
 	return {$: 0, a: a};
 };
@@ -11336,7 +11338,8 @@ var $author$project$PupilForm$view = F2(
 			case 1:
 				return A3($author$project$PupilForm$viewNewAndEdit, 'Schüler/in bearbeiten', action, model);
 			default:
-				return A2($author$project$PupilForm$viewDelete, action, model);
+				var pupil = action.a;
+				return $author$project$PupilForm$viewDelete(pupil);
 		}
 	});
 var $author$project$Main$view = function (model) {
@@ -11463,7 +11466,7 @@ var $author$project$Main$view = function (model) {
 															]));
 												case 2:
 													var c = fp.a;
-													var dayId = fp.b;
+													var day = fp.b;
 													return _Utils_ap(
 														$author$project$Main$campaignView(c),
 														_List_fromArray(
@@ -11473,7 +11476,7 @@ var $author$project$Main$view = function (model) {
 																$author$project$Main$DayFormMsg(c),
 																A2(
 																	$author$project$DayForm$view,
-																	$author$project$DayForm$Delete(dayId),
+																	$author$project$DayForm$Delete(day),
 																	model.v))
 															]));
 												case 3:
@@ -11504,7 +11507,7 @@ var $author$project$Main$view = function (model) {
 															]));
 												case 5:
 													var c = fp.a;
-													var eventId = fp.b;
+													var event = fp.b;
 													return _Utils_ap(
 														$author$project$Main$campaignView(c),
 														_List_fromArray(
@@ -11514,7 +11517,7 @@ var $author$project$Main$view = function (model) {
 																$author$project$Main$EventFormMsg(c),
 																A2(
 																	$author$project$EventForm$view,
-																	$author$project$EventForm$Delete(eventId),
+																	$author$project$EventForm$Delete(event),
 																	model.w))
 															]));
 												case 6:
@@ -11545,7 +11548,7 @@ var $author$project$Main$view = function (model) {
 															]));
 												default:
 													var c = fp.a;
-													var pupilId = fp.b;
+													var pupil = fp.b;
 													return _Utils_ap(
 														$author$project$Main$campaignView(c),
 														_List_fromArray(
@@ -11555,7 +11558,7 @@ var $author$project$Main$view = function (model) {
 																$author$project$Main$PupilFormMsg(c),
 																A2(
 																	$author$project$PupilForm$view,
-																	$author$project$PupilForm$Delete(pupilId),
+																	$author$project$PupilForm$Delete(pupil),
 																	model.y))
 															]));
 											}

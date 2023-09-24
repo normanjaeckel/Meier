@@ -71,13 +71,13 @@ type Page
 type FormPage
     = NewDayPage Campaign
     | EditDayPage Campaign Data.DayId
-    | DeleteDayPage Campaign Data.DayId
+    | DeleteDayPage Campaign Data.Day
     | NewEventPage Campaign
     | EditEventPage Campaign Data.EventId
-    | DeleteEventPage Campaign Data.EventId
+    | DeleteEventPage Campaign Data.Event
     | NewPupilPage Campaign
     | EditPupilPage Campaign Data.PupilId
-    | DeletePupilPage Campaign Data.PupilId
+    | DeletePupilPage Campaign Data.Pupil
 
 
 
@@ -140,8 +140,8 @@ update msg model =
                     in
                     ( { model | connection = Success <| FormPage <| EditDayPage campaign day.id, dayForm = dayForm }, Cmd.none )
 
-                SwitchToDeleteDay c day ->
-                    ( { model | connection = Success <| FormPage <| DeleteDayPage c day.id }, Cmd.none )
+                SwitchToDeleteDay campaign day ->
+                    ( { model | connection = Success <| FormPage <| DeleteDayPage campaign day }, Cmd.none )
 
                 SwitchToNewEvent campaign ->
                     ( { model | connection = Success <| FormPage <| NewEventPage campaign }, Cmd.none )
@@ -158,7 +158,7 @@ update msg model =
                     ( { model | connection = Success <| FormPage <| EditEventPage campaign event.id, eventForm = eventForm }, Cmd.none )
 
                 SwitchToDeleteEvent campaign event ->
-                    ( { model | connection = Success <| FormPage <| DeleteEventPage campaign event.id }, Cmd.none )
+                    ( { model | connection = Success <| FormPage <| DeleteEventPage campaign event }, Cmd.none )
 
                 SwitchToNewPupil campaign ->
                     ( { model | connection = Success <| FormPage <| NewPupilPage campaign }, Cmd.none )
@@ -175,7 +175,7 @@ update msg model =
                     ( { model | connection = Success <| FormPage <| EditPupilPage campaign pupil.id, pupilForm = pupilForm }, Cmd.none )
 
                 SwitchToDeletePupil campaign pupil ->
-                    ( { model | connection = Success <| FormPage <| DeletePupilPage campaign pupil.id }, Cmd.none )
+                    ( { model | connection = Success <| FormPage <| DeletePupilPage campaign pupil }, Cmd.none )
 
                 SwitchToCampaign campaign ->
                     ( { model | connection = Success <| CampaignPage campaign }, Cmd.none )
@@ -379,8 +379,8 @@ view model =
                                     EditDayPage c dayId ->
                                         campaignView c ++ [ DayForm.view (DayForm.Edit dayId) model.dayForm |> Html.map (DayFormMsg c) ]
 
-                                    DeleteDayPage c dayId ->
-                                        campaignView c ++ [ DayForm.view (DayForm.Delete dayId) model.dayForm |> Html.map (DayFormMsg c) ]
+                                    DeleteDayPage c day ->
+                                        campaignView c ++ [ DayForm.view (DayForm.Delete day) model.dayForm |> Html.map (DayFormMsg c) ]
 
                                     NewEventPage c ->
                                         campaignView c ++ [ EventForm.view EventForm.New model.eventForm |> Html.map (EventFormMsg c) ]
@@ -388,8 +388,8 @@ view model =
                                     EditEventPage c eventId ->
                                         campaignView c ++ [ EventForm.view (EventForm.Edit eventId) model.eventForm |> Html.map (EventFormMsg c) ]
 
-                                    DeleteEventPage c eventId ->
-                                        campaignView c ++ [ EventForm.view (EventForm.Delete eventId) model.eventForm |> Html.map (EventFormMsg c) ]
+                                    DeleteEventPage c event ->
+                                        campaignView c ++ [ EventForm.view (EventForm.Delete event) model.eventForm |> Html.map (EventFormMsg c) ]
 
                                     NewPupilPage c ->
                                         campaignView c ++ [ PupilForm.view PupilForm.New model.pupilForm |> Html.map (PupilFormMsg c) ]
@@ -397,8 +397,8 @@ view model =
                                     EditPupilPage c pupilId ->
                                         campaignView c ++ [ PupilForm.view (PupilForm.Edit pupilId) model.pupilForm |> Html.map (PupilFormMsg c) ]
 
-                                    DeletePupilPage c pupilId ->
-                                        campaignView c ++ [ PupilForm.view (PupilForm.Delete pupilId) model.pupilForm |> Html.map (PupilFormMsg c) ]
+                                    DeletePupilPage c pupil ->
+                                        campaignView c ++ [ PupilForm.view (PupilForm.Delete pupil) model.pupilForm |> Html.map (PupilFormMsg c) ]
 
                             PupilPage pup ->
                                 pupilView pup

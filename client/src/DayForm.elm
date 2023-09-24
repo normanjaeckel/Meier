@@ -43,7 +43,7 @@ type FormMsg
 type Action
     = New
     | Edit Data.DayId
-    | Delete Data.DayId
+    | Delete Data.Day
 
 
 type Effect
@@ -93,12 +93,12 @@ update campaign msg model =
                         )
                     )
 
-                Delete dayId ->
+                Delete day ->
                     ( model
                     , Loading <|
-                        (Api.Mutation.deleteDay (Api.Mutation.DeleteDayRequiredArguments dayId)
+                        (Api.Mutation.deleteDay (Api.Mutation.DeleteDayRequiredArguments day.id)
                             |> Graphql.Http.mutationRequest Shared.queryUrl
-                            |> Graphql.Http.send (GotDeleteDay dayId)
+                            |> Graphql.Http.send (GotDeleteDay day.id)
                         )
                     )
 
@@ -171,8 +171,8 @@ view action model =
         Edit _ ->
             viewNewAndEdit "Tag bearbeiten" action model
 
-        Delete _ ->
-            viewDelete action model
+        Delete day ->
+            viewDelete day
 
 
 viewNewAndEdit : String -> Action -> Model -> Html Msg
@@ -215,8 +215,8 @@ formFields model =
     ]
 
 
-viewDelete : Action -> Model -> Html Msg
-viewDelete action model =
+viewDelete : Data.Day -> Html Msg
+viewDelete day =
     div [ classes "modal is-active" ]
         [ div [ class "modal-background", onClick CloseForm ] []
         , div [ class "modal-card" ]
@@ -225,10 +225,10 @@ viewDelete action model =
                 , button [ class "delete", attribute "aria-label" "close", onClick CloseForm ] []
                 ]
             , section [ class "modal-card-body" ]
-                [ p [] [ text <| "Wollen Sie den Tag " ++ model.title ++ "wirklich löschen?" ]
+                [ p [] [ text <| "Wollen Sie den Tag " ++ day.title ++ "wirklich löschen?" ]
                 ]
             , footer [ class "modal-card-foot" ]
-                [ button [ classes "button is-success", onClick <| SendDayForm action ] [ text "Löschen" ]
+                [ button [ classes "button is-success", onClick <| SendDayForm (Delete day) ] [ text "Löschen" ]
                 , button [ class "button", onClick CloseForm ] [ text "Abbrechen" ]
                 ]
             ]
