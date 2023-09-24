@@ -72,9 +72,9 @@ type FormPage
     | NewDayPage CampaignId
     | EditDayPage CampaignId Data.Day
     | DeleteDayPage CampaignId Data.Day
-    | NewEventPage Campaign
-    | EditEventPage Campaign Data.EventId
-    | DeleteEventPage Campaign Data.Event
+    | NewEventPage CampaignId
+    | EditEventPage CampaignId Data.EventId
+    | DeleteEventPage CampaignId Data.Event
     | NewPupilPage Campaign
     | EditPupilPage Campaign Data.PupilId
     | DeletePupilPage Campaign Data.Pupil
@@ -89,7 +89,7 @@ type Msg
     | SwitchPage SwitchTo
     | CampaignFormMsg CampaignForm.Msg
     | DayFormMsg CampaignId DayForm.Msg
-    | EventFormMsg Campaign EventForm.Msg
+    | EventFormMsg CampaignId EventForm.Msg
     | PupilFormMsg Campaign PupilForm.Msg
 
 
@@ -100,9 +100,9 @@ type SwitchTo
     | SwitchToNewDay CampaignId
     | SwitchToEditDay CampaignId Day
     | SwitchToDeleteDay CampaignId Day
-    | SwitchToNewEvent Campaign
-    | SwitchToEditEvent Campaign Event
-    | SwitchToDeleteEvent Campaign Event
+    | SwitchToNewEvent CampaignId
+    | SwitchToEditEvent CampaignId Event
+    | SwitchToDeleteEvent CampaignId Event
     | SwitchToNewPupil Campaign
     | SwitchToEditPupil Campaign Pupil
     | SwitchToDeletePupil Campaign Pupil
@@ -128,8 +128,8 @@ update msg model =
                 SwitchToNewCampaign ->
                     ( { model | connection = Success <| FormPage <| NewCampaignPage }, Cmd.none )
 
-                SwitchToNewDay campaign ->
-                    ( { model | connection = Success <| FormPage <| NewDayPage campaign }, Cmd.none )
+                SwitchToNewDay campaignId ->
+                    ( { model | connection = Success <| FormPage <| NewDayPage campaignId }, Cmd.none )
 
                 SwitchToEditDay campaignId day ->
                     let
@@ -140,13 +140,13 @@ update msg model =
                     in
                     ( { model | connection = Success <| FormPage <| EditDayPage campaignId day, dayForm = dayForm }, Cmd.none )
 
-                SwitchToDeleteDay campaign day ->
-                    ( { model | connection = Success <| FormPage <| DeleteDayPage campaign day }, Cmd.none )
+                SwitchToDeleteDay campaignId day ->
+                    ( { model | connection = Success <| FormPage <| DeleteDayPage campaignId day }, Cmd.none )
 
-                SwitchToNewEvent campaign ->
-                    ( { model | connection = Success <| FormPage <| NewEventPage campaign }, Cmd.none )
+                SwitchToNewEvent campaignId ->
+                    ( { model | connection = Success <| FormPage <| NewEventPage campaignId }, Cmd.none )
 
-                SwitchToEditEvent campaign event ->
+                SwitchToEditEvent campaignId event ->
                     let
                         eventForm : EventForm.Model
                         eventForm =
@@ -155,10 +155,10 @@ update msg model =
                                 event.capacity
                                 event.maxSpecialPupils
                     in
-                    ( { model | connection = Success <| FormPage <| EditEventPage campaign event.id, eventForm = eventForm }, Cmd.none )
+                    ( { model | connection = Success <| FormPage <| EditEventPage campaignId event.id, eventForm = eventForm }, Cmd.none )
 
-                SwitchToDeleteEvent campaign event ->
-                    ( { model | connection = Success <| FormPage <| DeleteEventPage campaign event }, Cmd.none )
+                SwitchToDeleteEvent campaignId event ->
+                    ( { model | connection = Success <| FormPage <| DeleteEventPage campaignId event }, Cmd.none )
 
                 SwitchToNewPupil campaign ->
                     ( { model | connection = Success <| FormPage <| NewPupilPage campaign }, Cmd.none )
@@ -339,41 +339,87 @@ update msg model =
                 DayForm.Error err ->
                     ( { model | connection = Failure err }, Cmd.none )
 
-        EventFormMsg campaign innerMsg ->
+        EventFormMsg campaignId innerMsg ->
             let
                 ( updatedModel, effect ) =
-                    EventForm.update campaign innerMsg model.eventForm
+                    EventForm.update campaignId innerMsg model.eventForm
             in
             case effect of
                 EventForm.None ->
                     ( { model | eventForm = updatedModel }, Cmd.none )
 
                 EventForm.Loading innerCmd ->
-                    ( { model | connection = Loading }, innerCmd |> Cmd.map (EventFormMsg campaign) )
+                    ( { model | connection = Loading }, innerCmd |> Cmd.map (EventFormMsg campaignId) )
 
-                EventForm.Done updatedCamp ->
-                    let
-                        newCampaignList : List Campaign
-                        newCampaignList =
-                            -- TODO: use recursion here
-                            model.campaigns
-                                |> List.foldr
-                                    (\camp acc ->
-                                        if camp.id == updatedCamp.id then
-                                            updatedCamp :: acc
-
-                                        else
-                                            camp :: acc
-                                    )
-                                    []
-                    in
+                EventForm.ClosedWithoutChange ->
                     ( { model
-                        | connection = Success <| CampaignPage updatedCamp.id
-                        , campaigns = newCampaignList
+                        | connection = Success <| CampaignPage campaignId
                         , eventForm = EventForm.init
                       }
                     , Cmd.none
                     )
+
+                EventForm.Done returnValue ->
+                    let
+                        walkCampaigns : (List Event -> List Event) -> List Campaign -> List Campaign
+                        walkCampaigns innerWalk campaigns =
+                            case campaigns of
+                                one :: rest ->
+                                    if one.id == campaignId then
+                                        { one | events = innerWalk one.events } :: rest
+
+                                    else
+                                        one :: walkCampaigns innerWalk rest
+
+                                [] ->
+                                    []
+                    in
+                    case returnValue of
+                        EventForm.NewOrUpdated obj ->
+                            let
+                                walkObjectsNewAndEdit : List Event -> List Event
+                                walkObjectsNewAndEdit objects =
+                                    case objects of
+                                        one :: rest ->
+                                            if one.id == obj.id then
+                                                obj :: rest
+
+                                            else
+                                                one :: walkObjectsNewAndEdit rest
+
+                                        [] ->
+                                            [ obj ]
+                            in
+                            ( { model
+                                | connection = Success <| CampaignPage campaignId
+                                , campaigns = walkCampaigns walkObjectsNewAndEdit model.campaigns
+                                , eventForm = EventForm.init
+                              }
+                            , Cmd.none
+                            )
+
+                        EventForm.Deleted objId ->
+                            let
+                                walkObjectsDelete : List Event -> List Event
+                                walkObjectsDelete objects =
+                                    case objects of
+                                        one :: rest ->
+                                            if objId == one.id then
+                                                rest
+
+                                            else
+                                                one :: walkObjectsDelete rest
+
+                                        [] ->
+                                            []
+                            in
+                            ( { model
+                                | connection = Success <| CampaignPage campaignId
+                                , campaigns = walkCampaigns walkObjectsDelete model.campaigns
+                                , eventForm = EventForm.init
+                              }
+                            , Cmd.none
+                            )
 
                 EventForm.Error err ->
                     ( { model | connection = Failure err }, Cmd.none )
@@ -482,17 +528,17 @@ view model =
                                         (model.campaigns |> getCampaign campaignId |> campaignView)
                                             ++ [ DayForm.view (DayForm.Delete day) model.dayForm |> Html.map (DayFormMsg campaignId) ]
 
-                                    NewEventPage c ->
-                                        (model.campaigns |> getCampaign c.id |> campaignView)
-                                            ++ [ EventForm.view EventForm.New model.eventForm |> Html.map (EventFormMsg c) ]
+                                    NewEventPage campaignId ->
+                                        (model.campaigns |> getCampaign campaignId |> campaignView)
+                                            ++ [ EventForm.view EventForm.New model.eventForm |> Html.map (EventFormMsg campaignId) ]
 
-                                    EditEventPage c eventId ->
-                                        (model.campaigns |> getCampaign c.id |> campaignView)
-                                            ++ [ EventForm.view (EventForm.Edit eventId) model.eventForm |> Html.map (EventFormMsg c) ]
+                                    EditEventPage campaignId eventId ->
+                                        (model.campaigns |> getCampaign campaignId |> campaignView)
+                                            ++ [ EventForm.view (EventForm.Edit eventId) model.eventForm |> Html.map (EventFormMsg campaignId) ]
 
-                                    DeleteEventPage c event ->
-                                        (model.campaigns |> getCampaign c.id |> campaignView)
-                                            ++ [ EventForm.view (EventForm.Delete event) model.eventForm |> Html.map (EventFormMsg c) ]
+                                    DeleteEventPage campaignId event ->
+                                        (model.campaigns |> getCampaign campaignId |> campaignView)
+                                            ++ [ EventForm.view (EventForm.Delete event) model.eventForm |> Html.map (EventFormMsg campaignId) ]
 
                                     NewPupilPage c ->
                                         (model.campaigns |> getCampaign c.id |> campaignView)
@@ -547,7 +593,7 @@ campaignView c =
             , div [ class "block" ]
                 (h2 [ classes "title is-5" ] [ text "Alle Angebote" ]
                     :: (campaign.events |> List.map (eventView campaign))
-                    ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewEvent campaign ] [ text "Neues Angebot" ] ]
+                    ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewEvent campaign.id ] [ text "Neues Angebot" ] ]
                 )
             , div [ class "block" ]
                 [ h2 [ classes "title is-5" ] [ text "Alle Schüler/innen" ]
@@ -615,12 +661,12 @@ eventView campaign event =
                     , span [ classes "tag is-primary" ] [ text <| String.fromInt event.maxSpecialPupils ]
                     ]
                 ]
-            , a [ title "Bearbeiten", onClick <| SwitchPage <| SwitchToEditEvent campaign event ]
+            , a [ title "Bearbeiten", onClick <| SwitchPage <| SwitchToEditEvent campaign.id event ]
                 [ span [ class "icon" ]
                     [ Html.node "ion-icon" [ name "create-outline" ] []
                     ]
                 ]
-            , a [ title "Löschen", onClick <| SwitchPage <| SwitchToDeleteEvent campaign event ]
+            , a [ title "Löschen", onClick <| SwitchPage <| SwitchToDeleteEvent campaign.id event ]
                 [ span [ class "icon" ]
                     [ Html.node "ion-icon" [ name "trash-outline" ] []
                     ]

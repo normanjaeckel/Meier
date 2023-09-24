@@ -7902,7 +7902,11 @@ var $dillonkearns$elm_graphql$Graphql$Http$send = F2(
 	});
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
+<<<<<<< HEAD
 		{B: $author$project$CampaignForm$init, b: _List_Nil, a: $author$project$Main$Loading, r: $author$project$DayForm$init, v: $author$project$EventForm$init, x: $author$project$PupilForm$init},
+=======
+		{C: $author$project$CampaignForm$init, b: _List_Nil, a: $author$project$Main$Loading, s: $author$project$DayForm$init, t: $author$project$EventForm$init, y: $author$project$PupilForm$init},
+>>>>>>> 9b8281f (Step)
 		A2(
 			$dillonkearns$elm_graphql$Graphql$Http$send,
 			$author$project$Main$GotCampaignList,
@@ -8531,27 +8535,34 @@ var $author$project$Api$Mutation$AddEventRequiredArguments = F4(
 	function (campaignID, title, capacity, maxSpecialPupils) {
 		return {O: campaignID, _: capacity, ad: maxSpecialPupils, o: title};
 	});
+var $author$project$EventForm$ClosedWithoutChange = {$: 2};
 var $author$project$Api$Mutation$DeleteEventRequiredArguments = function (id) {
 	return {i: id};
 };
-var $author$project$EventForm$Done = function (a) {
-	return {$: 2, a: a};
+var $author$project$EventForm$Deleted = function (a) {
+	return {$: 1, a: a};
 };
-var $author$project$EventForm$Error = function (a) {
+var $author$project$EventForm$Done = function (a) {
 	return {$: 3, a: a};
 };
-var $author$project$EventForm$GotDeleteEvent = F2(
+var $author$project$EventForm$Error = function (a) {
+	return {$: 4, a: a};
+};
+var $author$project$EventForm$GotDelete = F2(
 	function (a, b) {
 		return {$: 5, a: a, b: b};
 	});
-var $author$project$EventForm$GotNewEvent = function (a) {
+var $author$project$EventForm$GotNew = function (a) {
 	return {$: 3, a: a};
 };
-var $author$project$EventForm$GotUpdatedEvent = function (a) {
+var $author$project$EventForm$GotUpdated = function (a) {
 	return {$: 4, a: a};
 };
 var $author$project$EventForm$Loading = function (a) {
 	return {$: 1, a: a};
+};
+var $author$project$EventForm$NewOrUpdated = function (a) {
+	return {$: 0, a: a};
 };
 var $author$project$EventForm$None = {$: 0};
 var $author$project$Api$Mutation$UpdateEventRequiredArguments = function (id) {
@@ -8672,7 +8683,7 @@ var $author$project$Api$Mutation$updateEvent = F3(
 			$elm$core$Basics$identity);
 	});
 var $author$project$EventForm$update = F3(
-	function (campaign, msg, model) {
+	function (campaignId, msg, model) {
 		switch (msg.$) {
 			case 0:
 				var formMsg = msg.a;
@@ -8708,17 +8719,21 @@ var $author$project$EventForm$update = F3(
 							$author$project$EventForm$Loading(
 								A2(
 									$dillonkearns$elm_graphql$Graphql$Http$send,
-									$author$project$EventForm$GotNewEvent,
+									$author$project$EventForm$GotNew,
 									A2(
 										$dillonkearns$elm_graphql$Graphql$Http$mutationRequest,
 										$author$project$Shared$queryUrl,
 										A3(
 											$author$project$Api$Mutation$addEvent,
+<<<<<<< HEAD
 											optionalArgs,
 											A4($author$project$Api$Mutation$AddEventRequiredArguments, campaign.i, model.o, model._, model.ad),
+=======
+											A5($author$project$Api$Mutation$AddEventRequiredArguments, campaignId, model.m, _List_Nil, model._, model.ae),
+>>>>>>> 9b8281f (Step)
 											$author$project$Data$eventSelectionSet)))));
 					case 1:
-						var eventId = action.a;
+						var objId = action.a;
 						var optionalArgs = function (args) {
 							return _Utils_update(
 								args,
@@ -8733,40 +8748,39 @@ var $author$project$EventForm$update = F3(
 							$author$project$EventForm$Loading(
 								A2(
 									$dillonkearns$elm_graphql$Graphql$Http$send,
-									$author$project$EventForm$GotUpdatedEvent,
+									$author$project$EventForm$GotUpdated,
 									A2(
 										$dillonkearns$elm_graphql$Graphql$Http$mutationRequest,
 										$author$project$Shared$queryUrl,
 										A3(
 											$author$project$Api$Mutation$updateEvent,
 											optionalArgs,
-											$author$project$Api$Mutation$UpdateEventRequiredArguments(eventId),
+											$author$project$Api$Mutation$UpdateEventRequiredArguments(objId),
 											$author$project$Data$eventSelectionSet)))));
 					default:
-						var event = action.a;
+						var obj = action.a;
 						return _Utils_Tuple2(
 							model,
 							$author$project$EventForm$Loading(
 								A2(
 									$dillonkearns$elm_graphql$Graphql$Http$send,
-									$author$project$EventForm$GotDeleteEvent(event.i),
+									$author$project$EventForm$GotDelete(obj.i),
 									A2(
 										$dillonkearns$elm_graphql$Graphql$Http$mutationRequest,
 										$author$project$Shared$queryUrl,
 										$author$project$Api$Mutation$deleteEvent(
-											$author$project$Api$Mutation$DeleteEventRequiredArguments(event.i))))));
+											$author$project$Api$Mutation$DeleteEventRequiredArguments(obj.i))))));
 				}
 			case 2:
-				return _Utils_Tuple2(
-					model,
-					$author$project$EventForm$Done(campaign));
+				return _Utils_Tuple2(model, $author$project$EventForm$ClosedWithoutChange);
 			case 3:
 				var res = msg.a;
 				if (!res.$) {
-					var event = res.a;
+					var obj = res.a;
 					return _Utils_Tuple2(
 						model,
 						$author$project$EventForm$Done(
+<<<<<<< HEAD
 							_Utils_update(
 								campaign,
 								{
@@ -8775,6 +8789,9 @@ var $author$project$EventForm$update = F3(
 										_List_fromArray(
 											[event]))
 								})));
+=======
+							$author$project$EventForm$NewOrUpdated(obj)));
+>>>>>>> 9b8281f (Step)
 				} else {
 					var err = res.a;
 					return _Utils_Tuple2(
@@ -8785,27 +8802,19 @@ var $author$project$EventForm$update = F3(
 			case 4:
 				var res = msg.a;
 				if (!res.$) {
-					var eventFromServer = res.a;
-					var walkToUpdate = function (events) {
-						if (events.b) {
-							var event = events.a;
-							var rest = events.b;
-							return _Utils_eq(event.i, eventFromServer.i) ? A2($elm$core$List$cons, eventFromServer, rest) : A2(
-								$elm$core$List$cons,
-								event,
-								walkToUpdate(rest));
-						} else {
-							return _List_Nil;
-						}
-					};
+					var obj = res.a;
 					return _Utils_Tuple2(
 						model,
 						$author$project$EventForm$Done(
+<<<<<<< HEAD
 							_Utils_update(
 								campaign,
 								{
 									aB: walkToUpdate(campaign.aB)
 								})));
+=======
+							$author$project$EventForm$NewOrUpdated(obj)));
+>>>>>>> 9b8281f (Step)
 				} else {
 					var err = res.a;
 					return _Utils_Tuple2(
@@ -8814,29 +8823,21 @@ var $author$project$EventForm$update = F3(
 							$author$project$Shared$parseGraphqlError(err)));
 				}
 			default:
-				var eventToBeDeletedId = msg.a;
+				var objId = msg.a;
 				var res = msg.b;
 				if (!res.$) {
-					var walkToUpdate = function (events) {
-						if (events.b) {
-							var event = events.a;
-							var rest = events.b;
-							return _Utils_eq(event.i, eventToBeDeletedId) ? rest : A2(
-								$elm$core$List$cons,
-								event,
-								walkToUpdate(rest));
-						} else {
-							return _List_Nil;
-						}
-					};
 					return _Utils_Tuple2(
 						model,
 						$author$project$EventForm$Done(
+<<<<<<< HEAD
 							_Utils_update(
 								campaign,
 								{
 									aB: walkToUpdate(campaign.aB)
 								})));
+=======
+							$author$project$EventForm$Deleted(objId)));
+>>>>>>> 9b8281f (Step)
 				} else {
 					var err = res.a;
 					return _Utils_Tuple2(
@@ -9195,14 +9196,14 @@ var $author$project$Main$update = F2(
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 3:
-						var campaign = s.a;
+						var campaignId = s.a;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
 								{
 									a: $author$project$Main$Success(
 										$author$project$Main$FormPage(
-											$author$project$Main$NewDayPage(campaign)))
+											$author$project$Main$NewDayPage(campaignId)))
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 4:
@@ -9220,7 +9221,7 @@ var $author$project$Main$update = F2(
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 5:
-						var campaign = s.a;
+						var campaignId = s.a;
 						var day = s.b;
 						return _Utils_Tuple2(
 							_Utils_update(
@@ -9228,22 +9229,22 @@ var $author$project$Main$update = F2(
 								{
 									a: $author$project$Main$Success(
 										$author$project$Main$FormPage(
-											A2($author$project$Main$DeleteDayPage, campaign, day)))
+											A2($author$project$Main$DeleteDayPage, campaignId, day)))
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 6:
-						var campaign = s.a;
+						var campaignId = s.a;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
 								{
 									a: $author$project$Main$Success(
 										$author$project$Main$FormPage(
-											$author$project$Main$NewEventPage(campaign)))
+											$author$project$Main$NewEventPage(campaignId)))
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 7:
-						var campaign = s.a;
+						var campaignId = s.a;
 						var event = s.b;
 						var eventForm = A3($author$project$EventForm$Model, event.o, event._, event.ad);
 						return _Utils_Tuple2(
@@ -9252,12 +9253,17 @@ var $author$project$Main$update = F2(
 								{
 									a: $author$project$Main$Success(
 										$author$project$Main$FormPage(
+<<<<<<< HEAD
 											A2($author$project$Main$EditEventPage, campaign, event.i))),
 									v: eventForm
+=======
+											A2($author$project$Main$EditEventPage, campaignId, event.i))),
+									t: eventForm
+>>>>>>> 9b8281f (Step)
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 8:
-						var campaign = s.a;
+						var campaignId = s.a;
 						var event = s.b;
 						return _Utils_Tuple2(
 							_Utils_update(
@@ -9265,7 +9271,7 @@ var $author$project$Main$update = F2(
 								{
 									a: $author$project$Main$Success(
 										$author$project$Main$FormPage(
-											A2($author$project$Main$DeleteEventPage, campaign, event)))
+											A2($author$project$Main$DeleteEventPage, campaignId, event)))
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 9:
@@ -9530,9 +9536,13 @@ var $author$project$Main$update = F2(
 							$elm$core$Platform$Cmd$none);
 				}
 			case 4:
-				var campaign = msg.a;
+				var campaignId = msg.a;
 				var innerMsg = msg.b;
+<<<<<<< HEAD
 				var _v14 = A3($author$project$EventForm$update, campaign, innerMsg, model.v);
+=======
+				var _v14 = A3($author$project$EventForm$update, campaignId, innerMsg, model.t);
+>>>>>>> 9b8281f (Step)
 				var updatedModel = _v14.a;
 				var effect = _v14.b;
 				switch (effect.$) {
@@ -9540,7 +9550,11 @@ var $author$project$Main$update = F2(
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
+<<<<<<< HEAD
 								{v: updatedModel}),
+=======
+								{t: updatedModel}),
+>>>>>>> 9b8281f (Step)
 							$elm$core$Platform$Cmd$none);
 					case 1:
 						var innerCmd = effect.a;
@@ -9550,28 +9564,95 @@ var $author$project$Main$update = F2(
 								{a: $author$project$Main$Loading}),
 							A2(
 								$elm$core$Platform$Cmd$map,
-								$author$project$Main$EventFormMsg(campaign),
+								$author$project$Main$EventFormMsg(campaignId),
 								innerCmd));
 					case 2:
-						var updatedCamp = effect.a;
-						var newCampaignList = A3(
-							$elm$core$List$foldr,
-							F2(
-								function (camp, acc) {
-									return _Utils_eq(camp.i, updatedCamp.i) ? A2($elm$core$List$cons, updatedCamp, acc) : A2($elm$core$List$cons, camp, acc);
-								}),
-							_List_Nil,
-							model.b);
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
 								{
-									b: newCampaignList,
 									a: $author$project$Main$Success(
+<<<<<<< HEAD
 										$author$project$Main$CampaignPage(updatedCamp.i)),
 									v: $author$project$EventForm$init
+=======
+										$author$project$Main$CampaignPage(campaignId)),
+									t: $author$project$EventForm$init
+>>>>>>> 9b8281f (Step)
 								}),
 							$elm$core$Platform$Cmd$none);
+					case 3:
+						var returnValue = effect.a;
+						var walkCampaigns = F2(
+							function (innerWalk, campaigns) {
+								if (campaigns.b) {
+									var one = campaigns.a;
+									var rest = campaigns.b;
+									return _Utils_eq(one.i, campaignId) ? A2(
+										$elm$core$List$cons,
+										_Utils_update(
+											one,
+											{
+												aC: innerWalk(one.aC)
+											}),
+										rest) : A2(
+										$elm$core$List$cons,
+										one,
+										A2(walkCampaigns, innerWalk, rest));
+								} else {
+									return _List_Nil;
+								}
+							});
+						if (!returnValue.$) {
+							var obj = returnValue.a;
+							var walkObjectsNewAndEdit = function (objects) {
+								if (objects.b) {
+									var one = objects.a;
+									var rest = objects.b;
+									return _Utils_eq(one.i, obj.i) ? A2($elm$core$List$cons, obj, rest) : A2(
+										$elm$core$List$cons,
+										one,
+										walkObjectsNewAndEdit(rest));
+								} else {
+									return _List_fromArray(
+										[obj]);
+								}
+							};
+							return _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{
+										b: A2(walkCampaigns, walkObjectsNewAndEdit, model.b),
+										a: $author$project$Main$Success(
+											$author$project$Main$CampaignPage(campaignId)),
+										t: $author$project$EventForm$init
+									}),
+								$elm$core$Platform$Cmd$none);
+						} else {
+							var objId = returnValue.a;
+							var walkObjectsDelete = function (objects) {
+								if (objects.b) {
+									var one = objects.a;
+									var rest = objects.b;
+									return _Utils_eq(objId, one.i) ? rest : A2(
+										$elm$core$List$cons,
+										one,
+										walkObjectsDelete(rest));
+								} else {
+									return _List_Nil;
+								}
+							};
+							return _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{
+										b: A2(walkCampaigns, walkObjectsDelete, model.b),
+										a: $author$project$Main$Success(
+											$author$project$Main$CampaignPage(campaignId)),
+										t: $author$project$EventForm$init
+									}),
+								$elm$core$Platform$Cmd$none);
+						}
 					default:
 						var err = effect.a;
 						return _Utils_Tuple2(
@@ -9585,9 +9666,15 @@ var $author$project$Main$update = F2(
 			default:
 				var campaign = msg.a;
 				var innerMsg = msg.b;
+<<<<<<< HEAD
 				var _v16 = A3($author$project$PupilForm$update, campaign, innerMsg, model.x);
 				var updatedModel = _v16.a;
 				var effect = _v16.b;
+=======
+				var _v20 = A3($author$project$PupilForm$update, campaign, innerMsg, model.y);
+				var updatedModel = _v20.a;
+				var effect = _v20.b;
+>>>>>>> 9b8281f (Step)
 				switch (effect.$) {
 					case 0:
 						return _Utils_Tuple2(
@@ -9976,7 +10063,7 @@ var $author$project$Main$eventView = F2(
 									$elm$html$Html$Attributes$title('Bearbeiten'),
 									$elm$html$Html$Events$onClick(
 									$author$project$Main$SwitchPage(
-										A2($author$project$Main$SwitchToEditEvent, campaign, event)))
+										A2($author$project$Main$SwitchToEditEvent, campaign.i, event)))
 								]),
 							_List_fromArray(
 								[
@@ -10005,7 +10092,7 @@ var $author$project$Main$eventView = F2(
 									$elm$html$Html$Attributes$title('Löschen'),
 									$elm$html$Html$Events$onClick(
 									$author$project$Main$SwitchPage(
-										A2($author$project$Main$SwitchToDeleteEvent, campaign, event)))
+										A2($author$project$Main$SwitchToDeleteEvent, campaign.i, event)))
 								]),
 							_List_fromArray(
 								[
@@ -10220,7 +10307,7 @@ var $author$project$Main$campaignView = function (c) {
 										$author$project$Shared$classes('button is-primary'),
 										$elm$html$Html$Events$onClick(
 										$author$project$Main$SwitchPage(
-											$author$project$Main$SwitchToNewEvent(campaign)))
+											$author$project$Main$SwitchToNewEvent(campaign.i)))
 									]),
 								_List_fromArray(
 									[
@@ -11025,10 +11112,10 @@ var $author$project$DayForm$view = F2(
 		}
 	});
 var $author$project$EventForm$CloseForm = {$: 2};
-var $author$project$EventForm$SendEventForm = function (a) {
+var $author$project$EventForm$SendForm = function (a) {
 	return {$: 1, a: a};
 };
-var $author$project$EventForm$viewDelete = function (event) {
+var $author$project$EventForm$viewDelete = function (obj) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -11095,7 +11182,11 @@ var $author$project$EventForm$viewDelete = function (event) {
 								_List_Nil,
 								_List_fromArray(
 									[
+<<<<<<< HEAD
 										$elm$html$Html$text('Wollen Sie das Angebot ' + (event.o + ' wirklich löschen?'))
+=======
+										$elm$html$Html$text('Wollen Sie das Angebot ' + (obj.m + ' wirklich löschen?'))
+>>>>>>> 9b8281f (Step)
 									]))
 							])),
 						A2(
@@ -11112,8 +11203,8 @@ var $author$project$EventForm$viewDelete = function (event) {
 									[
 										$author$project$Shared$classes('button is-success'),
 										$elm$html$Html$Events$onClick(
-										$author$project$EventForm$SendEventForm(
-											$author$project$EventForm$Delete(event)))
+										$author$project$EventForm$SendForm(
+											$author$project$EventForm$Delete(obj)))
 									]),
 								_List_fromArray(
 									[
@@ -11314,7 +11405,7 @@ var $author$project$EventForm$viewNewAndEdit = F3(
 							_List_fromArray(
 								[
 									$elm$html$Html$Events$onSubmit(
-									$author$project$EventForm$SendEventForm(action))
+									$author$project$EventForm$SendForm(action))
 								]),
 							_List_fromArray(
 								[
@@ -11341,6 +11432,7 @@ var $author$project$EventForm$viewNewAndEdit = F3(
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$class('delete'),
+													$elm$html$Html$Attributes$type_('button'),
 													A2($elm$html$Html$Attributes$attribute, 'aria-label', 'close'),
 													$elm$html$Html$Events$onClick($author$project$EventForm$CloseForm)
 												]),
@@ -11380,6 +11472,7 @@ var $author$project$EventForm$viewNewAndEdit = F3(
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$class('button'),
+													$elm$html$Html$Attributes$type_('button'),
 													$elm$html$Html$Events$onClick($author$project$EventForm$CloseForm)
 												]),
 											_List_fromArray(
@@ -11399,8 +11492,8 @@ var $author$project$EventForm$view = F2(
 			case 1:
 				return A3($author$project$EventForm$viewNewAndEdit, 'Angebot bearbeiten', action, model);
 			default:
-				var event = action.a;
-				return $author$project$EventForm$viewDelete(event);
+				var obj = action.a;
+				return $author$project$EventForm$viewDelete(obj);
 		}
 	});
 var $author$project$PupilForm$CloseForm = {$: 2};
@@ -11912,48 +12005,61 @@ var $author$project$Main$view = function (model) {
 																	model.r))
 															]));
 												case 4:
-													var c = fp.a;
+													var campaignId = fp.a;
 													return _Utils_ap(
 														$author$project$Main$campaignView(
-															A2($author$project$Main$getCampaign, c.i, model.b)),
+															A2($author$project$Main$getCampaign, campaignId, model.b)),
 														_List_fromArray(
 															[
 																A2(
 																$elm$html$Html$map,
+<<<<<<< HEAD
 																$author$project$Main$EventFormMsg(c),
 																A2($author$project$EventForm$view, $author$project$EventForm$New, model.v))
+=======
+																$author$project$Main$EventFormMsg(campaignId),
+																A2($author$project$EventForm$view, $author$project$EventForm$New, model.t))
+>>>>>>> 9b8281f (Step)
 															]));
 												case 5:
-													var c = fp.a;
+													var campaignId = fp.a;
 													var eventId = fp.b;
 													return _Utils_ap(
 														$author$project$Main$campaignView(
-															A2($author$project$Main$getCampaign, c.i, model.b)),
+															A2($author$project$Main$getCampaign, campaignId, model.b)),
 														_List_fromArray(
 															[
 																A2(
 																$elm$html$Html$map,
-																$author$project$Main$EventFormMsg(c),
+																$author$project$Main$EventFormMsg(campaignId),
 																A2(
 																	$author$project$EventForm$view,
 																	$author$project$EventForm$Edit(eventId),
+<<<<<<< HEAD
 																	model.v))
+=======
+																	model.t))
+>>>>>>> 9b8281f (Step)
 															]));
 												case 6:
-													var c = fp.a;
+													var campaignId = fp.a;
 													var event = fp.b;
 													return _Utils_ap(
 														$author$project$Main$campaignView(
-															A2($author$project$Main$getCampaign, c.i, model.b)),
+															A2($author$project$Main$getCampaign, campaignId, model.b)),
 														_List_fromArray(
 															[
 																A2(
 																$elm$html$Html$map,
-																$author$project$Main$EventFormMsg(c),
+																$author$project$Main$EventFormMsg(campaignId),
 																A2(
 																	$author$project$EventForm$view,
 																	$author$project$EventForm$Delete(event),
+<<<<<<< HEAD
 																	model.v))
+=======
+																	model.t))
+>>>>>>> 9b8281f (Step)
 															]));
 												case 7:
 													var c = fp.a;
