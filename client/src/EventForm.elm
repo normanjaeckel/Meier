@@ -48,7 +48,7 @@ type FormMsg
 type Action
     = New
     | Edit Data.EventId
-    | Delete Data.EventId
+    | Delete Data.Event
 
 
 type Effect
@@ -117,12 +117,12 @@ update campaign msg model =
                         )
                     )
 
-                Delete eventId ->
+                Delete event ->
                     ( model
                     , Loading <|
-                        (Api.Mutation.deleteEvent (Api.Mutation.DeleteEventRequiredArguments eventId)
+                        (Api.Mutation.deleteEvent (Api.Mutation.DeleteEventRequiredArguments event.id)
                             |> Graphql.Http.mutationRequest Shared.queryUrl
-                            |> Graphql.Http.send (GotDeleteEvent eventId)
+                            |> Graphql.Http.send (GotDeleteEvent event.id)
                         )
                     )
 
@@ -195,28 +195,8 @@ view action model =
         Edit _ ->
             viewNewAndEdit "Angebot bearbeiten" action model
 
-        Delete _ ->
-            viewDelete action model
-
-
-viewDelete : Action -> Model -> Html Msg
-viewDelete action model =
-    div [ classes "modal is-active" ]
-        [ div [ class "modal-background", onClick CloseForm ] []
-        , div [ class "modal-card" ]
-            [ header [ class "modal-card-head" ]
-                [ p [ class "modal-card-title" ] [ text "Angebot löschen" ]
-                , button [ class "delete", attribute "aria-label" "close", onClick CloseForm ] []
-                ]
-            , section [ class "modal-card-body" ]
-                [ p [] [ text <| "Wollen Sie das Angebot " ++ model.title ++ "wirklich löschen?" ]
-                ]
-            , footer [ class "modal-card-foot" ]
-                [ button [ classes "button is-success", onClick <| SendEventForm action ] [ text "Löschen" ]
-                , button [ class "button", onClick CloseForm ] [ text "Abbrechen" ]
-                ]
-            ]
-        ]
+        Delete event ->
+            viewDelete event
 
 
 viewNewAndEdit : String -> Action -> Model -> Html Msg
@@ -296,3 +276,23 @@ formFields model =
         , p [ class "help" ] [ text labelMaxSpecialPupils ]
         ]
     ]
+
+
+viewDelete : Data.Event -> Html Msg
+viewDelete event =
+    div [ classes "modal is-active" ]
+        [ div [ class "modal-background", onClick CloseForm ] []
+        , div [ class "modal-card" ]
+            [ header [ class "modal-card-head" ]
+                [ p [ class "modal-card-title" ] [ text "Angebot löschen" ]
+                , button [ class "delete", type_ "button", attribute "aria-label" "close", onClick CloseForm ] []
+                ]
+            , section [ class "modal-card-body" ]
+                [ p [] [ text <| "Wollen Sie das Angebot " ++ event.title ++ " wirklich löschen?" ]
+                ]
+            , footer [ class "modal-card-foot" ]
+                [ button [ classes "button is-success", onClick <| SendEventForm (Delete event) ] [ text "Löschen" ]
+                , button [ class "button", type_ "button", onClick CloseForm ] [ text "Abbrechen" ]
+                ]
+            ]
+        ]
