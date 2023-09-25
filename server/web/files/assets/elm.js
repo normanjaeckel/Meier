@@ -7903,10 +7903,14 @@ var $dillonkearns$elm_graphql$Graphql$Http$send = F2(
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
 <<<<<<< HEAD
+<<<<<<< HEAD
 		{B: $author$project$CampaignForm$init, b: _List_Nil, a: $author$project$Main$Loading, r: $author$project$DayForm$init, v: $author$project$EventForm$init, x: $author$project$PupilForm$init},
 =======
 		{C: $author$project$CampaignForm$init, b: _List_Nil, a: $author$project$Main$Loading, s: $author$project$DayForm$init, t: $author$project$EventForm$init, y: $author$project$PupilForm$init},
 >>>>>>> 9b8281f (Step)
+=======
+		{C: $author$project$CampaignForm$init, b: _List_Nil, a: $author$project$Main$Loading, s: $author$project$DayForm$init, t: $author$project$EventForm$init, v: $author$project$PupilForm$init},
+>>>>>>> 6351cc5 (Step)
 		A2(
 			$dillonkearns$elm_graphql$Graphql$Http$send,
 			$author$project$Main$GotCampaignList,
@@ -8851,27 +8855,34 @@ var $author$project$Api$Mutation$AddPupilRequiredArguments = F3(
 	function (campaignID, name, _class) {
 		return {O: campaignID, ab: _class, ae: name};
 	});
+var $author$project$PupilForm$ClosedWithoutChange = {$: 2};
 var $author$project$Api$Mutation$DeletePupilRequiredArguments = function (id) {
 	return {i: id};
 };
-var $author$project$PupilForm$Done = function (a) {
-	return {$: 2, a: a};
+var $author$project$PupilForm$Deleted = function (a) {
+	return {$: 1, a: a};
 };
-var $author$project$PupilForm$Error = function (a) {
+var $author$project$PupilForm$Done = function (a) {
 	return {$: 3, a: a};
 };
-var $author$project$PupilForm$GotDeletePupil = F2(
+var $author$project$PupilForm$Error = function (a) {
+	return {$: 4, a: a};
+};
+var $author$project$PupilForm$GotDelete = F2(
 	function (a, b) {
 		return {$: 5, a: a, b: b};
 	});
-var $author$project$PupilForm$GotNewPupil = function (a) {
+var $author$project$PupilForm$GotNew = function (a) {
 	return {$: 3, a: a};
 };
-var $author$project$PupilForm$GotUpdatedPupil = function (a) {
+var $author$project$PupilForm$GotUpdated = function (a) {
 	return {$: 4, a: a};
 };
 var $author$project$PupilForm$Loading = function (a) {
 	return {$: 1, a: a};
+};
+var $author$project$PupilForm$NewOrUpdated = function (a) {
+	return {$: 0, a: a};
 };
 var $author$project$PupilForm$None = {$: 0};
 var $author$project$Api$Mutation$UpdatePupilRequiredArguments = function (id) {
@@ -8971,7 +8982,7 @@ var $author$project$Api$Mutation$updatePupil = F3(
 			$elm$core$Basics$identity);
 	});
 var $author$project$PupilForm$update = F3(
-	function (campaign, msg, model) {
+	function (campaignId, msg, model) {
 		switch (msg.$) {
 			case 0:
 				var formMsg = msg.a;
@@ -9011,17 +9022,21 @@ var $author$project$PupilForm$update = F3(
 							$author$project$PupilForm$Loading(
 								A2(
 									$dillonkearns$elm_graphql$Graphql$Http$send,
-									$author$project$PupilForm$GotNewPupil,
+									$author$project$PupilForm$GotNew,
 									A2(
 										$dillonkearns$elm_graphql$Graphql$Http$mutationRequest,
 										$author$project$Shared$queryUrl,
 										A3(
 											$author$project$Api$Mutation$addPupil,
 											optionalArguments,
+<<<<<<< HEAD
 											A3($author$project$Api$Mutation$AddPupilRequiredArguments, campaign.i, model.ae, model.ab),
+=======
+											A3($author$project$Api$Mutation$AddPupilRequiredArguments, campaignId, model.af, model.ab),
+>>>>>>> 6351cc5 (Step)
 											$author$project$Data$pupilSelectionSet)))));
 					case 1:
-						var pupilId = action.a;
+						var objId = action.a;
 						var optionalArgs = function (args) {
 							return _Utils_update(
 								args,
@@ -9036,40 +9051,39 @@ var $author$project$PupilForm$update = F3(
 							$author$project$PupilForm$Loading(
 								A2(
 									$dillonkearns$elm_graphql$Graphql$Http$send,
-									$author$project$PupilForm$GotUpdatedPupil,
+									$author$project$PupilForm$GotUpdated,
 									A2(
 										$dillonkearns$elm_graphql$Graphql$Http$mutationRequest,
 										$author$project$Shared$queryUrl,
 										A3(
 											$author$project$Api$Mutation$updatePupil,
 											optionalArgs,
-											$author$project$Api$Mutation$UpdatePupilRequiredArguments(pupilId),
+											$author$project$Api$Mutation$UpdatePupilRequiredArguments(objId),
 											$author$project$Data$pupilSelectionSet)))));
 					default:
-						var pupil = action.a;
+						var obj = action.a;
 						return _Utils_Tuple2(
 							model,
 							$author$project$PupilForm$Loading(
 								A2(
 									$dillonkearns$elm_graphql$Graphql$Http$send,
-									$author$project$PupilForm$GotDeletePupil(pupil.i),
+									$author$project$PupilForm$GotDelete(obj.i),
 									A2(
 										$dillonkearns$elm_graphql$Graphql$Http$mutationRequest,
 										$author$project$Shared$queryUrl,
 										$author$project$Api$Mutation$deletePupil(
-											$author$project$Api$Mutation$DeletePupilRequiredArguments(pupil.i))))));
+											$author$project$Api$Mutation$DeletePupilRequiredArguments(obj.i))))));
 				}
 			case 2:
-				return _Utils_Tuple2(
-					model,
-					$author$project$PupilForm$Done(campaign));
+				return _Utils_Tuple2(model, $author$project$PupilForm$ClosedWithoutChange);
 			case 3:
 				var res = msg.a;
 				if (!res.$) {
-					var pupil = res.a;
+					var obj = res.a;
 					return _Utils_Tuple2(
 						model,
 						$author$project$PupilForm$Done(
+<<<<<<< HEAD
 							_Utils_update(
 								campaign,
 								{
@@ -9078,6 +9092,9 @@ var $author$project$PupilForm$update = F3(
 										_List_fromArray(
 											[pupil]))
 								})));
+=======
+							$author$project$PupilForm$NewOrUpdated(obj)));
+>>>>>>> 6351cc5 (Step)
 				} else {
 					var err = res.a;
 					return _Utils_Tuple2(
@@ -9088,27 +9105,19 @@ var $author$project$PupilForm$update = F3(
 			case 4:
 				var res = msg.a;
 				if (!res.$) {
-					var pupilFromServer = res.a;
-					var walkToUpdate = function (pupils) {
-						if (pupils.b) {
-							var pupil = pupils.a;
-							var rest = pupils.b;
-							return _Utils_eq(pupil.i, pupilFromServer.i) ? A2($elm$core$List$cons, pupilFromServer, rest) : A2(
-								$elm$core$List$cons,
-								pupil,
-								walkToUpdate(rest));
-						} else {
-							return _List_Nil;
-						}
-					};
+					var obj = res.a;
 					return _Utils_Tuple2(
 						model,
 						$author$project$PupilForm$Done(
+<<<<<<< HEAD
 							_Utils_update(
 								campaign,
 								{
 									bq: walkToUpdate(campaign.bq)
 								})));
+=======
+							$author$project$PupilForm$NewOrUpdated(obj)));
+>>>>>>> 6351cc5 (Step)
 				} else {
 					var err = res.a;
 					return _Utils_Tuple2(
@@ -9117,29 +9126,21 @@ var $author$project$PupilForm$update = F3(
 							$author$project$Shared$parseGraphqlError(err)));
 				}
 			default:
-				var pupilToBeDeletedId = msg.a;
+				var objId = msg.a;
 				var res = msg.b;
 				if (!res.$) {
-					var walkToUpdate = function (pupils) {
-						if (pupils.b) {
-							var pupil = pupils.a;
-							var rest = pupils.b;
-							return _Utils_eq(pupil.i, pupilToBeDeletedId) ? rest : A2(
-								$elm$core$List$cons,
-								pupil,
-								walkToUpdate(rest));
-						} else {
-							return _List_Nil;
-						}
-					};
 					return _Utils_Tuple2(
 						model,
 						$author$project$PupilForm$Done(
+<<<<<<< HEAD
 							_Utils_update(
 								campaign,
 								{
 									bq: walkToUpdate(campaign.bq)
 								})));
+=======
+							$author$project$PupilForm$Deleted(objId)));
+>>>>>>> 6351cc5 (Step)
 				} else {
 					var err = res.a;
 					return _Utils_Tuple2(
@@ -9275,14 +9276,14 @@ var $author$project$Main$update = F2(
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 9:
-						var campaign = s.a;
+						var campaignId = s.a;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
 								{
 									a: $author$project$Main$Success(
 										$author$project$Main$FormPage(
-											$author$project$Main$NewPupilPage(campaign)))
+											$author$project$Main$NewPupilPage(campaignId)))
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 10:
@@ -9296,7 +9297,11 @@ var $author$project$Main$update = F2(
 									a: $author$project$Main$Success(
 										$author$project$Main$FormPage(
 											A2($author$project$Main$EditPupilPage, campaign, pupil.i))),
+<<<<<<< HEAD
 									x: pupilForm
+=======
+									v: pupilForm
+>>>>>>> 6351cc5 (Step)
 								}),
 							$elm$core$Platform$Cmd$none);
 					case 11:
@@ -9664,14 +9669,18 @@ var $author$project$Main$update = F2(
 							$elm$core$Platform$Cmd$none);
 				}
 			default:
-				var campaign = msg.a;
+				var campaignId = msg.a;
 				var innerMsg = msg.b;
+<<<<<<< HEAD
 <<<<<<< HEAD
 				var _v16 = A3($author$project$PupilForm$update, campaign, innerMsg, model.x);
 				var updatedModel = _v16.a;
 				var effect = _v16.b;
 =======
 				var _v20 = A3($author$project$PupilForm$update, campaign, innerMsg, model.y);
+=======
+				var _v20 = A3($author$project$PupilForm$update, campaignId, innerMsg, model.v);
+>>>>>>> 6351cc5 (Step)
 				var updatedModel = _v20.a;
 				var effect = _v20.b;
 >>>>>>> 9b8281f (Step)
@@ -9680,7 +9689,11 @@ var $author$project$Main$update = F2(
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
+<<<<<<< HEAD
 								{x: updatedModel}),
+=======
+								{v: updatedModel}),
+>>>>>>> 6351cc5 (Step)
 							$elm$core$Platform$Cmd$none);
 					case 1:
 						var innerCmd = effect.a;
@@ -9690,28 +9703,95 @@ var $author$project$Main$update = F2(
 								{a: $author$project$Main$Loading}),
 							A2(
 								$elm$core$Platform$Cmd$map,
-								$author$project$Main$PupilFormMsg(campaign),
+								$author$project$Main$PupilFormMsg(campaignId),
 								innerCmd));
 					case 2:
-						var updatedCamp = effect.a;
-						var newCampaignList = A3(
-							$elm$core$List$foldr,
-							F2(
-								function (camp, acc) {
-									return _Utils_eq(camp.i, updatedCamp.i) ? A2($elm$core$List$cons, updatedCamp, acc) : A2($elm$core$List$cons, camp, acc);
-								}),
-							_List_Nil,
-							model.b);
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
 								{
-									b: newCampaignList,
 									a: $author$project$Main$Success(
+<<<<<<< HEAD
 										$author$project$Main$CampaignPage(updatedCamp.i)),
 									x: $author$project$PupilForm$init
+=======
+										$author$project$Main$CampaignPage(campaignId)),
+									v: $author$project$PupilForm$init
+>>>>>>> 6351cc5 (Step)
 								}),
 							$elm$core$Platform$Cmd$none);
+					case 3:
+						var returnValue = effect.a;
+						var walkCampaigns = F2(
+							function (innerWalk, campaigns) {
+								if (campaigns.b) {
+									var one = campaigns.a;
+									var rest = campaigns.b;
+									return _Utils_eq(one.i, campaignId) ? A2(
+										$elm$core$List$cons,
+										_Utils_update(
+											one,
+											{
+												br: innerWalk(one.br)
+											}),
+										rest) : A2(
+										$elm$core$List$cons,
+										one,
+										A2(walkCampaigns, innerWalk, rest));
+								} else {
+									return _List_Nil;
+								}
+							});
+						if (!returnValue.$) {
+							var obj = returnValue.a;
+							var walkObjectsNewAndEdit = function (objects) {
+								if (objects.b) {
+									var one = objects.a;
+									var rest = objects.b;
+									return _Utils_eq(one.i, obj.i) ? A2($elm$core$List$cons, obj, rest) : A2(
+										$elm$core$List$cons,
+										one,
+										walkObjectsNewAndEdit(rest));
+								} else {
+									return _List_fromArray(
+										[obj]);
+								}
+							};
+							return _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{
+										b: A2(walkCampaigns, walkObjectsNewAndEdit, model.b),
+										a: $author$project$Main$Success(
+											$author$project$Main$CampaignPage(campaignId)),
+										v: $author$project$PupilForm$init
+									}),
+								$elm$core$Platform$Cmd$none);
+						} else {
+							var objId = returnValue.a;
+							var walkObjectsDelete = function (objects) {
+								if (objects.b) {
+									var one = objects.a;
+									var rest = objects.b;
+									return _Utils_eq(objId, one.i) ? rest : A2(
+										$elm$core$List$cons,
+										one,
+										walkObjectsDelete(rest));
+								} else {
+									return _List_Nil;
+								}
+							};
+							return _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{
+										b: A2(walkCampaigns, walkObjectsDelete, model.b),
+										a: $author$project$Main$Success(
+											$author$project$Main$CampaignPage(campaignId)),
+										v: $author$project$PupilForm$init
+									}),
+								$elm$core$Platform$Cmd$none);
+						}
 					default:
 						var err = effect.a;
 						return _Utils_Tuple2(
@@ -10135,7 +10215,7 @@ var $author$project$Main$pupilToStr = function (p) {
 };
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$pupilUl = F2(
-	function (campaign, pupList) {
+	function (campaign, pupils) {
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -10149,7 +10229,7 @@ var $author$project$Main$pupilUl = F2(
 					_List_Nil,
 					A2(
 						$elm$core$List$map,
-						function (pup) {
+						function (pupil) {
 							return A2(
 								$elm$html$Html$li,
 								_List_Nil,
@@ -10161,12 +10241,12 @@ var $author$project$Main$pupilUl = F2(
 											[
 												$elm$html$Html$Events$onClick(
 												$author$project$Main$SwitchPage(
-													$author$project$Main$SwitchToPupil(pup)))
+													$author$project$Main$SwitchToPupil(pupil)))
 											]),
 										_List_fromArray(
 											[
 												$elm$html$Html$text(
-												$author$project$Main$pupilToStr(pup))
+												$author$project$Main$pupilToStr(pupil))
 											])),
 										A2(
 										$elm$html$Html$a,
@@ -10175,7 +10255,7 @@ var $author$project$Main$pupilUl = F2(
 												$elm$html$Html$Attributes$title('Bearbeiten'),
 												$elm$html$Html$Events$onClick(
 												$author$project$Main$SwitchPage(
-													A2($author$project$Main$SwitchToEditPupil, campaign, pup)))
+													A2($author$project$Main$SwitchToEditPupil, campaign.i, pupil)))
 											]),
 										_List_fromArray(
 											[
@@ -10204,7 +10284,7 @@ var $author$project$Main$pupilUl = F2(
 												$elm$html$Html$Attributes$title('Löschen'),
 												$elm$html$Html$Events$onClick(
 												$author$project$Main$SwitchPage(
-													A2($author$project$Main$SwitchToDeletePupil, campaign, pup)))
+													A2($author$project$Main$SwitchToDeletePupil, campaign.i, pupil)))
 											]),
 										_List_fromArray(
 											[
@@ -10228,7 +10308,7 @@ var $author$project$Main$pupilUl = F2(
 											]))
 									]));
 						},
-						pupList))
+						pupils))
 				]));
 	});
 var $author$project$Main$campaignView = function (c) {
@@ -10340,7 +10420,7 @@ var $author$project$Main$campaignView = function (c) {
 								$author$project$Shared$classes('button is-primary'),
 								$elm$html$Html$Events$onClick(
 								$author$project$Main$SwitchPage(
-									$author$project$Main$SwitchToNewPupil(campaign)))
+									$author$project$Main$SwitchToNewPupil(campaign.i)))
 							]),
 						_List_fromArray(
 							[
@@ -11497,10 +11577,10 @@ var $author$project$EventForm$view = F2(
 		}
 	});
 var $author$project$PupilForm$CloseForm = {$: 2};
-var $author$project$PupilForm$SendPupilForm = function (a) {
+var $author$project$PupilForm$SendForm = function (a) {
 	return {$: 1, a: a};
 };
-var $author$project$PupilForm$viewDelete = function (pupil) {
+var $author$project$PupilForm$viewDelete = function (obj) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -11567,7 +11647,11 @@ var $author$project$PupilForm$viewDelete = function (pupil) {
 								_List_Nil,
 								_List_fromArray(
 									[
+<<<<<<< HEAD
 										$elm$html$Html$text('Wollen Sie den/die Schüler/in ' + (pupil.ae + ' wirklich löschen?'))
+=======
+										$elm$html$Html$text('Wollen Sie den Schüler bzw. die Schülerin ' + (obj.af + ' wirklich löschen?'))
+>>>>>>> 6351cc5 (Step)
 									]))
 							])),
 						A2(
@@ -11584,8 +11668,8 @@ var $author$project$PupilForm$viewDelete = function (pupil) {
 									[
 										$author$project$Shared$classes('button is-success'),
 										$elm$html$Html$Events$onClick(
-										$author$project$PupilForm$SendPupilForm(
-											$author$project$PupilForm$Delete(pupil)))
+										$author$project$PupilForm$SendForm(
+											$author$project$PupilForm$Delete(obj)))
 									]),
 								_List_fromArray(
 									[
@@ -11768,7 +11852,7 @@ var $author$project$PupilForm$viewNewAndEdit = F3(
 							_List_fromArray(
 								[
 									$elm$html$Html$Events$onSubmit(
-									$author$project$PupilForm$SendPupilForm(action))
+									$author$project$PupilForm$SendForm(action))
 								]),
 							_List_fromArray(
 								[
@@ -11795,6 +11879,7 @@ var $author$project$PupilForm$viewNewAndEdit = F3(
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$class('delete'),
+													$elm$html$Html$Attributes$type_('button'),
 													A2($elm$html$Html$Attributes$attribute, 'aria-label', 'close'),
 													$elm$html$Html$Events$onClick($author$project$PupilForm$CloseForm)
 												]),
@@ -11834,6 +11919,7 @@ var $author$project$PupilForm$viewNewAndEdit = F3(
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$class('button'),
+													$elm$html$Html$Attributes$type_('button'),
 													$elm$html$Html$Events$onClick($author$project$PupilForm$CloseForm)
 												]),
 											_List_fromArray(
@@ -11853,8 +11939,8 @@ var $author$project$PupilForm$view = F2(
 			case 1:
 				return A3($author$project$PupilForm$viewNewAndEdit, 'Schüler/in bearbeiten', action, model);
 			default:
-				var pupil = action.a;
-				return $author$project$PupilForm$viewDelete(pupil);
+				var obj = action.a;
+				return $author$project$PupilForm$viewDelete(obj);
 		}
 	});
 var $author$project$Main$view = function (model) {
@@ -12062,48 +12148,61 @@ var $author$project$Main$view = function (model) {
 >>>>>>> 9b8281f (Step)
 															]));
 												case 7:
-													var c = fp.a;
+													var campaignId = fp.a;
 													return _Utils_ap(
 														$author$project$Main$campaignView(
-															A2($author$project$Main$getCampaign, c.i, model.b)),
+															A2($author$project$Main$getCampaign, campaignId, model.b)),
 														_List_fromArray(
 															[
 																A2(
 																$elm$html$Html$map,
+<<<<<<< HEAD
 																$author$project$Main$PupilFormMsg(c),
 																A2($author$project$PupilForm$view, $author$project$PupilForm$New, model.x))
+=======
+																$author$project$Main$PupilFormMsg(campaignId),
+																A2($author$project$PupilForm$view, $author$project$PupilForm$New, model.v))
+>>>>>>> 6351cc5 (Step)
 															]));
 												case 8:
-													var c = fp.a;
+													var campaignId = fp.a;
 													var pupilId = fp.b;
 													return _Utils_ap(
 														$author$project$Main$campaignView(
-															A2($author$project$Main$getCampaign, c.i, model.b)),
+															A2($author$project$Main$getCampaign, campaignId, model.b)),
 														_List_fromArray(
 															[
 																A2(
 																$elm$html$Html$map,
-																$author$project$Main$PupilFormMsg(c),
+																$author$project$Main$PupilFormMsg(campaignId),
 																A2(
 																	$author$project$PupilForm$view,
 																	$author$project$PupilForm$Edit(pupilId),
+<<<<<<< HEAD
 																	model.x))
+=======
+																	model.v))
+>>>>>>> 6351cc5 (Step)
 															]));
 												default:
-													var c = fp.a;
+													var campaignId = fp.a;
 													var pupil = fp.b;
 													return _Utils_ap(
 														$author$project$Main$campaignView(
-															A2($author$project$Main$getCampaign, c.i, model.b)),
+															A2($author$project$Main$getCampaign, campaignId, model.b)),
 														_List_fromArray(
 															[
 																A2(
 																$elm$html$Html$map,
-																$author$project$Main$PupilFormMsg(c),
+																$author$project$Main$PupilFormMsg(campaignId),
 																A2(
 																	$author$project$PupilForm$view,
 																	$author$project$PupilForm$Delete(pupil),
+<<<<<<< HEAD
 																	model.x))
+=======
+																	model.v))
+>>>>>>> 6351cc5 (Step)
 															]));
 											}
 										default:

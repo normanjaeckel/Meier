@@ -1,4 +1,4 @@
-module PupilForm exposing (Action(..), Effect(..), Model, Msg, init, update, view)
+module PupilForm exposing (Action(..), Effect(..), Model, Msg, ReturnValue(..), init, update, view)
 
 import Api.Mutation
 import Data
@@ -8,6 +8,14 @@ import Html exposing (Html, button, div, footer, form, header, input, label, p, 
 import Html.Attributes exposing (attribute, checked, class, placeholder, required, type_, value)
 import Html.Events exposing (onCheck, onClick, onInput, onSubmit)
 import Shared exposing (classes)
+
+
+type alias Obj =
+    Data.Pupil
+
+
+type alias ObjId =
+    Data.PupilId
 
 
 
@@ -32,11 +40,11 @@ init =
 
 type Msg
     = FormMsg FormMsg
-    | SendPupilForm Action
+    | SendForm Action
     | CloseForm
-    | GotNewPupil (Result (Graphql.Http.Error Data.Pupil) Data.Pupil)
-    | GotUpdatedPupil (Result (Graphql.Http.Error Data.Pupil) Data.Pupil)
-    | GotDeletePupil Data.PupilId (Result (Graphql.Http.Error Bool) Bool)
+    | GotNew (Result (Graphql.Http.Error Obj) Obj)
+    | GotUpdated (Result (Graphql.Http.Error Obj) Obj)
+    | GotDelete ObjId (Result (Graphql.Http.Error Bool) Bool)
 
 
 type FormMsg
@@ -47,19 +55,25 @@ type FormMsg
 
 type Action
     = New
-    | Edit Data.PupilId
-    | Delete Data.Pupil
+    | Edit ObjId
+    | Delete Obj
 
 
 type Effect
     = None
     | Loading (Cmd Msg)
-    | Done Data.Campaign
+    | ClosedWithoutChange
+    | Done ReturnValue
     | Error String
 
 
-update : Data.Campaign -> Msg -> Model -> ( Model, Effect )
-update campaign msg model =
+type ReturnValue
+    = NewOrUpdated Obj
+    | Deleted ObjId
+
+
+update : Data.CampaignId -> Msg -> Model -> ( Model, Effect )
+update campaignId msg model =
     case msg of
         FormMsg formMsg ->
             let
@@ -77,7 +91,7 @@ update campaign msg model =
             in
             ( updatedModel, None )
 
-        SendPupilForm action ->
+        SendForm action ->
             case action of
                 New ->
                     let
@@ -90,17 +104,17 @@ update campaign msg model =
                         (Api.Mutation.addPupil
                             optionalArguments
                             (Api.Mutation.AddPupilRequiredArguments
-                                campaign.id
+                                campaignId
                                 model.name
                                 model.class
                             )
                             Data.pupilSelectionSet
                             |> Graphql.Http.mutationRequest Shared.queryUrl
-                            |> Graphql.Http.send GotNewPupil
+                            |> Graphql.Http.send GotNew
                         )
                     )
 
-                Edit pupilId ->
+                Edit objId ->
                     let
                         optionalArgs : Api.Mutation.UpdatePupilOptionalArguments -> Api.Mutation.UpdatePupilOptionalArguments
                         optionalArgs args =
@@ -114,73 +128,45 @@ update campaign msg model =
                     , Loading <|
                         (Api.Mutation.updatePupil
                             optionalArgs
-                            (Api.Mutation.UpdatePupilRequiredArguments pupilId)
+                            (Api.Mutation.UpdatePupilRequiredArguments objId)
                             Data.pupilSelectionSet
                             |> Graphql.Http.mutationRequest Shared.queryUrl
-                            |> Graphql.Http.send GotUpdatedPupil
+                            |> Graphql.Http.send GotUpdated
                         )
                     )
 
-                Delete pupil ->
+                Delete obj ->
                     ( model
                     , Loading <|
-                        (Api.Mutation.deletePupil (Api.Mutation.DeletePupilRequiredArguments pupil.id)
+                        (Api.Mutation.deletePupil (Api.Mutation.DeletePupilRequiredArguments obj.id)
                             |> Graphql.Http.mutationRequest Shared.queryUrl
-                            |> Graphql.Http.send (GotDeletePupil pupil.id)
+                            |> Graphql.Http.send (GotDelete obj.id)
                         )
                     )
 
         CloseForm ->
-            ( model, Done campaign )
+            ( model, ClosedWithoutChange )
 
-        GotNewPupil res ->
+        GotNew res ->
             case res of
-                Ok pupil ->
-                    ( model, Done { campaign | pupils = campaign.pupils ++ [ pupil ] } )
+                Ok obj ->
+                    ( model, Done <| NewOrUpdated obj )
 
                 Err err ->
                     ( model, Error (Shared.parseGraphqlError err) )
 
-        GotUpdatedPupil res ->
+        GotUpdated res ->
             case res of
-                Ok pupilFromServer ->
-                    let
-                        walkToUpdate : List Data.Pupil -> List Data.Pupil
-                        walkToUpdate pupils =
-                            case pupils of
-                                pupil :: rest ->
-                                    if pupil.id == pupilFromServer.id then
-                                        pupilFromServer :: rest
-
-                                    else
-                                        pupil :: walkToUpdate rest
-
-                                [] ->
-                                    []
-                    in
-                    ( model, Done { campaign | pupils = walkToUpdate campaign.pupils } )
+                Ok obj ->
+                    ( model, Done <| NewOrUpdated obj )
 
                 Err err ->
                     ( model, Error (Shared.parseGraphqlError err) )
 
-        GotDeletePupil pupilToBeDeletedId res ->
+        GotDelete objId res ->
             case res of
                 Ok _ ->
-                    let
-                        walkToUpdate : List Data.Pupil -> List Data.Pupil
-                        walkToUpdate pupils =
-                            case pupils of
-                                pupil :: rest ->
-                                    if pupil.id == pupilToBeDeletedId then
-                                        rest
-
-                                    else
-                                        pupil :: walkToUpdate rest
-
-                                [] ->
-                                    []
-                    in
-                    ( model, Done { campaign | pupils = walkToUpdate campaign.pupils } )
+                    ( model, Done <| Deleted objId )
 
                 Err err ->
                     ( model, Error (Shared.parseGraphqlError err) )
@@ -199,8 +185,8 @@ view action model =
         Edit _ ->
             viewNewAndEdit "Schüler/in bearbeiten" action model
 
-        Delete pupil ->
-            viewDelete pupil
+        Delete obj ->
+            viewDelete obj
 
 
 viewNewAndEdit : String -> Action -> Model -> Html Msg
@@ -208,16 +194,16 @@ viewNewAndEdit headline action model =
     div [ classes "modal is-active" ]
         [ div [ class "modal-background", onClick CloseForm ] []
         , div [ class "modal-card" ]
-            [ form [ onSubmit <| SendPupilForm action ]
+            [ form [ onSubmit <| SendForm action ]
                 [ header [ class "modal-card-head" ]
                     [ p [ class "modal-card-title" ] [ text headline ]
-                    , button [ class "delete", attribute "aria-label" "close", onClick CloseForm ] []
+                    , button [ class "delete", type_ "button", attribute "aria-label" "close", onClick CloseForm ] []
                     ]
                 , section [ class "modal-card-body" ]
                     (formFields model |> List.map (Html.map FormMsg))
                 , footer [ class "modal-card-foot" ]
                     [ button [ classes "button is-success", type_ "submit" ] [ text "Speichern" ]
-                    , button [ class "button", onClick CloseForm ] [ text "Abbrechen" ]
+                    , button [ class "button", type_ "button", onClick CloseForm ] [ text "Abbrechen" ]
                     ]
                 ]
             ]
@@ -271,8 +257,8 @@ formFields model =
     ]
 
 
-viewDelete : Data.Pupil -> Html Msg
-viewDelete pupil =
+viewDelete : Obj -> Html Msg
+viewDelete obj =
     div [ classes "modal is-active" ]
         [ div [ class "modal-background", onClick CloseForm ] []
         , div [ class "modal-card" ]
@@ -281,10 +267,10 @@ viewDelete pupil =
                 , button [ class "delete", type_ "button", attribute "aria-label" "close", onClick CloseForm ] []
                 ]
             , section [ class "modal-card-body" ]
-                [ p [] [ text <| "Wollen Sie den/die Schüler/in " ++ pupil.name ++ " wirklich löschen?" ]
+                [ p [] [ text <| "Wollen Sie den Schüler bzw. die Schülerin " ++ obj.name ++ " wirklich löschen?" ]
                 ]
             , footer [ class "modal-card-foot" ]
-                [ button [ classes "button is-success", onClick <| SendPupilForm (Delete pupil) ] [ text "Löschen" ]
+                [ button [ classes "button is-success", onClick <| SendForm (Delete obj) ] [ text "Löschen" ]
                 , button [ class "button", type_ "button", onClick CloseForm ] [ text "Abbrechen" ]
                 ]
             ]
