@@ -19,8 +19,8 @@ type Config struct {
 	Secred string `toml:"secred"`
 }
 
-// DefaultConfig returns a config object with default values.
-func DefaultConfig() Config {
+// defaultConfig returns a config object with default values.
+func defaultConfig() Config {
 	return Config{
 		WebListenAddr: ":8080",
 		LoginToken:    "admin",
@@ -30,7 +30,7 @@ func DefaultConfig() Config {
 
 // LoadConfig loads the config from a toml file.
 func LoadConfig(file string) (Config, error) {
-	c := DefaultConfig()
+	c := defaultConfig()
 
 	f, err := os.Open(file)
 	if err != nil {
