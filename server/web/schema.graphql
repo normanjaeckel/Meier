@@ -24,6 +24,7 @@ type Mutation {
     addPupil(campaignID: ID!, name: String!, class: String!, special: Boolean = false): Pupil!
     updatePupil(id: ID!, name: String, class: String, special: Boolean): Pupil!
     deletePupil(id: ID!): Boolean!
+    addPupilsOfClass(campaignID: ID!, class: String!, names: [String!]!): [Pupil!]!
 
     assignPupil(pupilID: ID!, eventID: ID!, dayID: ID!): Day!
     # assignAll(campaignID: ID!): Campaign!
