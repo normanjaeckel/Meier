@@ -43,7 +43,7 @@ func TestUpdateDay(t *testing.T) {
 func runQueries(queries []string) (*graphql.Response, error) {
 	now := func() time.Time { return time.Time{} }
 	dbContent := sticky.NewMemoryDB("")
-	db, err := sticky.New(dbContent, model.Model{}, model.GetEvent, sticky.WithNow[model.Model](now))
+	db, err := sticky.New(dbContent, model.New(nil), model.GetEvent, sticky.WithNow[model.Model](now))
 	if err != nil {
 		return nil, fmt.Errorf("sticky.New: %w", err)
 	}
