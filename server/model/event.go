@@ -417,7 +417,7 @@ func (e eventEventDelete) Execute(model Model, time time.Time) Model {
 }
 
 type eventPupilsCreate struct {
-	IDs        []int    `json:"id"`
+	IDs        []int    `json:"ids"`
 	CampaignID int      `json:"campaign_id"`
 	Names      []string `json:"names"`
 	LoginToken string   `json:"login_token"`
