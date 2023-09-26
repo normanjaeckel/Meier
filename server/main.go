@@ -26,7 +26,7 @@ func run() error {
 
 	setlogger()
 
-	s, err := sticky.New(sticky.FileDB{File: "db.jsonl"}, model.New(), model.GetEvent)
+	s, err := sticky.New(sticky.FileDB{File: "db.jsonl"}, model.New(nil), model.GetEvent)
 	if err != nil {
 		return fmt.Errorf("loading model: %w", err)
 	}

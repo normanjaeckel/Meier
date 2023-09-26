@@ -46,19 +46,17 @@ func (r *resolver) CampaignList() ([]model.CampaignResolver, error) {
 
 func (r *resolver) AddCampaign(
 	args struct {
-		Title      string
-		LoginToken *string
-		Days       []string
+		Title string
+		Days  *[]string
 	},
 ) (model.CampaignResolver, error) {
 	var newID int
 	err := r.db.Write(func(m model.Model) sticky.Event[model.Model] {
-		loginToken := ""
-		if args.LoginToken != nil {
-			loginToken = *args.LoginToken
+		var days []string
+		if args.Days != nil {
+			days = *args.Days
 		}
-
-		id, e := m.CampaignCreate(args.Title, loginToken, args.Days)
+		id, e := m.CampaignCreate(args.Title, days)
 		newID = id
 
 		return e
@@ -78,9 +76,8 @@ func (r *resolver) AddCampaign(
 
 func (r *resolver) UpdateCampaign(
 	args struct {
-		ID         model.ID
-		Title      *string
-		LoginToken *string
+		ID    model.ID
+		Title *string
 	},
 ) (model.CampaignResolver, error) {
 	title := ""
@@ -88,13 +85,8 @@ func (r *resolver) UpdateCampaign(
 		title = *args.Title
 	}
 
-	loginToken := ""
-	if args.LoginToken != nil {
-		loginToken = *args.LoginToken
-	}
-
 	err := r.db.Write(func(m model.Model) sticky.Event[model.Model] {
-		return m.CampaignUpdate(int(args.ID), title, loginToken)
+		return m.CampaignUpdate(int(args.ID), title)
 	})
 	if err != nil {
 		return model.CampaignResolver{}, fmt.Errorf("write: %w", err)
@@ -190,16 +182,19 @@ func (r *resolver) AddEvent(
 	args struct {
 		CampaignID       model.ID
 		Title            string
-		DayIDs           []model.ID
+		DayIDs           *[]model.ID
 		Capacity         int32
 		MaxSpecialPupils int32
 	},
 ) (model.EventResolver, error) {
 	var newID int
 	err := r.db.Write(func(m model.Model) sticky.Event[model.Model] {
-		dayIDs := make([]int, len(args.DayIDs))
-		for i, dayID := range args.DayIDs {
-			dayIDs[i] = int(dayID)
+		var dayIDs []int
+		if args.DayIDs != nil {
+			dayIDs = make([]int, len(*args.DayIDs))
+			for i, dayID := range *args.DayIDs {
+				dayIDs[i] = int(dayID)
+			}
 		}
 
 		id, event := m.EventCreate(int(args.CampaignID), args.Title, dayIDs, int(args.Capacity), int(args.MaxSpecialPupils))
@@ -286,19 +281,13 @@ func (r *resolver) AddPupil(
 	args struct {
 		CampaignID model.ID
 		Name       string
-		LoginToken *string
 		Class      string
 		Special    bool
 	},
 ) (model.PupilResolver, error) {
-	loginToken := ""
-	if args.LoginToken != nil {
-		loginToken = *args.LoginToken
-	}
-
 	var newID int
 	err := r.db.Write(func(m model.Model) sticky.Event[model.Model] {
-		id, event := m.PupilCreate(int(args.CampaignID), args.Name, loginToken, args.Class, args.Special)
+		id, event := m.PupilCreate(int(args.CampaignID), args.Name, args.Class, args.Special)
 		newID = id
 		return event
 	})
@@ -317,22 +306,16 @@ func (r *resolver) AddPupil(
 
 func (r *resolver) UpdatePupil(
 	args struct {
-		ID         model.ID
-		Name       *string
-		LoginToken *string
-		Class      *string
-		Special    *bool
+		ID      model.ID
+		Name    *string
+		Class   *string
+		Special *bool
 	},
 ) (model.PupilResolver, error) {
 	err := r.db.Write(func(m model.Model) sticky.Event[model.Model] {
 		name := ""
 		if args.Name != nil {
 			name = *args.Name
-		}
-
-		loginToken := ""
-		if args.LoginToken != nil {
-			loginToken = *args.LoginToken
 		}
 
 		class := ""
@@ -345,7 +328,7 @@ func (r *resolver) UpdatePupil(
 			special = *args.Special
 		}
 
-		return m.PupilUpdate(int(args.ID), name, loginToken, class, special)
+		return m.PupilUpdate(int(args.ID), name, class, special)
 	})
 	if err != nil {
 		return model.PupilResolver{}, fmt.Errorf("write: %w", err)

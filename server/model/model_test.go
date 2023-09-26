@@ -12,14 +12,14 @@ import (
 func TestRest(t *testing.T) {
 	now := func() time.Time { return time.Time{} }
 	dbContent := sticky.NewMemoryDB("")
-	db, err := sticky.New(dbContent, model.Model{}, model.GetEvent, sticky.WithNow[model.Model](now))
+	db, err := sticky.New(dbContent, model.New(testCreatePassword), model.GetEvent, sticky.WithNow[model.Model](now))
 	if err != nil {
 		t.Fatalf("sticky.New: %v", err)
 	}
 
 	t.Run("create campaign without title has to return an error", func(t *testing.T) {
 		err := db.Write(func(m model.Model) sticky.Event[model.Model] {
-			_, e := m.CampaignCreate("", "", nil)
+			_, e := m.CampaignCreate("", nil)
 			return e
 		})
 
@@ -32,7 +32,7 @@ func TestRest(t *testing.T) {
 		var id int
 		err := db.Write(func(m model.Model) sticky.Event[model.Model] {
 			var e sticky.Event[model.Model]
-			id, e = m.CampaignCreate("my title", "pass", nil)
+			id, e = m.CampaignCreate("my title", nil)
 			return e
 		})
 		if err != nil {
@@ -43,9 +43,9 @@ func TestRest(t *testing.T) {
 			t.Errorf("got id %d, expected 1", id)
 		}
 
-		expect := `{"time":"0001-01-01 00:00:00","type":"campaign-create","payload":{"id":1,"title":"my title","login_token":"pass"}}`
+		expect := `{"time":"0001-01-01 00:00:00","type":"campaign-create","payload":{"id":1,"title":"my title","login_token":"randomra"}}`
 		if got := strings.TrimSpace(dbContent.Content); got != expect {
-			t.Errorf("got event %s, expected %s", got, expect)
+			t.Errorf("got event\n%s\n\nexpected\n%s", got, expect)
 		}
 	})
 
@@ -53,7 +53,7 @@ func TestRest(t *testing.T) {
 		var id int
 		err := db.Write(func(m model.Model) sticky.Event[model.Model] {
 			var e sticky.Event[model.Model]
-			id, e = m.CampaignCreate("my second title", "pass", nil)
+			id, e = m.CampaignCreate("my second title", nil)
 			return e
 		})
 		if err != nil {
@@ -64,7 +64,7 @@ func TestRest(t *testing.T) {
 			t.Errorf("got id %d, expected 2", id)
 		}
 
-		expect := `{"time":"0001-01-01 00:00:00","type":"campaign-create","payload":{"id":2,"title":"my second title","login_token":"pass"}}`
+		expect := `{"time":"0001-01-01 00:00:00","type":"campaign-create","payload":{"id":2,"title":"my second title","login_token":"randomra"}}`
 		if got := lastLine(dbContent.Content); got != expect {
 			t.Errorf("got event %s, expected %s", got, expect)
 		}
@@ -72,7 +72,7 @@ func TestRest(t *testing.T) {
 
 	t.Run("update campaign without title has to return an error", func(t *testing.T) {
 		err := db.Write(func(m model.Model) sticky.Event[model.Model] {
-			return m.CampaignUpdate(1, "", "")
+			return m.CampaignUpdate(1, "")
 		})
 		if err == nil {
 			t.Fatalf("got no error, expected one")
@@ -81,7 +81,7 @@ func TestRest(t *testing.T) {
 
 	t.Run("update campaign with title has to create an event", func(t *testing.T) {
 		err := db.Write(func(m model.Model) sticky.Event[model.Model] {
-			return m.CampaignUpdate(1, "new title", "")
+			return m.CampaignUpdate(1, "new title")
 		})
 		if err != nil {
 			t.Fatalf("write: %v", err)
@@ -95,7 +95,7 @@ func TestRest(t *testing.T) {
 
 	t.Run("update non existing campaign", func(t *testing.T) {
 		err := db.Write(func(m model.Model) sticky.Event[model.Model] {
-			return m.CampaignUpdate(404, "new title", "pass")
+			return m.CampaignUpdate(404, "new title")
 		})
 		if err == nil {
 			t.Error("write did not return an error, expected one")
@@ -118,10 +118,10 @@ func TestStandardData(t *testing.T) {
 	{"time":"2023-09-03 12:43:33","type":"event-create","payload":{"id":2,"campaign_id":1,"title":"Tanzen","capacity":16,"max_special_pupils":1}}
 	{"time":"2023-09-03 12:48:03","type":"pupil-create","payload":{"id":1,"campaign_id":1,"name":"Max Mustermann","class":"2b","special":false}}
 	{"time":"2023-09-04 07:45:53","type":"assign-pupil","payload":{"pupil_id":1,"day_id":1,"event_id":1}}
-	{"time":"2023-09-04 07:46:22","type":"assign-pupil","payload":{"pupil_id":1,"day_id":2,"event_id":2}}	
+	{"time":"2023-09-04 07:46:22","type":"assign-pupil","payload":{"pupil_id":1,"day_id":2,"event_id":2}}
 	{"time":"2023-09-04 09:25:00","type":"pupil-choice","payload":{"pupil_id":1,"choices":[{"event_id":1,"choice":1},{"event_id":2,"choice":2}]}}
 	`)
-	db, err := sticky.New(dbContent, model.Model{}, model.GetEvent, sticky.WithNow[model.Model](now))
+	db, err := sticky.New(dbContent, model.New(testCreatePassword), model.GetEvent, sticky.WithNow[model.Model](now))
 	if err != nil {
 		t.Fatalf("sticky.New: %v", err)
 	}
@@ -162,4 +162,12 @@ func TestStandardData(t *testing.T) {
 			t.Errorf("got %d pupils, expected 1", len(pupils))
 		}
 	})
+}
+
+func testCreatePassword(length int) string {
+	var s string
+	for len(s) < length {
+		s += "random"
+	}
+	return s[:length]
 }
