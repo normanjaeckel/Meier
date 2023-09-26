@@ -19,18 +19,18 @@ type Config struct {
 	Secred string `toml:"secred"`
 }
 
-// DefaultConfig returns a config object with default values.
-func DefaultConfig() Config {
+// defaultConfig returns a config object with default values.
+func defaultConfig(r *rand.Rand) Config {
 	return Config{
 		WebListenAddr: ":8080",
 		LoginToken:    "admin",
-		Secred:        CreatePassword(32),
+		Secred:        CreatePassword(r, 32),
 	}
 }
 
 // LoadConfig loads the config from a toml file.
-func LoadConfig(file string) (Config, error) {
-	c := DefaultConfig()
+func LoadConfig(r *rand.Rand, file string) (Config, error) {
+	c := defaultConfig(r)
 
 	f, err := os.Open(file)
 	if err != nil {
@@ -69,13 +69,13 @@ func saveConfig(file string, config Config) (err error) {
 }
 
 // CreatePassword creates a random password string.
-func CreatePassword(length int) string {
+func CreatePassword(r *rand.Rand, length int) string {
 	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ" +
 		"abcdefghijklmnopqrstuvwxyzåäö" +
 		"0123456789")
 	var b strings.Builder
 	for i := 0; i < length; i++ {
-		b.WriteRune(chars[rand.Intn(len(chars))])
+		b.WriteRune(chars[r.Intn(len(chars))])
 	}
 	return b.String()
 }

@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"math/rand"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/normanjaeckel/Meier/server/config"
 	"github.com/normanjaeckel/Meier/server/model"
@@ -26,12 +28,14 @@ func run() error {
 
 	setlogger()
 
-	s, err := sticky.New(sticky.FileDB{File: "db.jsonl"}, model.New(), model.GetEvent)
+	rnd := rand.New(rand.NewSource(time.Now().Unix()))
+
+	s, err := sticky.New(sticky.FileDB{File: "db.jsonl"}, model.New(rnd), model.GetEvent)
 	if err != nil {
 		return fmt.Errorf("loading model: %w", err)
 	}
 
-	config, err := config.LoadConfig("config.toml")
+	config, err := config.LoadConfig(rnd, "config.toml")
 	if err != nil {
 		return fmt.Errorf("loading config: %w", err)
 	}

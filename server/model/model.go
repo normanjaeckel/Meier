@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"math/rand"
 
 	"github.com/normanjaeckel/Meier/server/config"
 	"github.com/ostcar/timer/sticky"
@@ -42,6 +43,8 @@ type pupil struct {
 
 // Model represents the model of Maier
 type Model struct {
+	rnd *rand.Rand
+
 	campains []campaign
 	days     []day
 	events   []event
@@ -52,15 +55,15 @@ type Model struct {
 type Event = sticky.Event[Model]
 
 // New returns an initialized Meyar model
-func New() Model {
-	return Model{}
+func New(rnd *rand.Rand) Model {
+	return Model{rnd: rnd}
 }
 
 // CampaignCreate creates a new Mayer campaign.
 func (m Model) CampaignCreate(title string, days []string) (int, Event) {
 	nextID := nextID(m.campains)
 
-	loginToken := config.CreatePassword(8)
+	loginToken := config.CreatePassword(m.rnd, 8)
 
 	return nextID, eventCampaignCreate{ID: nextID, LoginToken: loginToken, Title: title, Days: days}
 }
@@ -118,7 +121,7 @@ func (m Model) EventDelete(id int) Event {
 func (m Model) PupilCreate(campaignID int, name string, class string, special bool) (int, Event) {
 	nextID := nextID(m.pupils)
 
-	loginToken := config.CreatePassword(8)
+	loginToken := config.CreatePassword(m.rnd, 8)
 
 	return nextID, eventPupilCreate{ID: nextID, CampaignID: campaignID, PName: name, LoginToken: loginToken, Class: class, Special: special}
 }
