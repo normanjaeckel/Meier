@@ -26,12 +26,14 @@ type alias Model =
     { name : String
     , class : String
     , isSpecial : Bool
+    , campaignId : Data.CampaignId
+    , action : Action
     }
 
 
-init : Model
-init =
-    Model "" "" False
+init : Data.CampaignId -> Action -> Model
+init campaignId action =
+    Model "" "" False campaignId action
 
 
 
@@ -56,7 +58,7 @@ type FormMsg
 type Action
     = New
     | Edit ObjId
-    | Delete Obj
+    | Delete ObjId
 
 
 type Effect
@@ -72,8 +74,8 @@ type ReturnValue
     | Deleted ObjId
 
 
-update : Data.CampaignId -> Msg -> Model -> ( Model, Effect )
-update campaignId msg model =
+update : Msg -> Model -> ( Model, Effect )
+update msg model =
     case msg of
         FormMsg formMsg ->
             let
@@ -104,7 +106,7 @@ update campaignId msg model =
                         (Api.Mutation.addPupil
                             optionalArguments
                             (Api.Mutation.AddPupilRequiredArguments
-                                campaignId
+                                model.campaignId
                                 model.name
                                 model.class
                             )
@@ -135,12 +137,12 @@ update campaignId msg model =
                         )
                     )
 
-                Delete obj ->
+                Delete objId ->
                     ( model
                     , Loading <|
-                        (Api.Mutation.deletePupil (Api.Mutation.DeletePupilRequiredArguments obj.id)
+                        (Api.Mutation.deletePupil (Api.Mutation.DeletePupilRequiredArguments objId)
                             |> Graphql.Http.mutationRequest Shared.queryUrl
-                            |> Graphql.Http.send (GotDelete obj.id)
+                            |> Graphql.Http.send (GotDelete objId)
                         )
                     )
 
@@ -176,25 +178,25 @@ update campaignId msg model =
 -- VIEW
 
 
-view : Action -> Model -> Html Msg
-view action model =
-    case action of
+view : Model -> Html Msg
+view model =
+    case model.action of
         New ->
-            viewNewAndEdit "Neue/n Schüler/in hinzufügen" action model
+            viewNewAndEdit "Neue/n Schüler/in hinzufügen" model
 
         Edit _ ->
-            viewNewAndEdit "Schüler/in bearbeiten" action model
+            viewNewAndEdit "Schüler/in bearbeiten" model
 
-        Delete obj ->
-            viewDelete obj
+        Delete _ ->
+            viewDelete model
 
 
-viewNewAndEdit : String -> Action -> Model -> Html Msg
-viewNewAndEdit headline action model =
+viewNewAndEdit : String -> Model -> Html Msg
+viewNewAndEdit headline model =
     div [ classes "modal is-active" ]
         [ div [ class "modal-background", onClick CloseForm ] []
         , div [ class "modal-card" ]
-            [ form [ onSubmit <| SendForm action ]
+            [ form [ onSubmit <| SendForm model.action ]
                 [ header [ class "modal-card-head" ]
                     [ p [ class "modal-card-title" ] [ text headline ]
                     , button [ class "delete", type_ "button", attribute "aria-label" "close", onClick CloseForm ] []
@@ -257,8 +259,8 @@ formFields model =
     ]
 
 
-viewDelete : Obj -> Html Msg
-viewDelete obj =
+viewDelete : Model -> Html Msg
+viewDelete model =
     div [ classes "modal is-active" ]
         [ div [ class "modal-background", onClick CloseForm ] []
         , div [ class "modal-card" ]
@@ -267,10 +269,10 @@ viewDelete obj =
                 , button [ class "delete", type_ "button", attribute "aria-label" "close", onClick CloseForm ] []
                 ]
             , section [ class "modal-card-body" ]
-                [ p [] [ text <| "Wollen Sie den Schüler bzw. die Schülerin " ++ obj.name ++ " wirklich löschen?" ]
+                [ p [] [ text <| "Wollen Sie den Schüler bzw. die Schülerin " ++ model.name ++ " wirklich löschen?" ]
                 ]
             , footer [ class "modal-card-foot" ]
-                [ button [ classes "button is-success", onClick <| SendForm (Delete obj) ] [ text "Löschen" ]
+                [ button [ classes "button is-success", onClick <| SendForm model.action ] [ text "Löschen" ]
                 , button [ class "button", type_ "button", onClick CloseForm ] [ text "Abbrechen" ]
                 ]
             ]
