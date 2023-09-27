@@ -35,8 +35,8 @@ func GetEvent(eventType string) Event {
 	case eventEventDelete{}.Name():
 		return &eventEventDelete{}
 
-	case eventPupilCreate{}.Name():
-		return &eventPupilCreate{}
+	case eventPupilsCreate{}.Name():
+		return &eventPupilsCreate{}
 
 	case eventPupilUpdate{}.Name():
 		return &eventPupilUpdate{}
@@ -416,26 +416,38 @@ func (e eventEventDelete) Execute(model Model, time time.Time) Model {
 	return model
 }
 
-type eventPupilCreate struct {
-	ID         int    `json:"id"`
-	CampaignID int    `json:"campaign_id"`
-	PName      string `json:"name"`
-	LoginToken string `json:"login_token"`
-	Class      string `json:"class"`
-	Special    bool   `json:"special"`
+type eventPupilsCreate struct {
+	IDs        []int    `json:"ids"`
+	CampaignID int      `json:"campaign_id"`
+	Names      []string `json:"names"`
+	LoginToken string   `json:"login_token"`
+	Class      string   `json:"class"`
+	Special    bool     `json:"special"`
 }
 
-func (e eventPupilCreate) Name() string {
+func (e eventPupilsCreate) Name() string {
 	return "pupil-create"
 }
 
-func (e eventPupilCreate) Validate(model Model) error {
-	if len(model.pupils) > e.ID {
-		return fmt.Errorf("ID %d is not unique", e.ID)
+func (e eventPupilsCreate) Validate(model Model) error {
+	if len(e.Names) == 0 {
+		return fmt.Errorf("at least one name is required")
 	}
 
-	if e.PName == "" {
-		return fmt.Errorf("pupil name can not be empty")
+	if len(e.Names) != len(e.IDs) {
+		return fmt.Errorf("ids and names have to be the same len")
+	}
+
+	for _, id := range e.IDs {
+		if len(model.pupils) > id {
+			return fmt.Errorf("ID %d is not unique", id)
+		}
+	}
+
+	for _, name := range e.Names {
+		if name == "" {
+			return fmt.Errorf("pupil name can not be empty")
+		}
 	}
 
 	if e.Class == "" {
@@ -453,17 +465,21 @@ func (e eventPupilCreate) Validate(model Model) error {
 	return nil
 }
 
-func (e eventPupilCreate) Execute(model Model, time time.Time) Model {
-	for len(model.pupils) <= e.ID {
-		model.pupils = append(model.pupils, pupil{})
+func (e eventPupilsCreate) Execute(model Model, time time.Time) Model {
+	for i, id := range e.IDs {
+		for len(model.pupils) <= id {
+			model.pupils = append(model.pupils, pupil{})
+		}
+
+		model.pupils[id] = pupil{
+			campaignID: e.CampaignID,
+			name:       e.Names[i],
+			loginToken: e.LoginToken,
+			class:      e.Class,
+			special:    e.Special,
+		}
 	}
-	model.pupils[e.ID] = pupil{
-		campaignID: e.CampaignID,
-		name:       e.PName,
-		loginToken: e.LoginToken,
-		class:      e.Class,
-		special:    e.Special,
-	}
+
 	return model
 }
 

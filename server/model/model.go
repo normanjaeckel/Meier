@@ -120,12 +120,15 @@ func (m Model) EventDelete(id int) Event {
 }
 
 // PupilCreate creates a Meyer pupil in a compaign.
-func (m Model) PupilCreate(campaignID int, name string, class string, special bool) (int, Event) {
-	nextID := nextID(m.pupils)
+func (m Model) PupilCreate(campaignID int, class string, special bool, names ...string) ([]int, Event) {
+	nextIDs := make([]int, len(names))
+	for i := 0; i < len(names); i++ {
+		nextIDs[i] = nextID(m.pupils)
+	}
 
 	loginToken := m.createPassword(8)
 
-	return nextID, eventPupilCreate{ID: nextID, CampaignID: campaignID, PName: name, LoginToken: loginToken, Class: class, Special: special}
+	return nextIDs, eventPupilsCreate{IDs: nextIDs, CampaignID: campaignID, Names: names, LoginToken: loginToken, Class: class, Special: special}
 }
 
 // PupilUpdate updates a Mayer event in a compaign.

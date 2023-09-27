@@ -287,8 +287,8 @@ func (r *resolver) AddPupil(
 ) (model.PupilResolver, error) {
 	var newID int
 	err := r.db.Write(func(m model.Model) sticky.Event[model.Model] {
-		id, event := m.PupilCreate(int(args.CampaignID), args.Name, args.Class, args.Special)
-		newID = id
+		id, event := m.PupilCreate(int(args.CampaignID), args.Class, args.Special, args.Name)
+		newID = id[0]
 		return event
 	})
 	if err != nil {
@@ -302,6 +302,37 @@ func (r *resolver) AddPupil(
 	})
 
 	return pupil, err
+}
+
+func (r *resolver) AddPupilsOfClass(
+	args struct {
+		CampaignID model.ID
+		Class      string
+		Names      []string
+	},
+) ([]model.PupilResolver, error) {
+	var newIDs []int
+	err := r.db.Write(func(m model.Model) sticky.Event[model.Model] {
+		ids, event := m.PupilCreate(int(args.CampaignID), args.Class, false, args.Names...)
+		newIDs = ids
+		return event
+	})
+	if err != nil {
+		return nil, fmt.Errorf("write: %w", err)
+	}
+
+	pupils := make([]model.PupilResolver, len(newIDs))
+	r.db.Read(func(m model.Model) {
+		// TODO: This contains a model outside of read. This could be a race condition.
+		for i, id := range newIDs {
+			pupils[i], err = m.Pupil(id)
+			if err != nil {
+				break
+			}
+		}
+	})
+
+	return pupils, err
 }
 
 func (r *resolver) UpdatePupil(
