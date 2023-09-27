@@ -1,4 +1,4 @@
-module EventForm exposing (Action(..), Effect(..), Model, Msg, ReturnValue(..), init, update, view)
+module EventForm exposing (Action(..), Effect(..), Model, Msg, Obj, ObjId, ReturnValue(..), init, update, view)
 
 import Api.Mutation
 import Data
