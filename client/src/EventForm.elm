@@ -80,13 +80,18 @@ update campaign msg model =
         SendEventForm action ->
             case action of
                 New ->
+                    let
+                        optionalArgs : Api.Mutation.AddEventOptionalArguments -> Api.Mutation.AddEventOptionalArguments
+                        optionalArgs args =
+                            args
+                    in
                     ( model
                     , Loading <|
                         (Api.Mutation.addEvent
+                            optionalArgs
                             (Api.Mutation.AddEventRequiredArguments
                                 campaign.id
                                 model.title
-                                []
                                 model.capacity
                                 model.maxSpecialPupils
                             )
