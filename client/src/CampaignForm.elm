@@ -1,8 +1,9 @@
-module DayForm exposing (Action(..), Effect(..), Model, Msg, ReturnValue(..), init, update, view)
+module CampaignForm exposing (Action(..), Effect(..), Model, Msg, ReturnValue(..), init, update, view)
 
 import Api.Mutation
 import Data
 import Graphql.Http
+import Graphql.OptionalArgument
 import Html exposing (Html, button, div, footer, form, header, input, p, section, text)
 import Html.Attributes exposing (attribute, class, placeholder, required, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
@@ -10,11 +11,11 @@ import Shared exposing (classes)
 
 
 type alias Obj =
-    Data.Day
+    Data.Campaign
 
 
 type alias ObjId =
-    Data.DayId
+    Data.CampaignId
 
 
 
@@ -23,12 +24,13 @@ type alias ObjId =
 
 type alias Model =
     { title : String
+    , numOfDays : Int
     }
 
 
 init : Model
 init =
-    Model ""
+    Model "" 2
 
 
 
@@ -46,6 +48,7 @@ type Msg
 
 type FormMsg
     = Title String
+    | NumOfDays Int
 
 
 type Action
@@ -67,8 +70,8 @@ type ReturnValue
     | Deleted ObjId
 
 
-update : Data.CampaignId -> Msg -> Model -> ( Model, Effect )
-update campaignId msg model =
+update : Msg -> Model -> ( Model, Effect )
+update msg model =
     case msg of
         FormMsg formMsg ->
             let
@@ -77,20 +80,31 @@ update campaignId msg model =
                     case formMsg of
                         Title t ->
                             { model | title = t }
+
+                        NumOfDays nod ->
+                            { model | numOfDays = nod }
             in
             ( updatedModel, None )
 
         SendForm action ->
             case action of
                 New ->
+                    let
+                        dayList : List String
+                        dayList =
+                            List.range 1 model.numOfDays
+                                |> List.map (\i -> "Tag " ++ String.fromInt i)
+
+                        optionalArgs : Api.Mutation.AddCampaignOptionalArguments -> Api.Mutation.AddCampaignOptionalArguments
+                        optionalArgs args =
+                            { args | days = Graphql.OptionalArgument.Present dayList }
+                    in
                     ( model
                     , Loading <|
-                        (Api.Mutation.addDay
-                            (Api.Mutation.AddDayRequiredArguments
-                                campaignId
-                                model.title
-                            )
-                            Data.daySelectionSet
+                        (Api.Mutation.addCampaign
+                            optionalArgs
+                            (Api.Mutation.AddCampaignRequiredArguments model.title)
+                            Data.campaingSelectionSet
                             |> Graphql.Http.mutationRequest Shared.queryUrl
                             |> Graphql.Http.send GotNew
                         )
@@ -99,9 +113,9 @@ update campaignId msg model =
                 Edit objId ->
                     ( model
                     , Loading <|
-                        (Api.Mutation.updateDay
-                            (Api.Mutation.UpdateDayRequiredArguments objId model.title)
-                            Data.daySelectionSet
+                        (Api.Mutation.updateCampaign
+                            (Api.Mutation.UpdateCampaignRequiredArguments objId model.title)
+                            Data.campaingSelectionSet
                             |> Graphql.Http.mutationRequest Shared.queryUrl
                             |> Graphql.Http.send GotUpdated
                         )
@@ -110,7 +124,7 @@ update campaignId msg model =
                 Delete obj ->
                     ( model
                     , Loading <|
-                        (Api.Mutation.deleteDay (Api.Mutation.DeleteDayRequiredArguments obj.id)
+                        (Api.Mutation.deleteCampaign (Api.Mutation.DeleteCampaignRequiredArguments obj.id)
                             |> Graphql.Http.mutationRequest Shared.queryUrl
                             |> Graphql.Http.send (GotDelete obj.id)
                         )
@@ -152,10 +166,10 @@ view : Action -> Model -> Html Msg
 view action model =
     case action of
         New ->
-            viewNewAndEdit "Neuen Tag hinzufügen" action model
+            viewNewAndEdit "Neue Kampagne hinzufügen" action model
 
         Edit _ ->
-            viewNewAndEdit "Tag bearbeiten" action model
+            viewNewAndEdit "Kampagne bearbeiten" action model
 
         Delete obj ->
             viewDelete obj
@@ -184,6 +198,11 @@ viewNewAndEdit headline action model =
 
 formFields : Model -> List (Html FormMsg)
 formFields model =
+    let
+        labelNumOfDays : String
+        labelNumOfDays =
+            "Anzahl der Tage"
+    in
     [ div [ class "field" ]
         [ div [ class "control" ]
             [ input
@@ -198,6 +217,21 @@ formFields model =
                 []
             ]
         ]
+    , div [ class "field" ]
+        [ div [ class "control" ]
+            [ input
+                [ class "input"
+                , type_ "number"
+                , attribute "aria-label" labelNumOfDays
+                , Html.Attributes.min "1"
+                , Html.Attributes.max "10"
+                , onInput (String.toInt >> Maybe.withDefault 0 >> NumOfDays)
+                , value <| String.fromInt model.numOfDays
+                ]
+                []
+            ]
+        , p [ class "help" ] [ text labelNumOfDays ]
+        ]
     ]
 
 
@@ -207,11 +241,11 @@ viewDelete obj =
         [ div [ class "modal-background", onClick CloseForm ] []
         , div [ class "modal-card" ]
             [ header [ class "modal-card-head" ]
-                [ p [ class "modal-card-title" ] [ text "Tag löschen" ]
+                [ p [ class "modal-card-title" ] [ text "Kampagne löschen" ]
                 , button [ class "delete", type_ "button", attribute "aria-label" "close", onClick CloseForm ] []
                 ]
             , section [ class "modal-card-body" ]
-                [ p [] [ text <| "Wollen Sie den Tag " ++ obj.title ++ " wirklich löschen?" ]
+                [ p [] [ text <| "Wollen Sie die Kampagne " ++ obj.title ++ " wirklich löschen?" ]
                 ]
             , footer [ class "modal-card-foot" ]
                 [ button [ classes "button is-success", onClick <| SendForm (Delete obj) ] [ text "Löschen" ]
