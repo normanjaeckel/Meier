@@ -20,9 +20,7 @@ import Json.Decode as Decode exposing (Decoder)
 
 
 type alias AddCampaignOptionalArguments =
-    { days : OptionalArgument (List String)
-    , loginToken : OptionalArgument String
-    }
+    { days : OptionalArgument (List String) }
 
 
 type alias AddCampaignRequiredArguments =
@@ -37,40 +35,27 @@ addCampaign :
 addCampaign fillInOptionals____ requiredArgs____ object____ =
     let
         filledInOptionals____ =
-            fillInOptionals____ { days = Absent, loginToken = Absent }
+            fillInOptionals____ { days = Absent }
 
         optionalArgs____ =
-            [ Argument.optional "days" filledInOptionals____.days (Encode.string |> Encode.list), Argument.optional "loginToken" filledInOptionals____.loginToken Encode.string ]
+            [ Argument.optional "days" filledInOptionals____.days (Encode.string |> Encode.list) ]
                 |> List.filterMap Basics.identity
     in
     Object.selectionForCompositeField "addCampaign" (optionalArgs____ ++ [ Argument.required "title" requiredArgs____.title Encode.string ]) object____ Basics.identity
 
 
-type alias UpdateCampaignOptionalArguments =
-    { title : OptionalArgument String
-    , loginToken : OptionalArgument String
+type alias UpdateCampaignRequiredArguments =
+    { id : IdScalarCodecs.Id
+    , title : String
     }
 
 
-type alias UpdateCampaignRequiredArguments =
-    { id : IdScalarCodecs.Id }
-
-
 updateCampaign :
-    (UpdateCampaignOptionalArguments -> UpdateCampaignOptionalArguments)
-    -> UpdateCampaignRequiredArguments
+    UpdateCampaignRequiredArguments
     -> SelectionSet decodesTo Api.Object.Campaign
     -> SelectionSet decodesTo RootMutation
-updateCampaign fillInOptionals____ requiredArgs____ object____ =
-    let
-        filledInOptionals____ =
-            fillInOptionals____ { title = Absent, loginToken = Absent }
-
-        optionalArgs____ =
-            [ Argument.optional "title" filledInOptionals____.title Encode.string, Argument.optional "loginToken" filledInOptionals____.loginToken Encode.string ]
-                |> List.filterMap Basics.identity
-    in
-    Object.selectionForCompositeField "updateCampaign" (optionalArgs____ ++ [ Argument.required "id" requiredArgs____.id (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ]) object____ Basics.identity
+updateCampaign requiredArgs____ object____ =
+    Object.selectionForCompositeField "updateCampaign" [ Argument.required "id" requiredArgs____.id (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId), Argument.required "title" requiredArgs____.title Encode.string ] object____ Basics.identity
 
 
 type alias DeleteCampaignRequiredArguments =
@@ -123,28 +108,40 @@ deleteDay requiredArgs____ =
     Object.selectionForField "Bool" "deleteDay" [ Argument.required "id" requiredArgs____.id (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ] Decode.bool
 
 
+type alias AddEventOptionalArguments =
+    { dayIDs : OptionalArgument (List IdScalarCodecs.Id) }
+
+
 type alias AddEventRequiredArguments =
     { campaignID : IdScalarCodecs.Id
     , title : String
-    , dayIDs : List IdScalarCodecs.Id
     , capacity : Int
     , maxSpecialPupils : Int
     }
 
 
 addEvent :
-    AddEventRequiredArguments
+    (AddEventOptionalArguments -> AddEventOptionalArguments)
+    -> AddEventRequiredArguments
     -> SelectionSet decodesTo Api.Object.Event
     -> SelectionSet decodesTo RootMutation
-addEvent requiredArgs____ object____ =
-    Object.selectionForCompositeField "addEvent" [ Argument.required "campaignID" requiredArgs____.campaignID (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId), Argument.required "title" requiredArgs____.title Encode.string, Argument.required "dayIDs" requiredArgs____.dayIDs ((IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) |> Encode.list), Argument.required "capacity" requiredArgs____.capacity Encode.int, Argument.required "maxSpecialPupils" requiredArgs____.maxSpecialPupils Encode.int ] object____ Basics.identity
+addEvent fillInOptionals____ requiredArgs____ object____ =
+    let
+        filledInOptionals____ =
+            fillInOptionals____ { dayIDs = Absent }
+
+        optionalArgs____ =
+            [ Argument.optional "dayIDs" filledInOptionals____.dayIDs ((IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) |> Encode.list) ]
+                |> List.filterMap Basics.identity
+    in
+    Object.selectionForCompositeField "addEvent" (optionalArgs____ ++ [ Argument.required "campaignID" requiredArgs____.campaignID (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId), Argument.required "title" requiredArgs____.title Encode.string, Argument.required "capacity" requiredArgs____.capacity Encode.int, Argument.required "maxSpecialPupils" requiredArgs____.maxSpecialPupils Encode.int ]) object____ Basics.identity
 
 
 type alias UpdateEventOptionalArguments =
     { title : OptionalArgument String
-    , dayIDs : OptionalArgument (List IdScalarCodecs.Id)
     , capacity : OptionalArgument Int
     , maxSpecialPupils : OptionalArgument Int
+    , dayIDs : OptionalArgument (List IdScalarCodecs.Id)
     }
 
 
@@ -160,10 +157,10 @@ updateEvent :
 updateEvent fillInOptionals____ requiredArgs____ object____ =
     let
         filledInOptionals____ =
-            fillInOptionals____ { title = Absent, dayIDs = Absent, capacity = Absent, maxSpecialPupils = Absent }
+            fillInOptionals____ { title = Absent, capacity = Absent, maxSpecialPupils = Absent, dayIDs = Absent }
 
         optionalArgs____ =
-            [ Argument.optional "title" filledInOptionals____.title Encode.string, Argument.optional "dayIDs" filledInOptionals____.dayIDs ((IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) |> Encode.list), Argument.optional "capacity" filledInOptionals____.capacity Encode.int, Argument.optional "maxSpecialPupils" filledInOptionals____.maxSpecialPupils Encode.int ]
+            [ Argument.optional "title" filledInOptionals____.title Encode.string, Argument.optional "capacity" filledInOptionals____.capacity Encode.int, Argument.optional "maxSpecialPupils" filledInOptionals____.maxSpecialPupils Encode.int, Argument.optional "dayIDs" filledInOptionals____.dayIDs ((IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) |> Encode.list) ]
                 |> List.filterMap Basics.identity
     in
     Object.selectionForCompositeField "updateEvent" (optionalArgs____ ++ [ Argument.required "id" requiredArgs____.id (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ]) object____ Basics.identity
@@ -181,9 +178,7 @@ deleteEvent requiredArgs____ =
 
 
 type alias AddPupilOptionalArguments =
-    { loginToken : OptionalArgument String
-    , special : OptionalArgument Bool
-    }
+    { special : OptionalArgument Bool }
 
 
 type alias AddPupilRequiredArguments =
@@ -201,10 +196,10 @@ addPupil :
 addPupil fillInOptionals____ requiredArgs____ object____ =
     let
         filledInOptionals____ =
-            fillInOptionals____ { loginToken = Absent, special = Absent }
+            fillInOptionals____ { special = Absent }
 
         optionalArgs____ =
-            [ Argument.optional "loginToken" filledInOptionals____.loginToken Encode.string, Argument.optional "special" filledInOptionals____.special Encode.bool ]
+            [ Argument.optional "special" filledInOptionals____.special Encode.bool ]
                 |> List.filterMap Basics.identity
     in
     Object.selectionForCompositeField "addPupil" (optionalArgs____ ++ [ Argument.required "campaignID" requiredArgs____.campaignID (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId), Argument.required "name" requiredArgs____.name Encode.string, Argument.required "class" requiredArgs____.class Encode.string ]) object____ Basics.identity
@@ -214,7 +209,6 @@ type alias UpdatePupilOptionalArguments =
     { name : OptionalArgument String
     , class : OptionalArgument String
     , special : OptionalArgument Bool
-    , loginToken : OptionalArgument String
     }
 
 
@@ -230,10 +224,10 @@ updatePupil :
 updatePupil fillInOptionals____ requiredArgs____ object____ =
     let
         filledInOptionals____ =
-            fillInOptionals____ { name = Absent, class = Absent, special = Absent, loginToken = Absent }
+            fillInOptionals____ { name = Absent, class = Absent, special = Absent }
 
         optionalArgs____ =
-            [ Argument.optional "name" filledInOptionals____.name Encode.string, Argument.optional "class" filledInOptionals____.class Encode.string, Argument.optional "special" filledInOptionals____.special Encode.bool, Argument.optional "loginToken" filledInOptionals____.loginToken Encode.string ]
+            [ Argument.optional "name" filledInOptionals____.name Encode.string, Argument.optional "class" filledInOptionals____.class Encode.string, Argument.optional "special" filledInOptionals____.special Encode.bool ]
                 |> List.filterMap Basics.identity
     in
     Object.selectionForCompositeField "updatePupil" (optionalArgs____ ++ [ Argument.required "id" requiredArgs____.id (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ]) object____ Basics.identity
