@@ -25,12 +25,13 @@ type alias ObjId =
 type alias Model =
     { title : String
     , numOfDays : Int
+    , action : Action
     }
 
 
-init : Model
-init =
-    Model "" 2
+init : Action -> Model
+init action =
+    Model "" 2 action
 
 
 
@@ -54,7 +55,7 @@ type FormMsg
 type Action
     = New
     | Edit ObjId
-    | Delete Obj
+    | Delete ObjId
 
 
 type Effect
@@ -121,12 +122,12 @@ update msg model =
                         )
                     )
 
-                Delete obj ->
+                Delete objId ->
                     ( model
                     , Loading <|
-                        (Api.Mutation.deleteCampaign (Api.Mutation.DeleteCampaignRequiredArguments obj.id)
+                        (Api.Mutation.deleteCampaign (Api.Mutation.DeleteCampaignRequiredArguments objId)
                             |> Graphql.Http.mutationRequest Shared.queryUrl
-                            |> Graphql.Http.send (GotDelete obj.id)
+                            |> Graphql.Http.send (GotDelete objId)
                         )
                     )
 
@@ -162,25 +163,25 @@ update msg model =
 -- VIEW
 
 
-view : Action -> Model -> Html Msg
-view action model =
-    case action of
+view : Model -> Html Msg
+view model =
+    case model.action of
         New ->
-            viewNewAndEdit "Neue Kampagne hinzufügen" action model
+            viewNewAndEdit "Neue Kampagne hinzufügen" model
 
         Edit _ ->
-            viewNewAndEdit "Kampagne bearbeiten" action model
+            viewNewAndEdit "Kampagne bearbeiten" model
 
-        Delete obj ->
-            viewDelete obj
+        Delete _ ->
+            viewDelete model
 
 
-viewNewAndEdit : String -> Action -> Model -> Html Msg
-viewNewAndEdit headline action model =
+viewNewAndEdit : String -> Model -> Html Msg
+viewNewAndEdit headline model =
     div [ classes "modal is-active" ]
         [ div [ class "modal-background", onClick CloseForm ] []
         , div [ class "modal-card" ]
-            [ form [ onSubmit <| SendForm action ]
+            [ form [ onSubmit <| SendForm model.action ]
                 [ header [ class "modal-card-head" ]
                     [ p [ class "modal-card-title" ] [ text headline ]
                     , button [ class "delete", type_ "button", attribute "aria-label" "close", onClick CloseForm ] []
@@ -235,8 +236,8 @@ formFields model =
     ]
 
 
-viewDelete : Obj -> Html Msg
-viewDelete obj =
+viewDelete : Model -> Html Msg
+viewDelete model =
     div [ classes "modal is-active" ]
         [ div [ class "modal-background", onClick CloseForm ] []
         , div [ class "modal-card" ]
@@ -245,10 +246,10 @@ viewDelete obj =
                 , button [ class "delete", type_ "button", attribute "aria-label" "close", onClick CloseForm ] []
                 ]
             , section [ class "modal-card-body" ]
-                [ p [] [ text <| "Wollen Sie die Kampagne " ++ obj.title ++ " wirklich löschen?" ]
+                [ p [] [ text <| "Wollen Sie die Kampagne " ++ model.title ++ " wirklich löschen?" ]
                 ]
             , footer [ class "modal-card-foot" ]
-                [ button [ classes "button is-success", onClick <| SendForm (Delete obj) ] [ text "Löschen" ]
+                [ button [ classes "button is-success", onClick <| SendForm model.action ] [ text "Löschen" ]
                 , button [ class "button", type_ "button", onClick CloseForm ] [ text "Abbrechen" ]
                 ]
             ]
