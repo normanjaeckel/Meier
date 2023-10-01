@@ -32,6 +32,7 @@ main =
 
 type alias Model =
     { connection : Connection
+    , page : Page
     , campaigns : List Campaign
     }
 
@@ -39,6 +40,7 @@ type alias Model =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { connection = Loading
+      , page = Overview
       , campaigns = []
       }
     , Api.Query.campaignList Data.campaingSelectionSet
@@ -58,7 +60,7 @@ getObjFromCampaign campaignId objId getter campaigns =
 type Connection
     = Loading
     | Failure String
-    | Success Page
+    | Success
 
 
 type Page
@@ -108,7 +110,7 @@ update msg model =
         GotCampaignList res ->
             case res of
                 Ok campaigns ->
-                    ( { model | connection = Success Overview, campaigns = campaigns }, Cmd.none )
+                    ( { model | connection = Success, campaigns = campaigns }, Cmd.none )
 
                 Err err ->
                     ( { model | connection = Failure (parseGraphqlError err) }, Cmd.none )
@@ -116,7 +118,7 @@ update msg model =
         SwitchPage s ->
             case s of
                 SwitchToOverview ->
-                    ( { model | connection = Success <| Overview }, Cmd.none )
+                    ( { model | page = Overview }, Cmd.none )
 
                 SwitchToCampaignFormPage action ->
                     let
@@ -147,7 +149,7 @@ update msg model =
                                         Nothing ->
                                             emptyForm
                     in
-                    ( { model | connection = Success <| FormPage <| CampaignFormPage formModel }, Cmd.none )
+                    ( { model | page = FormPage <| CampaignFormPage formModel }, Cmd.none )
 
                 SwitchToDayFormPage campaignId action ->
                     let
@@ -178,7 +180,7 @@ update msg model =
                                         Nothing ->
                                             emptyForm
                     in
-                    ( { model | connection = Success <| FormPage <| DayFormPage formModel }, Cmd.none )
+                    ( { model | page = FormPage <| DayFormPage formModel }, Cmd.none )
 
                 SwitchToEventFormPage campaignId action ->
                     let
@@ -209,7 +211,7 @@ update msg model =
                                         Nothing ->
                                             emptyForm
                     in
-                    ( { model | connection = Success <| FormPage <| EventFormPage formModel }, Cmd.none )
+                    ( { model | page = FormPage <| EventFormPage formModel }, Cmd.none )
 
                 SwitchToPupilFormPage campaignId action ->
                     let
@@ -240,23 +242,18 @@ update msg model =
                                         Nothing ->
                                             emptyForm
                     in
-                    ( { model | connection = Success <| FormPage <| PupilFormPage formModel }, Cmd.none )
+                    ( { model | page = FormPage <| PupilFormPage formModel }, Cmd.none )
 
                 SwitchToCampaign campaignId ->
-                    ( { model | connection = Success <| CampaignPage campaignId }, Cmd.none )
+                    ( { model | page = CampaignPage campaignId }, Cmd.none )
 
                 SwitchToPupil pupil ->
-                    ( { model | connection = Success <| PupilPage pupil }, Cmd.none )
+                    ( { model | page = PupilPage pupil }, Cmd.none )
 
         FormMsg formMsg ->
-            case model.connection of
-                Success page ->
-                    case page of
-                        FormPage fp ->
-                            updateForm model formMsg fp |> Tuple.mapSecond (Cmd.map FormMsg)
-
-                        _ ->
-                            ( model, Cmd.none )
+            case model.page of
+                FormPage fp ->
+                    updateForm model formMsg fp |> Tuple.mapSecond (Cmd.map FormMsg)
 
                 _ ->
                     ( model, Cmd.none )
@@ -306,19 +303,20 @@ updateCampaignForm model msg formModel =
     in
     case effect of
         CampaignForm.None ->
-            ( { model | connection = Success <| FormPage <| CampaignFormPage updatedFormModel }, Cmd.none )
+            ( { model | page = FormPage <| CampaignFormPage updatedFormModel }, Cmd.none )
 
         CampaignForm.Loading innerCmd ->
             ( { model | connection = Loading }, innerCmd )
 
         CampaignForm.ClosedWithoutChange ->
-            ( { model | connection = Success <| Overview }, Cmd.none )
+            ( { model | page = Overview }, Cmd.none )
 
         CampaignForm.Done returnValue ->
             case returnValue of
                 CampaignForm.NewOrUpdated obj ->
                     ( { model
-                        | connection = Success <| Overview
+                        | connection = Success
+                        , page = Overview
                         , campaigns = model.campaigns |> insertOrUpdateInList obj
                       }
                     , Cmd.none
@@ -326,7 +324,8 @@ updateCampaignForm model msg formModel =
 
                 CampaignForm.Deleted objId ->
                     ( { model
-                        | connection = Success <| Overview
+                        | connection = Success
+                        , page = Overview
                         , campaigns = model.campaigns |> deleteFromList objId
                       }
                     , Cmd.none
@@ -344,13 +343,13 @@ updateDayForm model msg formModel =
     in
     case effect of
         DayForm.None ->
-            ( { model | connection = Success <| FormPage <| DayFormPage updatedFormModel }, Cmd.none )
+            ( { model | page = FormPage <| DayFormPage updatedFormModel }, Cmd.none )
 
         DayForm.Loading innerCmd ->
             ( { model | connection = Loading }, innerCmd )
 
         DayForm.ClosedWithoutChange ->
-            ( { model | connection = Success <| CampaignPage updatedFormModel.campaignId }, Cmd.none )
+            ( { model | page = CampaignPage updatedFormModel.campaignId }, Cmd.none )
 
         DayForm.Done returnValue ->
             case returnValue of
@@ -361,7 +360,8 @@ updateDayForm model msg formModel =
                             { campaign | days = campaign.days |> insertOrUpdateInList obj }
                     in
                     ( { model
-                        | connection = Success <| CampaignPage updatedFormModel.campaignId
+                        | connection = Success
+                        , page = CampaignPage updatedFormModel.campaignId
                         , campaigns = model.campaigns |> findCampaigns newOrEditObj updatedFormModel.campaignId
                       }
                     , Cmd.none
@@ -374,7 +374,8 @@ updateDayForm model msg formModel =
                             { campaign | days = campaign.days |> deleteFromList objId }
                     in
                     ( { model
-                        | connection = Success <| CampaignPage updatedFormModel.campaignId
+                        | connection = Success
+                        , page = CampaignPage updatedFormModel.campaignId
                         , campaigns = model.campaigns |> findCampaigns deleteObj updatedFormModel.campaignId
                       }
                     , Cmd.none
@@ -392,13 +393,13 @@ updateEventForm model msg formModel =
     in
     case effect of
         EventForm.None ->
-            ( { model | connection = Success <| FormPage <| EventFormPage updatedFormModel }, Cmd.none )
+            ( { model | page = FormPage <| EventFormPage updatedFormModel }, Cmd.none )
 
         EventForm.Loading innerCmd ->
             ( { model | connection = Loading }, innerCmd )
 
         EventForm.ClosedWithoutChange ->
-            ( { model | connection = Success <| CampaignPage updatedFormModel.campaignId }, Cmd.none )
+            ( { model | page = CampaignPage updatedFormModel.campaignId }, Cmd.none )
 
         EventForm.Done returnValue ->
             case returnValue of
@@ -409,7 +410,8 @@ updateEventForm model msg formModel =
                             { campaign | events = campaign.events |> insertOrUpdateInList obj }
                     in
                     ( { model
-                        | connection = Success <| CampaignPage updatedFormModel.campaignId
+                        | connection = Success
+                        , page = CampaignPage updatedFormModel.campaignId
                         , campaigns = model.campaigns |> findCampaigns newOrEditObj updatedFormModel.campaignId
                       }
                     , Cmd.none
@@ -422,7 +424,8 @@ updateEventForm model msg formModel =
                             { campaign | events = campaign.events |> deleteFromList objId }
                     in
                     ( { model
-                        | connection = Success <| CampaignPage updatedFormModel.campaignId
+                        | connection = Success
+                        , page = CampaignPage updatedFormModel.campaignId
                         , campaigns = model.campaigns |> findCampaigns deleteObj updatedFormModel.campaignId
                       }
                     , Cmd.none
@@ -440,13 +443,13 @@ updatePupilForm model msg formModel =
     in
     case effect of
         PupilForm.None ->
-            ( { model | connection = Success <| FormPage <| PupilFormPage updatedFormModel }, Cmd.none )
+            ( { model | page = FormPage <| PupilFormPage updatedFormModel }, Cmd.none )
 
         PupilForm.Loading innerCmd ->
             ( { model | connection = Loading }, innerCmd )
 
         PupilForm.ClosedWithoutChange ->
-            ( { model | connection = Success <| CampaignPage updatedFormModel.campaignId }, Cmd.none )
+            ( { model | page = CampaignPage updatedFormModel.campaignId }, Cmd.none )
 
         PupilForm.Done returnValue ->
             case returnValue of
@@ -457,7 +460,8 @@ updatePupilForm model msg formModel =
                             { campaign | pupils = campaign.pupils |> insertOrUpdateInList obj }
                     in
                     ( { model
-                        | connection = Success <| CampaignPage updatedFormModel.campaignId
+                        | connection = Success
+                        , page = CampaignPage updatedFormModel.campaignId
                         , campaigns = model.campaigns |> findCampaigns newOrEditObj updatedFormModel.campaignId
                       }
                     , Cmd.none
@@ -470,7 +474,8 @@ updatePupilForm model msg formModel =
                             { campaign | pupils = campaign.pupils |> deleteFromList objId }
                     in
                     ( { model
-                        | connection = Success <| CampaignPage updatedFormModel.campaignId
+                        | connection = Success
+                        , page = CampaignPage updatedFormModel.campaignId
                         , campaigns = model.campaigns |> findCampaigns deleteObj updatedFormModel.campaignId
                       }
                     , Cmd.none
@@ -488,7 +493,7 @@ findCampaigns innerChangeFn campaignId campaigns =
                 innerChangeFn one :: rest
 
             else
-                one :: rest |> findCampaigns innerChangeFn campaignId
+                one :: findCampaigns innerChangeFn campaignId rest
 
         [] ->
             []
@@ -502,7 +507,7 @@ insertOrUpdateInList obj objects =
                 obj :: rest
 
             else
-                one :: rest |> insertOrUpdateInList obj
+                one :: insertOrUpdateInList obj rest
 
         [] ->
             [ obj ]
@@ -516,7 +521,7 @@ deleteFromList objId objects =
                 rest
 
             else
-                one :: rest |> deleteFromList objId
+                one :: deleteFromList objId rest
 
         [] ->
             []
@@ -544,7 +549,7 @@ view model =
                     Failure f ->
                         [ text f ]
 
-                    Success p ->
+                    Success ->
                         let
                             overview =
                                 [ h1 [ classes "title is-3" ] [ text "Überblick über alle Kampagnen" ]
@@ -561,13 +566,17 @@ view model =
                                     )
                                 , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToCampaignFormPage CampaignForm.New ] [ text "Neue Kampagne" ]
                                 ]
+
+                            thisCampaignView : CampaignId -> List (Html Msg)
+                            thisCampaignView cId =
+                                model.campaigns |> getCampaign cId |> campaignView
                         in
-                        case p of
+                        case model.page of
                             Overview ->
                                 overview
 
                             CampaignPage campaignId ->
-                                model.campaigns |> getCampaign campaignId |> campaignView
+                                thisCampaignView campaignId
 
                             FormPage fp ->
                                 case fp of
@@ -575,15 +584,15 @@ view model =
                                         overview ++ [ CampaignForm.view formModel |> Html.map (CampaignFormMsg >> FormMsg) ]
 
                                     DayFormPage formModel ->
-                                        (model.campaigns |> getCampaign formModel.campaignId |> campaignView)
+                                        thisCampaignView formModel.campaignId
                                             ++ [ DayForm.view formModel |> Html.map (DayFormMsg >> FormMsg) ]
 
                                     EventFormPage formModel ->
-                                        (model.campaigns |> getCampaign formModel.campaignId |> campaignView)
+                                        thisCampaignView formModel.campaignId
                                             ++ [ EventForm.view formModel |> Html.map (EventFormMsg >> FormMsg) ]
 
                                     PupilFormPage formModel ->
-                                        (model.campaigns |> getCampaign formModel.campaignId |> campaignView)
+                                        thisCampaignView formModel.campaignId
                                             ++ [ PupilForm.view formModel |> Html.map (PupilFormMsg >> FormMsg) ]
 
                             PupilPage pup ->
