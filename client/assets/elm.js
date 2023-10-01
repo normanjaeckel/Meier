@@ -9592,7 +9592,7 @@ var $author$project$Main$update = F2(
 										campaignId,
 										objId,
 										function ($) {
-											return $.aA;
+											return $.ak;
 										},
 										model.a);
 									if (!_v7.$) {
@@ -9610,7 +9610,7 @@ var $author$project$Main$update = F2(
 										campaignId,
 										objId,
 										function ($) {
-											return $.aA;
+											return $.ak;
 										},
 										model.a);
 									if (!_v8.$) {

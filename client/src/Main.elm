@@ -165,7 +165,7 @@ update msg model =
                                     emptyForm
 
                                 DayForm.Edit objId ->
-                                    case model.campaigns |> getObjFromCampaign campaignId objId .events of
+                                    case model.campaigns |> getObjFromCampaign campaignId objId .days of
                                         Just obj ->
                                             { emptyForm | title = obj.title }
 
@@ -173,7 +173,7 @@ update msg model =
                                             emptyForm
 
                                 DayForm.Delete objId ->
-                                    case model.campaigns |> getObjFromCampaign campaignId objId .events of
+                                    case model.campaigns |> getObjFromCampaign campaignId objId .days of
                                         Just obj ->
                                             { emptyForm | title = obj.title }
 
