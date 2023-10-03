@@ -225,6 +225,9 @@ update msg model =
                                 PupilForm.New ->
                                     emptyForm
 
+                                PupilForm.MultiNew ->
+                                    emptyForm
+
                                 PupilForm.Edit objId ->
                                     case model.campaigns |> getObjFromCampaign campaignId objId .pupils of
                                         Just obj ->
@@ -452,11 +455,16 @@ updatePupilForm model msg formModel =
 
         PupilForm.Done returnValue ->
             case returnValue of
-                PupilForm.NewOrUpdated obj ->
+                PupilForm.NewOrUpdated listOfObjs ->
                     let
                         newOrEditObj : Campaign -> Campaign
                         newOrEditObj campaign =
-                            { campaign | pupils = campaign.pupils |> insertOrUpdateInList obj }
+                            let
+                                fn : Pupil -> List Pupil -> List Pupil
+                                fn pupil pupils =
+                                    pupils |> insertOrUpdateInList pupil
+                            in
+                            { campaign | pupils = listOfObjs |> List.foldl fn campaign.pupils }
                     in
                     ( { model
                         | connection = Success
@@ -641,7 +649,16 @@ campaignView c =
             , div [ class "block" ]
                 [ h2 [ classes "title is-5" ] [ text "Alle Schüler/innen" ]
                 , campaign.pupils |> pupilUl campaign
-                , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToPupilFormPage campaign.id PupilForm.New ] [ text "Neue Schüler/innen" ]
+                , div [ class "buttons" ]
+                    [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToPupilFormPage campaign.id PupilForm.New ]
+                        [ span [ class "icon" ] [ Html.node "ion-icon" [ name "add-circle-sharp" ] [] ]
+                        , span [] [ text "Neue Schüler/innen" ]
+                        ]
+                    , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToPupilFormPage campaign.id PupilForm.MultiNew ]
+                        [ span [ class "icon" ] [ Html.node "ion-icon" [ name "add-circle-sharp" ] [] ]
+                        , span [] [ text "Mehrere neue Schüler/innen" ]
+                        ]
+                    ]
                 ]
             , div [ class "block" ]
                 [ h2 [ classes "title is-5" ] [ text "Administration" ]

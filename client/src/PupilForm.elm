@@ -4,7 +4,7 @@ import Api.Mutation
 import Data
 import Graphql.Http
 import Graphql.OptionalArgument
-import Html exposing (Html, button, div, footer, form, header, input, label, p, section, text)
+import Html exposing (Html, button, div, footer, form, header, input, label, p, section, text, textarea)
 import Html.Attributes exposing (attribute, checked, class, placeholder, required, type_, value)
 import Html.Events exposing (onCheck, onClick, onInput, onSubmit)
 import Shared exposing (classes)
@@ -45,6 +45,7 @@ type Msg
     | SendForm Action
     | CloseForm
     | GotNew (Result (Graphql.Http.Error Obj) Obj)
+    | GotNewMulti (Result (Graphql.Http.Error (List Obj)) (List Obj))
     | GotUpdated (Result (Graphql.Http.Error Obj) Obj)
     | GotDelete ObjId (Result (Graphql.Http.Error Bool) Bool)
 
@@ -57,6 +58,7 @@ type FormMsg
 
 type Action
     = New
+    | MultiNew
     | Edit ObjId
     | Delete ObjId
 
@@ -70,7 +72,7 @@ type Effect
 
 
 type ReturnValue
-    = NewOrUpdated Obj
+    = NewOrUpdated (List Obj)
     | Deleted ObjId
 
 
@@ -116,6 +118,26 @@ update msg model =
                         )
                     )
 
+                MultiNew ->
+                    let
+                        listOfNames : List String
+                        listOfNames =
+                            [ "Anna", "Bert" ]
+                    in
+                    ( model
+                    , Loading <|
+                        (Api.Mutation.addPupilsOfClass
+                            (Api.Mutation.AddPupilsOfClassRequiredArguments
+                                model.campaignId
+                                model.class
+                                listOfNames
+                            )
+                            Data.pupilSelectionSet
+                            |> Graphql.Http.mutationRequest Shared.queryUrl
+                            |> Graphql.Http.send GotNewMulti
+                        )
+                    )
+
                 Edit objId ->
                     let
                         optionalArgs : Api.Mutation.UpdatePupilOptionalArguments -> Api.Mutation.UpdatePupilOptionalArguments
@@ -152,7 +174,15 @@ update msg model =
         GotNew res ->
             case res of
                 Ok obj ->
-                    ( model, Done <| NewOrUpdated obj )
+                    ( model, Done <| NewOrUpdated [ obj ] )
+
+                Err err ->
+                    ( model, Error (Shared.parseGraphqlError err) )
+
+        GotNewMulti res ->
+            case res of
+                Ok listOfObjs ->
+                    ( model, Done <| NewOrUpdated listOfObjs )
 
                 Err err ->
                     ( model, Error (Shared.parseGraphqlError err) )
@@ -160,7 +190,7 @@ update msg model =
         GotUpdated res ->
             case res of
                 Ok obj ->
-                    ( model, Done <| NewOrUpdated obj )
+                    ( model, Done <| NewOrUpdated [ obj ] )
 
                 Err err ->
                     ( model, Error (Shared.parseGraphqlError err) )
@@ -183,6 +213,9 @@ view model =
     case model.action of
         New ->
             viewNewAndEdit "Neue/n Schüler/in hinzufügen" model
+
+        MultiNew ->
+            viewMultiNew model
 
         Edit _ ->
             viewNewAndEdit "Schüler/in bearbeiten" model
@@ -257,6 +290,54 @@ formFields model =
             ]
         ]
     ]
+
+
+viewMultiNew : Model -> Html Msg
+viewMultiNew model =
+    div [ classes "modal is-active" ]
+        [ div [ class "modal-background", onClick CloseForm ] []
+        , div [ class "modal-card" ]
+            [ form [ onSubmit <| SendForm model.action ]
+                [ header [ class "modal-card-head" ]
+                    [ p [ class "modal-card-title" ] [ text "Neue Schüler/innen einer Klasse hinzufügen" ]
+                    , button [ class "delete", type_ "button", attribute "aria-label" "close", onClick CloseForm ] []
+                    ]
+                , section [ class "modal-card-body" ]
+                    [ div [ class "field" ]
+                        [ div [ class "control" ]
+                            [ input
+                                [ class "input"
+                                , type_ "text"
+                                , placeholder "Klasse"
+                                , attribute "aria-label" "Klasse"
+                                , required True
+                                , onInput <| Class >> FormMsg
+                                , value model.class
+                                ]
+                                []
+                            ]
+                        ]
+                    , div [ class "field" ]
+                        [ div [ class "control" ]
+                            [ textarea
+                                [ class "textarea"
+                                , placeholder "Namen"
+                                , attribute "aria-label" "Namen"
+                                , required True
+                                , onInput <| Name >> FormMsg
+                                , value model.name
+                                ]
+                                []
+                            ]
+                        ]
+                    ]
+                , footer [ class "modal-card-foot" ]
+                    [ button [ classes "button is-success", type_ "submit" ] [ text "Speichern" ]
+                    , button [ class "button", type_ "button", onClick CloseForm ] [ text "Abbrechen" ]
+                    ]
+                ]
+            ]
+        ]
 
 
 viewDelete : Model -> Html Msg
