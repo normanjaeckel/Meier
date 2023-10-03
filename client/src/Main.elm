@@ -48,6 +48,11 @@ init _ =
     )
 
 
+getCampaign : CampaignId -> List Campaign -> Maybe Campaign
+getCampaign campaignId campaigns =
+    campaigns |> List.filter (\c -> c.id == campaignId) |> List.head
+
+
 getObjFromCampaign : CampaignId -> a -> (Campaign -> List { b | id : a }) -> List Campaign -> Maybe { b | id : a }
 getObjFromCampaign campaignId objId getter campaigns =
     campaigns
@@ -133,7 +138,7 @@ update msg model =
                                     emptyForm
 
                                 CampaignForm.Edit objId ->
-                                    case model.campaigns |> List.filter (\c -> c.id == objId) |> List.head of
+                                    case model.campaigns |> getCampaign objId of
                                         Just obj ->
                                             { emptyForm | title = obj.title }
 
@@ -141,7 +146,7 @@ update msg model =
                                             emptyForm
 
                                 CampaignForm.Delete objId ->
-                                    case model.campaigns |> List.filter (\c -> c.id == objId) |> List.head of
+                                    case model.campaigns |> getCampaign objId of
                                         Just obj ->
                                             { emptyForm | title = obj.title }
 
@@ -188,11 +193,16 @@ update msg model =
                             let
                                 emptyForm : EventForm.Model
                                 emptyForm =
-                                    EventForm.init campaignId action
+                                    EventForm.init [] campaignId action
                             in
                             case action of
                                 EventForm.New ->
-                                    emptyForm
+                                    case model.campaigns |> getCampaign campaignId of
+                                        Just campaign ->
+                                            { emptyForm | allDays = campaign.days |> List.sortBy .title }
+
+                                        Nothing ->
+                                            emptyForm
 
                                 EventForm.Edit objId ->
                                     case model.campaigns |> getObjFromCampaign campaignId objId .events of
@@ -591,11 +601,6 @@ view model =
                 )
             ]
         ]
-
-
-getCampaign : CampaignId -> List Campaign -> Maybe Campaign
-getCampaign campaignId campaigns =
-    campaigns |> List.filter (\c -> c.id == campaignId) |> List.head
 
 
 pupilToStr : Pupil -> String

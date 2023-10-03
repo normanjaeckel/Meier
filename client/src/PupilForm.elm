@@ -282,7 +282,7 @@ formFields model =
         [ div [ class "control" ]
             [ label [ class "checkbox" ]
                 [ input
-                    [ class "mr-2"
+                    [ class "mr-1"
                     , type_ "checkbox"
                     , onCheck IsSpecial
                     , checked model.isSpecial

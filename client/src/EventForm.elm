@@ -4,9 +4,9 @@ import Api.Mutation
 import Data
 import Graphql.Http
 import Graphql.OptionalArgument
-import Html exposing (Html, button, div, footer, form, header, input, p, section, text)
-import Html.Attributes exposing (attribute, class, placeholder, required, type_, value)
-import Html.Events exposing (onClick, onInput, onSubmit)
+import Html exposing (Html, button, div, footer, form, header, input, label, p, section, text)
+import Html.Attributes exposing (attribute, checked, class, placeholder, required, type_, value)
+import Html.Events exposing (onCheck, onClick, onInput, onSubmit)
 import Shared exposing (classes)
 
 
@@ -26,14 +26,16 @@ type alias Model =
     { title : String
     , capacity : Int
     , maxSpecialPupils : Int
+    , selectedDays : List Data.DayId
+    , allDays : List Data.Day
     , campaignId : Data.CampaignId
     , action : Action
     }
 
 
-init : Data.CampaignId -> Action -> Model
-init campaignId action =
-    Model "" 12 2 campaignId action
+init : List Data.Day -> Data.CampaignId -> Action -> Model
+init allDays campaignId action =
+    Model "" 12 2 [] allDays campaignId action
 
 
 
@@ -53,6 +55,7 @@ type FormMsg
     = Title String
     | Capacity Int
     | MaxSpecialPupil Int
+    | Days (List Data.DayId)
 
 
 type Action
@@ -90,6 +93,9 @@ update msg model =
 
                         MaxSpecialPupil msp ->
                             { model | maxSpecialPupils = msp }
+
+                        Days selectedDays ->
+                            { model | selectedDays = selectedDays }
             in
             ( updatedModel, None )
 
@@ -99,7 +105,7 @@ update msg model =
                     let
                         optionalArgs : Api.Mutation.AddEventOptionalArguments -> Api.Mutation.AddEventOptionalArguments
                         optionalArgs args =
-                            args
+                            { args | dayIDs = Graphql.OptionalArgument.Present model.selectedDays }
                     in
                     ( model
                     , Loading <|
@@ -183,23 +189,75 @@ view : Model -> Html Msg
 view model =
     case model.action of
         New ->
-            viewNewAndEdit "Neues Angebot hinzufügen" model
+            viewNew model
 
         Edit _ ->
-            viewNewAndEdit "Angebot bearbeiten" model
+            viewEdit model
 
         Delete _ ->
             viewDelete model
 
 
-viewNewAndEdit : String -> Model -> Html Msg
-viewNewAndEdit headline model =
+viewNew : Model -> Html Msg
+viewNew model =
+    let
+        fn : Data.DayId -> Bool -> FormMsg
+        fn dId isChecked =
+            if isChecked then
+                dId :: model.selectedDays |> Days
+
+            else
+                model.selectedDays |> List.filter ((/=) dId) |> Days
+    in
     div [ classes "modal is-active" ]
         [ div [ class "modal-background", onClick CloseForm ] []
         , div [ class "modal-card" ]
             [ form [ onSubmit <| SendForm model.action ]
                 [ header [ class "modal-card-head" ]
-                    [ p [ class "modal-card-title" ] [ text headline ]
+                    [ p [ class "modal-card-title" ] [ text "Neues Angebot hinzufügen" ]
+                    , button [ class "delete", type_ "button", attribute "aria-label" "close", onClick CloseForm ] []
+                    ]
+                , section [ class "modal-card-body" ]
+                    ((formFields model
+                        ++ [ div [ class "field" ]
+                                [ div [ classes "control checkboxesInLine" ]
+                                    (model.allDays
+                                        |> List.map
+                                            (\d ->
+                                                label [ class "checkbox" ]
+                                                    [ input
+                                                        [ class "mr-1"
+                                                        , type_ "checkbox"
+                                                        , onCheck <| fn d.id
+                                                        , checked (model.selectedDays |> List.member d.id)
+                                                        ]
+                                                        []
+                                                    , text d.title
+                                                    ]
+                                            )
+                                    )
+                                ]
+                           ]
+                     )
+                        |> List.map (Html.map FormMsg)
+                    )
+                , footer [ class "modal-card-foot" ]
+                    [ button [ classes "button is-success", type_ "submit" ] [ text "Speichern" ]
+                    , button [ class "button", type_ "button", onClick CloseForm ] [ text "Abbrechen" ]
+                    ]
+                ]
+            ]
+        ]
+
+
+viewEdit : Model -> Html Msg
+viewEdit model =
+    div [ classes "modal is-active" ]
+        [ div [ class "modal-background", onClick CloseForm ] []
+        , div [ class "modal-card" ]
+            [ form [ onSubmit <| SendForm model.action ]
+                [ header [ class "modal-card-head" ]
+                    [ p [ class "modal-card-title" ] [ text "Angebot bearbeiten" ]
                     , button [ class "delete", type_ "button", attribute "aria-label" "close", onClick CloseForm ] []
                     ]
                 , section [ class "modal-card-body" ]
