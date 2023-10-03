@@ -240,6 +240,13 @@ func (m Model) Event(id int) (EventResolver, error) {
 
 	e := m.events[id]
 
+	var days []int
+	for dayID, day := range m.days {
+		if _, ok := day.event[id]; ok {
+			days = append(days, dayID)
+		}
+	}
+
 	return EventResolver{
 		m: m,
 
@@ -248,6 +255,7 @@ func (m Model) Event(id int) (EventResolver, error) {
 		Title:            e.title,
 		Capacity:         int32(e.capacity),
 		MaxSpecialPupils: int32(e.maxSpecialPupils),
+		DayIDs:           days,
 	}, nil
 }
 
