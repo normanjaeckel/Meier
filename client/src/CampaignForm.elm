@@ -1,21 +1,21 @@
-module PupilForm exposing (Action(..), Effect(..), Model, Msg, Obj, ObjId, ReturnValue(..), init, update, view)
+module CampaignForm exposing (Action(..), Effect(..), Model, Msg, Obj, ObjId, ReturnValue(..), init, update, view)
 
 import Api.Mutation
 import Data
 import Graphql.Http
 import Graphql.OptionalArgument
-import Html exposing (Html, button, div, footer, form, header, input, label, p, section, text)
-import Html.Attributes exposing (attribute, checked, class, placeholder, required, type_, value)
-import Html.Events exposing (onCheck, onClick, onInput, onSubmit)
+import Html exposing (Html, button, div, footer, form, header, input, p, section, text)
+import Html.Attributes exposing (attribute, class, placeholder, required, type_, value)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import Shared exposing (classes)
 
 
 type alias Obj =
-    Data.Pupil
+    Data.Campaign
 
 
 type alias ObjId =
-    Data.PupilId
+    Data.CampaignId
 
 
 
@@ -23,17 +23,15 @@ type alias ObjId =
 
 
 type alias Model =
-    { name : String
-    , class : String
-    , isSpecial : Bool
-    , campaignId : Data.CampaignId
+    { title : String
+    , numOfDays : Int
     , action : Action
     }
 
 
-init : Data.CampaignId -> Action -> Model
-init campaignId action =
-    Model "" "" False campaignId action
+init : Action -> Model
+init action =
+    Model "" 2 action
 
 
 
@@ -50,9 +48,8 @@ type Msg
 
 
 type FormMsg
-    = Name String
-    | Class String
-    | IsSpecial Bool
+    = Title String
+    | NumOfDays Int
 
 
 type Action
@@ -82,14 +79,11 @@ update msg model =
                 updatedModel : Model
                 updatedModel =
                     case formMsg of
-                        Name n ->
-                            { model | name = n }
+                        Title t ->
+                            { model | title = t }
 
-                        Class cls ->
-                            { model | class = cls }
-
-                        IsSpecial isp ->
-                            { model | isSpecial = isp }
+                        NumOfDays nod ->
+                            { model | numOfDays = nod }
             in
             ( updatedModel, None )
 
@@ -97,41 +91,32 @@ update msg model =
             case action of
                 New ->
                     let
-                        optionalArguments : Api.Mutation.AddPupilOptionalArguments -> Api.Mutation.AddPupilOptionalArguments
-                        optionalArguments args =
-                            { args | special = Graphql.OptionalArgument.Present model.isSpecial }
+                        dayList : List String
+                        dayList =
+                            List.range 1 model.numOfDays
+                                |> List.map (\i -> "Tag " ++ String.fromInt i)
+
+                        optionalArgs : Api.Mutation.AddCampaignOptionalArguments -> Api.Mutation.AddCampaignOptionalArguments
+                        optionalArgs args =
+                            { args | days = Graphql.OptionalArgument.Present dayList }
                     in
                     ( model
                     , Loading <|
-                        (Api.Mutation.addPupil
-                            optionalArguments
-                            (Api.Mutation.AddPupilRequiredArguments
-                                model.campaignId
-                                model.name
-                                model.class
-                            )
-                            Data.pupilSelectionSet
+                        (Api.Mutation.addCampaign
+                            optionalArgs
+                            (Api.Mutation.AddCampaignRequiredArguments model.title)
+                            Data.campaingSelectionSet
                             |> Graphql.Http.mutationRequest Shared.queryUrl
                             |> Graphql.Http.send GotNew
                         )
                     )
 
                 Edit objId ->
-                    let
-                        optionalArgs : Api.Mutation.UpdatePupilOptionalArguments -> Api.Mutation.UpdatePupilOptionalArguments
-                        optionalArgs args =
-                            { args
-                                | name = Graphql.OptionalArgument.Present model.name
-                                , class = Graphql.OptionalArgument.Present model.class
-                                , special = Graphql.OptionalArgument.Present model.isSpecial
-                            }
-                    in
                     ( model
                     , Loading <|
-                        (Api.Mutation.updatePupil
-                            optionalArgs
-                            (Api.Mutation.UpdatePupilRequiredArguments objId)
-                            Data.pupilSelectionSet
+                        (Api.Mutation.updateCampaign
+                            (Api.Mutation.UpdateCampaignRequiredArguments objId model.title)
+                            Data.campaingSelectionSet
                             |> Graphql.Http.mutationRequest Shared.queryUrl
                             |> Graphql.Http.send GotUpdated
                         )
@@ -140,7 +125,7 @@ update msg model =
                 Delete objId ->
                     ( model
                     , Loading <|
-                        (Api.Mutation.deletePupil (Api.Mutation.DeletePupilRequiredArguments objId)
+                        (Api.Mutation.deleteCampaign (Api.Mutation.DeleteCampaignRequiredArguments objId)
                             |> Graphql.Http.mutationRequest Shared.queryUrl
                             |> Graphql.Http.send (GotDelete objId)
                         )
@@ -182,10 +167,10 @@ view : Model -> Html Msg
 view model =
     case model.action of
         New ->
-            viewNewAndEdit "Neue/n Schüler/in hinzufügen" model
+            viewNewAndEdit "Neue Kampagne hinzufügen" model
 
         Edit _ ->
-            viewNewAndEdit "Schüler/in bearbeiten" model
+            viewNewAndEdit "Kampagne bearbeiten" model
 
         Delete _ ->
             viewDelete model
@@ -193,6 +178,16 @@ view model =
 
 viewNewAndEdit : String -> Model -> Html Msg
 viewNewAndEdit headline model =
+    let
+        withDays : Bool
+        withDays =
+            case model.action of
+                New ->
+                    True
+
+                _ ->
+                    False
+    in
     div [ classes "modal is-active" ]
         [ div [ class "modal-background", onClick CloseForm ] []
         , div [ class "modal-card" ]
@@ -202,7 +197,7 @@ viewNewAndEdit headline model =
                     , button [ class "delete", type_ "button", attribute "aria-label" "close", onClick CloseForm ] []
                     ]
                 , section [ class "modal-card-body" ]
-                    (formFields model |> List.map (Html.map FormMsg))
+                    (formFields model withDays |> List.map (Html.map FormMsg))
                 , footer [ class "modal-card-foot" ]
                     [ button [ classes "button is-success", type_ "submit" ] [ text "Speichern" ]
                     , button [ class "button", type_ "button", onClick CloseForm ] [ text "Abbrechen" ]
@@ -212,50 +207,46 @@ viewNewAndEdit headline model =
         ]
 
 
-formFields : Model -> List (Html FormMsg)
-formFields model =
+formFields : Model -> Bool -> List (Html FormMsg)
+formFields model withDays =
     [ div [ class "field" ]
         [ div [ class "control" ]
             [ input
                 [ class "input"
                 , type_ "text"
-                , placeholder "Name"
-                , attribute "aria-label" "Name"
+                , placeholder "Titel"
+                , attribute "aria-label" "Titel"
                 , required True
-                , onInput Name
-                , value model.name
+                , onInput Title
+                , value model.title
                 ]
                 []
             ]
         ]
-    , div [ class "field" ]
-        [ div [ class "control" ]
-            [ input
-                [ class "input"
-                , type_ "text"
-                , placeholder "Klasse"
-                , attribute "aria-label" "Klasse"
-                , required True
-                , onInput Class
-                , value model.class
-                ]
-                []
-            ]
-        ]
-    , div [ class "field" ]
-        [ div [ class "control" ]
-            [ label [ class "checkbox" ]
+    , if withDays then
+        let
+            labelNumOfDays : String
+            labelNumOfDays =
+                "Anzahl der Tage"
+        in
+        div [ class "field" ]
+            [ div [ class "control" ]
                 [ input
-                    [ class "mr-2"
-                    , type_ "checkbox"
-                    , onCheck IsSpecial
-                    , checked model.isSpecial
+                    [ class "input"
+                    , type_ "number"
+                    , attribute "aria-label" labelNumOfDays
+                    , Html.Attributes.min "1"
+                    , Html.Attributes.max "10"
+                    , onInput (String.toInt >> Maybe.withDefault 0 >> NumOfDays)
+                    , value <| String.fromInt model.numOfDays
                     ]
                     []
-                , text "Besondere/r Schüler/in"
                 ]
+            , p [ class "help" ] [ text labelNumOfDays ]
             ]
-        ]
+
+      else
+        div [] []
     ]
 
 
@@ -265,11 +256,11 @@ viewDelete model =
         [ div [ class "modal-background", onClick CloseForm ] []
         , div [ class "modal-card" ]
             [ header [ class "modal-card-head" ]
-                [ p [ class "modal-card-title" ] [ text "Schüler/in löschen" ]
+                [ p [ class "modal-card-title" ] [ text "Kampagne löschen" ]
                 , button [ class "delete", type_ "button", attribute "aria-label" "close", onClick CloseForm ] []
                 ]
             , section [ class "modal-card-body" ]
-                [ p [] [ text <| "Wollen Sie den Schüler bzw. die Schülerin " ++ model.name ++ " wirklich löschen?" ]
+                [ p [] [ text <| "Wollen Sie die Kampagne " ++ model.title ++ " wirklich löschen?" ]
                 ]
             , footer [ class "modal-card-foot" ]
                 [ button [ classes "button is-success", onClick <| SendForm model.action ] [ text "Löschen" ]

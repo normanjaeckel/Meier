@@ -1,4 +1,4 @@
-module EventForm exposing (Action(..), Effect(..), Model, Msg, init, update, view)
+module EventForm exposing (Action(..), Effect(..), Model, Msg, Obj, ObjId, ReturnValue(..), init, update, view)
 
 import Api.Mutation
 import Data
@@ -10,6 +10,14 @@ import Html.Events exposing (onClick, onInput, onSubmit)
 import Shared exposing (classes)
 
 
+type alias Obj =
+    Data.Event
+
+
+type alias ObjId =
+    Data.EventId
+
+
 
 -- MODEL
 
@@ -18,12 +26,14 @@ type alias Model =
     { title : String
     , capacity : Int
     , maxSpecialPupils : Int
+    , campaignId : Data.CampaignId
+    , action : Action
     }
 
 
-init : Model
-init =
-    Model "" 12 2
+init : Data.CampaignId -> Action -> Model
+init campaignId action =
+    Model "" 12 2 campaignId action
 
 
 
@@ -32,11 +42,11 @@ init =
 
 type Msg
     = FormMsg FormMsg
-    | SendEventForm Action
+    | SendForm Action
     | CloseForm
-    | GotNewEvent (Result (Graphql.Http.Error Data.Event) Data.Event)
-    | GotUpdatedEvent (Result (Graphql.Http.Error Data.Event) Data.Event)
-    | GotDeleteEvent Data.EventId (Result (Graphql.Http.Error Bool) Bool)
+    | GotNew (Result (Graphql.Http.Error Obj) Obj)
+    | GotUpdated (Result (Graphql.Http.Error Obj) Obj)
+    | GotDelete ObjId (Result (Graphql.Http.Error Bool) Bool)
 
 
 type FormMsg
@@ -47,19 +57,25 @@ type FormMsg
 
 type Action
     = New
-    | Edit Data.EventId
-    | Delete Data.Event
+    | Edit ObjId
+    | Delete ObjId
 
 
 type Effect
     = None
     | Loading (Cmd Msg)
-    | Done Data.Campaign
+    | ClosedWithoutChange
+    | Done ReturnValue
     | Error String
 
 
-update : Data.Campaign -> Msg -> Model -> ( Model, Effect )
-update campaign msg model =
+type ReturnValue
+    = NewOrUpdated Obj
+    | Deleted ObjId
+
+
+update : Msg -> Model -> ( Model, Effect )
+update msg model =
     case msg of
         FormMsg formMsg ->
             let
@@ -77,7 +93,7 @@ update campaign msg model =
             in
             ( updatedModel, None )
 
-        SendEventForm action ->
+        SendForm action ->
             case action of
                 New ->
                     let
@@ -90,18 +106,18 @@ update campaign msg model =
                         (Api.Mutation.addEvent
                             optionalArgs
                             (Api.Mutation.AddEventRequiredArguments
-                                campaign.id
+                                model.campaignId
                                 model.title
                                 model.capacity
                                 model.maxSpecialPupils
                             )
                             Data.eventSelectionSet
                             |> Graphql.Http.mutationRequest Shared.queryUrl
-                            |> Graphql.Http.send GotNewEvent
+                            |> Graphql.Http.send GotNew
                         )
                     )
 
-                Edit eventId ->
+                Edit objId ->
                     let
                         optionalArgs : Api.Mutation.UpdateEventOptionalArguments -> Api.Mutation.UpdateEventOptionalArguments
                         optionalArgs args =
@@ -115,73 +131,45 @@ update campaign msg model =
                     , Loading <|
                         (Api.Mutation.updateEvent
                             optionalArgs
-                            (Api.Mutation.UpdateEventRequiredArguments eventId)
+                            (Api.Mutation.UpdateEventRequiredArguments objId)
                             Data.eventSelectionSet
                             |> Graphql.Http.mutationRequest Shared.queryUrl
-                            |> Graphql.Http.send GotUpdatedEvent
+                            |> Graphql.Http.send GotUpdated
                         )
                     )
 
-                Delete event ->
+                Delete objId ->
                     ( model
                     , Loading <|
-                        (Api.Mutation.deleteEvent (Api.Mutation.DeleteEventRequiredArguments event.id)
+                        (Api.Mutation.deleteEvent (Api.Mutation.DeleteEventRequiredArguments objId)
                             |> Graphql.Http.mutationRequest Shared.queryUrl
-                            |> Graphql.Http.send (GotDeleteEvent event.id)
+                            |> Graphql.Http.send (GotDelete objId)
                         )
                     )
 
         CloseForm ->
-            ( model, Done campaign )
+            ( model, ClosedWithoutChange )
 
-        GotNewEvent res ->
+        GotNew res ->
             case res of
-                Ok event ->
-                    ( model, Done { campaign | events = campaign.events ++ [ event ] } )
+                Ok obj ->
+                    ( model, Done <| NewOrUpdated obj )
 
                 Err err ->
                     ( model, Error (Shared.parseGraphqlError err) )
 
-        GotUpdatedEvent res ->
+        GotUpdated res ->
             case res of
-                Ok eventFromServer ->
-                    let
-                        walkToUpdate : List Data.Event -> List Data.Event
-                        walkToUpdate events =
-                            case events of
-                                event :: rest ->
-                                    if event.id == eventFromServer.id then
-                                        eventFromServer :: rest
-
-                                    else
-                                        event :: walkToUpdate rest
-
-                                [] ->
-                                    []
-                    in
-                    ( model, Done { campaign | events = walkToUpdate campaign.events } )
+                Ok obj ->
+                    ( model, Done <| NewOrUpdated obj )
 
                 Err err ->
                     ( model, Error (Shared.parseGraphqlError err) )
 
-        GotDeleteEvent eventToBeDeletedId res ->
+        GotDelete objId res ->
             case res of
                 Ok _ ->
-                    let
-                        walkToUpdate : List Data.Event -> List Data.Event
-                        walkToUpdate events =
-                            case events of
-                                event :: rest ->
-                                    if event.id == eventToBeDeletedId then
-                                        rest
-
-                                    else
-                                        event :: walkToUpdate rest
-
-                                [] ->
-                                    []
-                    in
-                    ( model, Done { campaign | events = walkToUpdate campaign.events } )
+                    ( model, Done <| Deleted objId )
 
                 Err err ->
                     ( model, Error (Shared.parseGraphqlError err) )
@@ -191,34 +179,34 @@ update campaign msg model =
 -- VIEW
 
 
-view : Action -> Model -> Html Msg
-view action model =
-    case action of
+view : Model -> Html Msg
+view model =
+    case model.action of
         New ->
-            viewNewAndEdit "Neues Angebot hinzufügen" action model
+            viewNewAndEdit "Neues Angebot hinzufügen" model
 
         Edit _ ->
-            viewNewAndEdit "Angebot bearbeiten" action model
+            viewNewAndEdit "Angebot bearbeiten" model
 
-        Delete event ->
-            viewDelete event
+        Delete _ ->
+            viewDelete model
 
 
-viewNewAndEdit : String -> Action -> Model -> Html Msg
-viewNewAndEdit headline action model =
+viewNewAndEdit : String -> Model -> Html Msg
+viewNewAndEdit headline model =
     div [ classes "modal is-active" ]
         [ div [ class "modal-background", onClick CloseForm ] []
         , div [ class "modal-card" ]
-            [ form [ onSubmit <| SendEventForm action ]
+            [ form [ onSubmit <| SendForm model.action ]
                 [ header [ class "modal-card-head" ]
                     [ p [ class "modal-card-title" ] [ text headline ]
-                    , button [ class "delete", attribute "aria-label" "close", onClick CloseForm ] []
+                    , button [ class "delete", type_ "button", attribute "aria-label" "close", onClick CloseForm ] []
                     ]
                 , section [ class "modal-card-body" ]
                     (formFields model |> List.map (Html.map FormMsg))
                 , footer [ class "modal-card-foot" ]
                     [ button [ classes "button is-success", type_ "submit" ] [ text "Speichern" ]
-                    , button [ class "button", onClick CloseForm ] [ text "Abbrechen" ]
+                    , button [ class "button", type_ "button", onClick CloseForm ] [ text "Abbrechen" ]
                     ]
                 ]
             ]
@@ -283,8 +271,8 @@ formFields model =
     ]
 
 
-viewDelete : Data.Event -> Html Msg
-viewDelete event =
+viewDelete : Model -> Html Msg
+viewDelete model =
     div [ classes "modal is-active" ]
         [ div [ class "modal-background", onClick CloseForm ] []
         , div [ class "modal-card" ]
@@ -293,10 +281,10 @@ viewDelete event =
                 , button [ class "delete", type_ "button", attribute "aria-label" "close", onClick CloseForm ] []
                 ]
             , section [ class "modal-card-body" ]
-                [ p [] [ text <| "Wollen Sie das Angebot " ++ event.title ++ " wirklich löschen?" ]
+                [ p [] [ text <| "Wollen Sie das Angebot " ++ model.title ++ " wirklich löschen?" ]
                 ]
             , footer [ class "modal-card-foot" ]
-                [ button [ classes "button is-success", onClick <| SendEventForm (Delete event) ] [ text "Löschen" ]
+                [ button [ classes "button is-success", onClick <| SendForm model.action ] [ text "Löschen" ]
                 , button [ class "button", type_ "button", onClick CloseForm ] [ text "Abbrechen" ]
                 ]
             ]

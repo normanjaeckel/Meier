@@ -2,14 +2,14 @@ module Main exposing (main)
 
 import Api.Query
 import Browser
-import Data exposing (Campaign, Day, Event, Pupil)
+import CampaignForm
+import Data exposing (Campaign, CampaignId, Day, Event, Pupil)
 import DayForm
 import EventForm
 import Graphql.Http
 import Html exposing (Html, a, button, div, h1, h2, h3, li, main_, nav, p, section, span, text, ul)
 import Html.Attributes exposing (class, name, title)
 import Html.Events exposing (onClick)
-import NewCampaign
 import Platform.Cmd as Cmd
 import PupilForm
 import Shared exposing (classes, parseGraphqlError)
@@ -31,22 +31,16 @@ main =
 
 type alias Model =
     { connection : Connection
+    , page : Page
     , campaigns : List Campaign
-    , newCampaign : NewCampaign.Model
-    , dayForm : DayForm.Model
-    , eventForm : EventForm.Model
-    , pupilForm : PupilForm.Model
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { connection = Loading
+      , page = Overview
       , campaigns = []
-      , newCampaign = NewCampaign.init
-      , dayForm = DayForm.init
-      , eventForm = EventForm.init
-      , pupilForm = PupilForm.init
       }
     , Api.Query.campaignList Data.campaingSelectionSet
         |> Graphql.Http.queryRequest Shared.queryUrl
@@ -54,30 +48,32 @@ init _ =
     )
 
 
+getObjFromCampaign : CampaignId -> a -> (Campaign -> List { b | id : a }) -> List Campaign -> Maybe { b | id : a }
+getObjFromCampaign campaignId objId getter campaigns =
+    campaigns
+        |> List.filter (\c -> c.id == campaignId)
+        |> List.head
+        |> Maybe.andThen (\c -> getter c |> List.filter (\e -> e.id == objId) |> List.head)
+
+
 type Connection
     = Loading
     | Failure String
-    | Success Page
+    | Success
 
 
 type Page
     = Overview
-    | CampaignPage Campaign
-    | NewCampaignPage
+    | CampaignPage CampaignId
     | FormPage FormPage
     | PupilPage Pupil
 
 
 type FormPage
-    = NewDayPage Campaign
-    | EditDayPage Campaign Data.DayId
-    | DeleteDayPage Campaign Data.Day
-    | NewEventPage Campaign
-    | EditEventPage Campaign Data.EventId
-    | DeleteEventPage Campaign Data.Event
-    | NewPupilPage Campaign
-    | EditPupilPage Campaign Data.PupilId
-    | DeletePupilPage Campaign Data.Pupil
+    = CampaignFormPage CampaignForm.Model
+    | DayFormPage DayForm.Model
+    | EventFormPage EventForm.Model
+    | PupilFormPage PupilForm.Model
 
 
 
@@ -87,25 +83,23 @@ type FormPage
 type Msg
     = GotCampaignList (Result (Graphql.Http.Error (List Campaign)) (List Campaign))
     | SwitchPage SwitchTo
-    | NewCampaignMsg NewCampaign.Msg
-    | DayFormMsg Campaign DayForm.Msg
-    | EventFormMsg Campaign EventForm.Msg
-    | PupilFormMsg Campaign PupilForm.Msg
+    | FormMsg FormMsg
+
+
+type FormMsg
+    = CampaignFormMsg CampaignForm.Msg
+    | DayFormMsg DayForm.Msg
+    | EventFormMsg EventForm.Msg
+    | PupilFormMsg PupilForm.Msg
 
 
 type SwitchTo
     = SwitchToOverview
-    | SwitchToNewCampaign
-    | SwitchToCampaign Campaign
-    | SwitchToNewDay Campaign
-    | SwitchToEditDay Campaign Day
-    | SwitchToDeleteDay Campaign Day
-    | SwitchToNewEvent Campaign
-    | SwitchToEditEvent Campaign Event
-    | SwitchToDeleteEvent Campaign Event
-    | SwitchToNewPupil Campaign
-    | SwitchToEditPupil Campaign Pupil
-    | SwitchToDeletePupil Campaign Pupil
+    | SwitchToCampaign CampaignId
+    | SwitchToCampaignFormPage CampaignForm.Action
+    | SwitchToDayFormPage CampaignId DayForm.Action
+    | SwitchToEventFormPage CampaignId EventForm.Action
+    | SwitchToPupilFormPage CampaignId PupilForm.Action
     | SwitchToPupil Pupil
 
 
@@ -115,7 +109,7 @@ update msg model =
         GotCampaignList res ->
             case res of
                 Ok campaigns ->
-                    ( { model | connection = Success Overview, campaigns = campaigns }, Cmd.none )
+                    ( { model | connection = Success, campaigns = campaigns }, Cmd.none )
 
                 Err err ->
                     ( { model | connection = Failure (parseGraphqlError err) }, Cmd.none )
@@ -123,206 +117,413 @@ update msg model =
         SwitchPage s ->
             case s of
                 SwitchToOverview ->
-                    ( { model | connection = Success <| Overview }, Cmd.none )
+                    ( { model | page = Overview }, Cmd.none )
 
-                SwitchToNewCampaign ->
-                    ( { model | connection = Success NewCampaignPage }, Cmd.none )
-
-                SwitchToNewDay campaign ->
-                    ( { model | connection = Success <| FormPage <| NewDayPage campaign }, Cmd.none )
-
-                SwitchToEditDay campaign day ->
+                SwitchToCampaignFormPage action ->
                     let
-                        dayForm : DayForm.Model
-                        dayForm =
-                            DayForm.Model
-                                day.title
+                        formModel : CampaignForm.Model
+                        formModel =
+                            let
+                                emptyForm : CampaignForm.Model
+                                emptyForm =
+                                    CampaignForm.init action
+                            in
+                            case action of
+                                CampaignForm.New ->
+                                    emptyForm
+
+                                CampaignForm.Edit objId ->
+                                    case model.campaigns |> List.filter (\c -> c.id == objId) |> List.head of
+                                        Just obj ->
+                                            { emptyForm | title = obj.title }
+
+                                        Nothing ->
+                                            emptyForm
+
+                                CampaignForm.Delete objId ->
+                                    case model.campaigns |> List.filter (\c -> c.id == objId) |> List.head of
+                                        Just obj ->
+                                            { emptyForm | title = obj.title }
+
+                                        Nothing ->
+                                            emptyForm
                     in
-                    ( { model | connection = Success <| FormPage <| EditDayPage campaign day.id, dayForm = dayForm }, Cmd.none )
+                    ( { model | page = FormPage <| CampaignFormPage formModel }, Cmd.none )
 
-                SwitchToDeleteDay campaign day ->
-                    ( { model | connection = Success <| FormPage <| DeleteDayPage campaign day }, Cmd.none )
-
-                SwitchToNewEvent campaign ->
-                    ( { model | connection = Success <| FormPage <| NewEventPage campaign }, Cmd.none )
-
-                SwitchToEditEvent campaign event ->
+                SwitchToDayFormPage campaignId action ->
                     let
-                        eventForm : EventForm.Model
-                        eventForm =
-                            EventForm.Model
-                                event.title
-                                event.capacity
-                                event.maxSpecialPupils
+                        formModel : DayForm.Model
+                        formModel =
+                            let
+                                emptyForm : DayForm.Model
+                                emptyForm =
+                                    DayForm.init campaignId action
+                            in
+                            case action of
+                                DayForm.New ->
+                                    emptyForm
+
+                                DayForm.Edit objId ->
+                                    case model.campaigns |> getObjFromCampaign campaignId objId .days of
+                                        Just obj ->
+                                            { emptyForm | title = obj.title }
+
+                                        Nothing ->
+                                            emptyForm
+
+                                DayForm.Delete objId ->
+                                    case model.campaigns |> getObjFromCampaign campaignId objId .days of
+                                        Just obj ->
+                                            { emptyForm | title = obj.title }
+
+                                        Nothing ->
+                                            emptyForm
                     in
-                    ( { model | connection = Success <| FormPage <| EditEventPage campaign event.id, eventForm = eventForm }, Cmd.none )
+                    ( { model | page = FormPage <| DayFormPage formModel }, Cmd.none )
 
-                SwitchToDeleteEvent campaign event ->
-                    ( { model | connection = Success <| FormPage <| DeleteEventPage campaign event }, Cmd.none )
-
-                SwitchToNewPupil campaign ->
-                    ( { model | connection = Success <| FormPage <| NewPupilPage campaign }, Cmd.none )
-
-                SwitchToEditPupil campaign pupil ->
+                SwitchToEventFormPage campaignId action ->
                     let
-                        pupilForm : PupilForm.Model
-                        pupilForm =
-                            PupilForm.Model
-                                pupil.name
-                                pupil.class
-                                pupil.isSpecial
+                        formModel : EventForm.Model
+                        formModel =
+                            let
+                                emptyForm : EventForm.Model
+                                emptyForm =
+                                    EventForm.init campaignId action
+                            in
+                            case action of
+                                EventForm.New ->
+                                    emptyForm
+
+                                EventForm.Edit objId ->
+                                    case model.campaigns |> getObjFromCampaign campaignId objId .events of
+                                        Just obj ->
+                                            { emptyForm | title = obj.title, capacity = obj.capacity, maxSpecialPupils = obj.maxSpecialPupils }
+
+                                        Nothing ->
+                                            emptyForm
+
+                                EventForm.Delete objId ->
+                                    case model.campaigns |> getObjFromCampaign campaignId objId .events of
+                                        Just obj ->
+                                            { emptyForm | title = obj.title }
+
+                                        Nothing ->
+                                            emptyForm
                     in
-                    ( { model | connection = Success <| FormPage <| EditPupilPage campaign pupil.id, pupilForm = pupilForm }, Cmd.none )
+                    ( { model | page = FormPage <| EventFormPage formModel }, Cmd.none )
 
-                SwitchToDeletePupil campaign pupil ->
-                    ( { model | connection = Success <| FormPage <| DeletePupilPage campaign pupil }, Cmd.none )
+                SwitchToPupilFormPage campaignId action ->
+                    let
+                        formModel : PupilForm.Model
+                        formModel =
+                            let
+                                emptyForm : PupilForm.Model
+                                emptyForm =
+                                    PupilForm.init campaignId action
+                            in
+                            case action of
+                                PupilForm.New ->
+                                    emptyForm
 
-                SwitchToCampaign campaign ->
-                    ( { model | connection = Success <| CampaignPage campaign }, Cmd.none )
+                                PupilForm.Edit objId ->
+                                    case model.campaigns |> getObjFromCampaign campaignId objId .pupils of
+                                        Just obj ->
+                                            { emptyForm | name = obj.name, class = obj.class, isSpecial = obj.isSpecial }
+
+                                        Nothing ->
+                                            emptyForm
+
+                                PupilForm.Delete objId ->
+                                    case model.campaigns |> getObjFromCampaign campaignId objId .pupils of
+                                        Just obj ->
+                                            { emptyForm | name = obj.name }
+
+                                        Nothing ->
+                                            emptyForm
+                    in
+                    ( { model | page = FormPage <| PupilFormPage formModel }, Cmd.none )
+
+                SwitchToCampaign campaignId ->
+                    ( { model | page = CampaignPage campaignId }, Cmd.none )
 
                 SwitchToPupil pupil ->
-                    ( { model | connection = Success <| PupilPage pupil }, Cmd.none )
+                    ( { model | page = PupilPage pupil }, Cmd.none )
 
-        NewCampaignMsg innerMsg ->
-            let
-                ( updatedModel, effect ) =
-                    NewCampaign.update innerMsg model.newCampaign
-            in
-            case effect of
-                NewCampaign.None ->
-                    ( { model | newCampaign = updatedModel }, Cmd.none )
+        FormMsg formMsg ->
+            case model.page of
+                FormPage fp ->
+                    updateForm model formMsg fp |> Tuple.mapSecond (Cmd.map FormMsg)
 
-                NewCampaign.Loading innerCmd ->
-                    ( { model | connection = Loading }, innerCmd |> Cmd.map NewCampaignMsg )
+                _ ->
+                    ( model, Cmd.none )
 
-                NewCampaign.Done c ->
+
+updateForm : Model -> FormMsg -> FormPage -> ( Model, Cmd FormMsg )
+updateForm model msg formPage =
+    case formPage of
+        CampaignFormPage formModel ->
+            case msg of
+                CampaignFormMsg innerMsg ->
+                    updateCampaignForm model innerMsg formModel |> Tuple.mapSecond (Cmd.map CampaignFormMsg)
+
+                _ ->
+                    ( model, Cmd.none )
+
+        DayFormPage formModel ->
+            case msg of
+                DayFormMsg innerMsg ->
+                    updateDayForm model innerMsg formModel |> Tuple.mapSecond (Cmd.map DayFormMsg)
+
+                _ ->
+                    ( model, Cmd.none )
+
+        EventFormPage formModel ->
+            case msg of
+                EventFormMsg innerMsg ->
+                    updateEventForm model innerMsg formModel |> Tuple.mapSecond (Cmd.map EventFormMsg)
+
+                _ ->
+                    ( model, Cmd.none )
+
+        PupilFormPage formModel ->
+            case msg of
+                PupilFormMsg innerMsg ->
+                    updatePupilForm model innerMsg formModel |> Tuple.mapSecond (Cmd.map PupilFormMsg)
+
+                _ ->
+                    ( model, Cmd.none )
+
+
+updateCampaignForm : Model -> CampaignForm.Msg -> CampaignForm.Model -> ( Model, Cmd CampaignForm.Msg )
+updateCampaignForm model msg formModel =
+    let
+        ( updatedFormModel, effect ) =
+            CampaignForm.update msg formModel
+    in
+    case effect of
+        CampaignForm.None ->
+            ( { model | page = FormPage <| CampaignFormPage updatedFormModel }, Cmd.none )
+
+        CampaignForm.Loading innerCmd ->
+            ( { model | connection = Loading }, innerCmd )
+
+        CampaignForm.ClosedWithoutChange ->
+            ( { model | page = Overview }, Cmd.none )
+
+        CampaignForm.Done returnValue ->
+            case returnValue of
+                CampaignForm.NewOrUpdated obj ->
                     ( { model
-                        | connection = Success <| CampaignPage c
-                        , campaigns = model.campaigns ++ [ c ]
-                        , newCampaign = NewCampaign.init
+                        | connection = Success
+                        , page = CampaignPage obj.id
+                        , campaigns = model.campaigns |> insertOrUpdateInList obj
                       }
                     , Cmd.none
                     )
 
-                NewCampaign.Error err ->
-                    ( { model | connection = Failure err }, Cmd.none )
+                CampaignForm.Deleted objId ->
+                    ( { model
+                        | connection = Success
+                        , page = Overview
+                        , campaigns = model.campaigns |> deleteFromList objId
+                      }
+                    , Cmd.none
+                    )
 
-        DayFormMsg campaign innerMsg ->
-            let
-                ( updatedModel, effect ) =
-                    DayForm.update campaign innerMsg model.dayForm
-            in
-            case effect of
-                DayForm.None ->
-                    ( { model | dayForm = updatedModel }, Cmd.none )
+        CampaignForm.Error err ->
+            ( { model | connection = Failure err }, Cmd.none )
 
-                DayForm.Loading innerCmd ->
-                    ( { model | connection = Loading }, innerCmd |> Cmd.map (DayFormMsg campaign) )
 
-                DayForm.Done updatedCamp ->
+updateDayForm : Model -> DayForm.Msg -> DayForm.Model -> ( Model, Cmd DayForm.Msg )
+updateDayForm model msg formModel =
+    let
+        ( updatedFormModel, effect ) =
+            DayForm.update msg formModel
+    in
+    case effect of
+        DayForm.None ->
+            ( { model | page = FormPage <| DayFormPage updatedFormModel }, Cmd.none )
+
+        DayForm.Loading innerCmd ->
+            ( { model | connection = Loading }, innerCmd )
+
+        DayForm.ClosedWithoutChange ->
+            ( { model | page = CampaignPage updatedFormModel.campaignId }, Cmd.none )
+
+        DayForm.Done returnValue ->
+            case returnValue of
+                DayForm.NewOrUpdated obj ->
                     let
-                        newCampaignList : List Campaign
-                        newCampaignList =
-                            -- TODO: use recursion here
-                            model.campaigns
-                                |> List.foldr
-                                    (\camp acc ->
-                                        if camp.id == updatedCamp.id then
-                                            updatedCamp :: acc
-
-                                        else
-                                            camp :: acc
-                                    )
-                                    []
+                        newOrEditObj : Campaign -> Campaign
+                        newOrEditObj campaign =
+                            { campaign | days = campaign.days |> insertOrUpdateInList obj }
                     in
                     ( { model
-                        | connection = Success <| CampaignPage updatedCamp
-                        , campaigns = newCampaignList
-                        , dayForm = DayForm.init
+                        | connection = Success
+                        , page = CampaignPage updatedFormModel.campaignId
+                        , campaigns = model.campaigns |> findCampaigns newOrEditObj updatedFormModel.campaignId
                       }
                     , Cmd.none
                     )
 
-                DayForm.Error err ->
-                    ( { model | connection = Failure err }, Cmd.none )
-
-        EventFormMsg campaign innerMsg ->
-            let
-                ( updatedModel, effect ) =
-                    EventForm.update campaign innerMsg model.eventForm
-            in
-            case effect of
-                EventForm.None ->
-                    ( { model | eventForm = updatedModel }, Cmd.none )
-
-                EventForm.Loading innerCmd ->
-                    ( { model | connection = Loading }, innerCmd |> Cmd.map (EventFormMsg campaign) )
-
-                EventForm.Done updatedCamp ->
+                DayForm.Deleted objId ->
                     let
-                        newCampaignList : List Campaign
-                        newCampaignList =
-                            -- TODO: use recursion here
-                            model.campaigns
-                                |> List.foldr
-                                    (\camp acc ->
-                                        if camp.id == updatedCamp.id then
-                                            updatedCamp :: acc
-
-                                        else
-                                            camp :: acc
-                                    )
-                                    []
+                        deleteObj : Campaign -> Campaign
+                        deleteObj campaign =
+                            { campaign | days = campaign.days |> deleteFromList objId }
                     in
                     ( { model
-                        | connection = Success <| CampaignPage updatedCamp
-                        , campaigns = newCampaignList
-                        , eventForm = EventForm.init
+                        | connection = Success
+                        , page = CampaignPage updatedFormModel.campaignId
+                        , campaigns = model.campaigns |> findCampaigns deleteObj updatedFormModel.campaignId
                       }
                     , Cmd.none
                     )
 
-                EventForm.Error err ->
-                    ( { model | connection = Failure err }, Cmd.none )
+        DayForm.Error err ->
+            ( { model | connection = Failure err }, Cmd.none )
 
-        PupilFormMsg campaign innerMsg ->
-            let
-                ( updatedModel, effect ) =
-                    PupilForm.update campaign innerMsg model.pupilForm
-            in
-            case effect of
-                PupilForm.None ->
-                    ( { model | pupilForm = updatedModel }, Cmd.none )
 
-                PupilForm.Loading innerCmd ->
-                    ( { model | connection = Loading }, innerCmd |> Cmd.map (PupilFormMsg campaign) )
+updateEventForm : Model -> EventForm.Msg -> EventForm.Model -> ( Model, Cmd EventForm.Msg )
+updateEventForm model msg formModel =
+    let
+        ( updatedFormModel, effect ) =
+            EventForm.update msg formModel
+    in
+    case effect of
+        EventForm.None ->
+            ( { model | page = FormPage <| EventFormPage updatedFormModel }, Cmd.none )
 
-                PupilForm.Done updatedCamp ->
+        EventForm.Loading innerCmd ->
+            ( { model | connection = Loading }, innerCmd )
+
+        EventForm.ClosedWithoutChange ->
+            ( { model | page = CampaignPage updatedFormModel.campaignId }, Cmd.none )
+
+        EventForm.Done returnValue ->
+            case returnValue of
+                EventForm.NewOrUpdated obj ->
                     let
-                        newCampaignList : List Campaign
-                        newCampaignList =
-                            -- TODO: use recursion here and reuse fn from above
-                            model.campaigns
-                                |> List.foldr
-                                    (\camp acc ->
-                                        if camp.id == updatedCamp.id then
-                                            updatedCamp :: acc
-
-                                        else
-                                            camp :: acc
-                                    )
-                                    []
+                        newOrEditObj : Campaign -> Campaign
+                        newOrEditObj campaign =
+                            { campaign | events = campaign.events |> insertOrUpdateInList obj }
                     in
                     ( { model
-                        | connection = Success <| CampaignPage updatedCamp
-                        , campaigns = newCampaignList
-                        , pupilForm = PupilForm.init
+                        | connection = Success
+                        , page = CampaignPage updatedFormModel.campaignId
+                        , campaigns = model.campaigns |> findCampaigns newOrEditObj updatedFormModel.campaignId
                       }
                     , Cmd.none
                     )
 
-                PupilForm.Error err ->
-                    ( { model | connection = Failure err }, Cmd.none )
+                EventForm.Deleted objId ->
+                    let
+                        deleteObj : Campaign -> Campaign
+                        deleteObj campaign =
+                            { campaign | events = campaign.events |> deleteFromList objId }
+                    in
+                    ( { model
+                        | connection = Success
+                        , page = CampaignPage updatedFormModel.campaignId
+                        , campaigns = model.campaigns |> findCampaigns deleteObj updatedFormModel.campaignId
+                      }
+                    , Cmd.none
+                    )
+
+        EventForm.Error err ->
+            ( { model | connection = Failure err }, Cmd.none )
+
+
+updatePupilForm : Model -> PupilForm.Msg -> PupilForm.Model -> ( Model, Cmd PupilForm.Msg )
+updatePupilForm model msg formModel =
+    let
+        ( updatedFormModel, effect ) =
+            PupilForm.update msg formModel
+    in
+    case effect of
+        PupilForm.None ->
+            ( { model | page = FormPage <| PupilFormPage updatedFormModel }, Cmd.none )
+
+        PupilForm.Loading innerCmd ->
+            ( { model | connection = Loading }, innerCmd )
+
+        PupilForm.ClosedWithoutChange ->
+            ( { model | page = CampaignPage updatedFormModel.campaignId }, Cmd.none )
+
+        PupilForm.Done returnValue ->
+            case returnValue of
+                PupilForm.NewOrUpdated obj ->
+                    let
+                        newOrEditObj : Campaign -> Campaign
+                        newOrEditObj campaign =
+                            { campaign | pupils = campaign.pupils |> insertOrUpdateInList obj }
+                    in
+                    ( { model
+                        | connection = Success
+                        , page = CampaignPage updatedFormModel.campaignId
+                        , campaigns = model.campaigns |> findCampaigns newOrEditObj updatedFormModel.campaignId
+                      }
+                    , Cmd.none
+                    )
+
+                PupilForm.Deleted objId ->
+                    let
+                        deleteObj : Campaign -> Campaign
+                        deleteObj campaign =
+                            { campaign | pupils = campaign.pupils |> deleteFromList objId }
+                    in
+                    ( { model
+                        | connection = Success
+                        , page = CampaignPage updatedFormModel.campaignId
+                        , campaigns = model.campaigns |> findCampaigns deleteObj updatedFormModel.campaignId
+                      }
+                    , Cmd.none
+                    )
+
+        PupilForm.Error err ->
+            ( { model | connection = Failure err }, Cmd.none )
+
+
+findCampaigns : (Campaign -> Campaign) -> CampaignId -> List Campaign -> List Campaign
+findCampaigns innerChangeFn campaignId campaigns =
+    case campaigns of
+        one :: rest ->
+            if one.id == campaignId then
+                innerChangeFn one :: rest
+
+            else
+                one :: findCampaigns innerChangeFn campaignId rest
+
+        [] ->
+            []
+
+
+insertOrUpdateInList : { a | id : b } -> List { a | id : b } -> List { a | id : b }
+insertOrUpdateInList obj objects =
+    case objects of
+        one :: rest ->
+            if one.id == obj.id then
+                obj :: rest
+
+            else
+                one :: insertOrUpdateInList obj rest
+
+        [] ->
+            [ obj ]
+
+
+deleteFromList : b -> List { a | id : b } -> List { a | id : b }
+deleteFromList objId objects =
+    case objects of
+        one :: rest ->
+            if one.id == objId then
+                rest
+
+            else
+                one :: deleteFromList objId rest
+
+        [] ->
+            []
 
 
 subscriptions : Model -> Sub Msg
@@ -347,9 +548,10 @@ view model =
                     Failure f ->
                         [ text f ]
 
-                    Success p ->
-                        case p of
-                            Overview ->
+                    Success ->
+                        let
+                            overview : List (Html Msg)
+                            overview =
                                 [ h1 [ classes "title is-3" ] [ text "Überblick über alle Kampagnen" ]
                                 , div [ class "buttons" ]
                                     (model.campaigns
@@ -357,54 +559,52 @@ view model =
                                             (\c ->
                                                 button
                                                     [ class "button"
-                                                    , onClick <| SwitchPage <| SwitchToCampaign c
+                                                    , onClick <| SwitchPage <| SwitchToCampaign c.id
                                                     ]
                                                     [ text c.title ]
                                             )
                                     )
-                                , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewCampaign ] [ text "Neue Kampagne" ]
+                                , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToCampaignFormPage CampaignForm.New ] [ text "Neue Kampagne" ]
                                 ]
 
-                            CampaignPage c ->
-                                campaignView c
+                            thisCampaignView : CampaignId -> List (Html Msg)
+                            thisCampaignView cId =
+                                model.campaigns |> getCampaign cId |> campaignView
+                        in
+                        case model.page of
+                            Overview ->
+                                overview
 
-                            NewCampaignPage ->
-                                NewCampaign.view model.newCampaign |> List.map (Html.map NewCampaignMsg)
+                            CampaignPage campaignId ->
+                                thisCampaignView campaignId
 
                             FormPage fp ->
                                 case fp of
-                                    NewDayPage c ->
-                                        campaignView c ++ [ DayForm.view DayForm.New model.dayForm |> Html.map (DayFormMsg c) ]
+                                    CampaignFormPage formModel ->
+                                        overview ++ [ CampaignForm.view formModel |> Html.map (CampaignFormMsg >> FormMsg) ]
 
-                                    EditDayPage c dayId ->
-                                        campaignView c ++ [ DayForm.view (DayForm.Edit dayId) model.dayForm |> Html.map (DayFormMsg c) ]
+                                    DayFormPage formModel ->
+                                        thisCampaignView formModel.campaignId
+                                            ++ [ DayForm.view formModel |> Html.map (DayFormMsg >> FormMsg) ]
 
-                                    DeleteDayPage c day ->
-                                        campaignView c ++ [ DayForm.view (DayForm.Delete day) model.dayForm |> Html.map (DayFormMsg c) ]
+                                    EventFormPage formModel ->
+                                        thisCampaignView formModel.campaignId
+                                            ++ [ EventForm.view formModel |> Html.map (EventFormMsg >> FormMsg) ]
 
-                                    NewEventPage c ->
-                                        campaignView c ++ [ EventForm.view EventForm.New model.eventForm |> Html.map (EventFormMsg c) ]
-
-                                    EditEventPage c eventId ->
-                                        campaignView c ++ [ EventForm.view (EventForm.Edit eventId) model.eventForm |> Html.map (EventFormMsg c) ]
-
-                                    DeleteEventPage c event ->
-                                        campaignView c ++ [ EventForm.view (EventForm.Delete event) model.eventForm |> Html.map (EventFormMsg c) ]
-
-                                    NewPupilPage c ->
-                                        campaignView c ++ [ PupilForm.view PupilForm.New model.pupilForm |> Html.map (PupilFormMsg c) ]
-
-                                    EditPupilPage c pupilId ->
-                                        campaignView c ++ [ PupilForm.view (PupilForm.Edit pupilId) model.pupilForm |> Html.map (PupilFormMsg c) ]
-
-                                    DeletePupilPage c pupil ->
-                                        campaignView c ++ [ PupilForm.view (PupilForm.Delete pupil) model.pupilForm |> Html.map (PupilFormMsg c) ]
+                                    PupilFormPage formModel ->
+                                        thisCampaignView formModel.campaignId
+                                            ++ [ PupilForm.view formModel |> Html.map (PupilFormMsg >> FormMsg) ]
 
                             PupilPage pup ->
                                 pupilView pup
                 )
             ]
         ]
+
+
+getCampaign : CampaignId -> List Campaign -> Maybe Campaign
+getCampaign campaignId campaigns =
+    campaigns |> List.filter (\c -> c.id == campaignId) |> List.head
 
 
 pupilToStr : Pupil -> String
@@ -421,24 +621,43 @@ navbar =
         ]
 
 
-campaignView : Campaign -> List (Html Msg)
-campaignView campaign =
-    [ h1 [ classes "title is-3" ] [ text campaign.title ]
-    , div [ class "block" ]
-        ((campaign.days |> List.map (dayView campaign))
-            ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewDay campaign ] [ text "Neuer Tag" ] ]
-        )
-    , div [ class "block" ]
-        (h2 [ classes "title is-5" ] [ text "Alle Angebote" ]
-            :: (campaign.events |> List.map (eventView campaign))
-            ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewEvent campaign ] [ text "Neues Angebot" ] ]
-        )
-    , div [ class "block" ]
-        [ h2 [ classes "title is-5" ] [ text "Alle Schüler/innen" ]
-        , campaign.pupils |> pupilUl campaign
-        , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToNewPupil campaign ] [ text "Neue Schüler/innen" ]
-        ]
-    ]
+campaignView : Maybe Campaign -> List (Html Msg)
+campaignView c =
+    case c of
+        Nothing ->
+            []
+
+        Just campaign ->
+            [ h1 [ classes "title is-3" ] [ text campaign.title ]
+            , div [ class "block" ]
+                ((campaign.days |> List.map (dayView campaign))
+                    ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToDayFormPage campaign.id DayForm.New ] [ text "Neuer Tag" ] ]
+                )
+            , div [ class "block" ]
+                (h2 [ classes "title is-5" ] [ text "Alle Angebote" ]
+                    :: (campaign.events |> List.map (eventView campaign))
+                    ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToEventFormPage campaign.id EventForm.New ] [ text "Neues Angebot" ] ]
+                )
+            , div [ class "block" ]
+                [ h2 [ classes "title is-5" ] [ text "Alle Schüler/innen" ]
+                , campaign.pupils |> pupilUl campaign
+                , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToPupilFormPage campaign.id PupilForm.New ] [ text "Neue Schüler/innen" ]
+                ]
+            , div [ class "block" ]
+                [ h2 [ classes "title is-5" ] [ text "Administration" ]
+                , div [ class "buttons" ]
+                    [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToCampaignFormPage (CampaignForm.Edit campaign.id) ]
+                        [ span [ class "icon" ] [ Html.node "ion-icon" [ name "create-sharp" ] [] ]
+                        , span [] [ text "Kampagne bearbeiten" ]
+                        ]
+                    , button [ classes "button is-danger", onClick <| SwitchPage <| SwitchToCampaignFormPage (CampaignForm.Delete campaign.id) ]
+                        [ span [ class "icon" ] [ Html.node "ion-icon" [ name "trash-sharp" ] [] ]
+                        , span []
+                            [ text "Kampagne löschen" ]
+                        ]
+                    ]
+                ]
+            ]
 
 
 dayView : Campaign -> Day -> Html Msg
@@ -466,12 +685,12 @@ dayView campaign day =
         [ div [ classes "field is-grouped is-grouped-multiline" ]
             [ div [ class "control" ]
                 (h2 [ classes "title is-5" ] [ text day.title ] :: events ++ unassignedPupils)
-            , a [ title "Bearbeiten", onClick <| SwitchPage <| SwitchToEditDay campaign day ]
+            , a [ title "Bearbeiten", onClick <| SwitchPage <| SwitchToDayFormPage campaign.id (DayForm.Edit day.id) ]
                 [ span [ class "icon" ]
                     [ Html.node "ion-icon" [ name "create-outline" ] []
                     ]
                 ]
-            , a [ title "Löschen", onClick <| SwitchPage <| SwitchToDeleteDay campaign day ]
+            , a [ title "Löschen", onClick <| SwitchPage <| SwitchToDayFormPage campaign.id (DayForm.Delete day.id) ]
                 [ span [ class "icon" ]
                     [ Html.node "ion-icon" [ name "trash-outline" ] []
                     ]
@@ -499,12 +718,12 @@ eventView campaign event =
                     , span [ classes "tag is-primary" ] [ text <| String.fromInt event.maxSpecialPupils ]
                     ]
                 ]
-            , a [ title "Bearbeiten", onClick <| SwitchPage <| SwitchToEditEvent campaign event ]
+            , a [ title "Bearbeiten", onClick <| SwitchPage <| SwitchToEventFormPage campaign.id (EventForm.Edit event.id) ]
                 [ span [ class "icon" ]
                     [ Html.node "ion-icon" [ name "create-outline" ] []
                     ]
                 ]
-            , a [ title "Löschen", onClick <| SwitchPage <| SwitchToDeleteEvent campaign event ]
+            , a [ title "Löschen", onClick <| SwitchPage <| SwitchToEventFormPage campaign.id (EventForm.Delete event.id) ]
                 [ span [ class "icon" ]
                     [ Html.node "ion-icon" [ name "trash-outline" ] []
                     ]
@@ -514,20 +733,20 @@ eventView campaign event =
 
 
 pupilUl : Campaign -> List Pupil -> Html Msg
-pupilUl campaign pupList =
+pupilUl campaign pupils =
     div [ class "block" ]
         [ ul []
-            (pupList
+            (pupils
                 |> List.map
-                    (\pup ->
+                    (\pupil ->
                         li []
-                            [ a [ onClick <| SwitchPage <| SwitchToPupil pup ] [ text <| pupilToStr pup ]
-                            , a [ title "Bearbeiten", onClick <| SwitchPage <| SwitchToEditPupil campaign pup ]
+                            [ a [ onClick <| SwitchPage <| SwitchToPupil pupil ] [ text <| pupilToStr pupil ]
+                            , a [ title "Bearbeiten", onClick <| SwitchPage <| SwitchToPupilFormPage campaign.id (PupilForm.Edit pupil.id) ]
                                 [ span [ class "icon" ]
                                     [ Html.node "ion-icon" [ name "create-outline" ] []
                                     ]
                                 ]
-                            , a [ title "Löschen", onClick <| SwitchPage <| SwitchToDeletePupil campaign pup ]
+                            , a [ title "Löschen", onClick <| SwitchPage <| SwitchToPupilFormPage campaign.id (PupilForm.Delete pupil.id) ]
                                 [ span [ class "icon" ]
                                     [ Html.node "ion-icon" [ name "trash-outline" ] []
                                     ]
