@@ -558,30 +558,13 @@ view model =
 
                     Success ->
                         let
-                            overview : List (Html Msg)
-                            overview =
-                                [ h1 [ classes "title is-3" ] [ text "Überblick über alle Kampagnen" ]
-                                , div [ class "buttons" ]
-                                    (model.campaigns
-                                        |> List.map
-                                            (\c ->
-                                                button
-                                                    [ class "button"
-                                                    , onClick <| SwitchPage <| SwitchToCampaign c.id
-                                                    ]
-                                                    [ text c.title ]
-                                            )
-                                    )
-                                , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToCampaignFormPage CampaignForm.New ] [ text "Neue Kampagne" ]
-                                ]
-
                             thisCampaignView : CampaignId -> List (Html Msg)
                             thisCampaignView cId =
                                 model.campaigns |> getCampaign cId |> campaignView
                         in
                         case model.page of
                             Overview ->
-                                overview
+                                overview model.campaigns
 
                             CampaignPage campaignId ->
                                 thisCampaignView campaignId
@@ -589,7 +572,7 @@ view model =
                             FormPage fp ->
                                 case fp of
                                     CampaignFormPage formModel ->
-                                        overview ++ [ CampaignForm.view formModel |> Html.map (CampaignFormMsg >> FormMsg) ]
+                                        overview model.campaigns ++ [ CampaignForm.view formModel |> Html.map (CampaignFormMsg >> FormMsg) ]
 
                                     DayFormPage formModel ->
                                         thisCampaignView formModel.campaignId
@@ -629,6 +612,28 @@ navbar =
         ]
 
 
+overview : List Campaign -> List (Html Msg)
+overview campaigns =
+    [ h1 [ classes "title is-3" ] [ text "Überblick über alle Kampagnen" ]
+    , div [ class "buttons" ]
+        (campaigns
+            |> List.sortBy .title
+            |> List.map
+                (\c ->
+                    button
+                        [ class "button"
+                        , onClick <| SwitchPage <| SwitchToCampaign c.id
+                        ]
+                        [ text c.title ]
+                )
+        )
+    , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToCampaignFormPage CampaignForm.New ]
+        [ span [ class "icon" ] [ Html.node "ion-icon" [ name "add-circle-sharp" ] [] ]
+        , span [] [ text "Neue Kampagne" ]
+        ]
+    ]
+
+
 campaignView : Maybe Campaign -> List (Html Msg)
 campaignView c =
     case c of
@@ -638,17 +643,25 @@ campaignView c =
         Just campaign ->
             [ h1 [ classes "title is-3" ] [ text campaign.title ]
             , div [ class "block" ]
-                ((campaign.days |> List.map (dayView campaign))
-                    ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToDayFormPage campaign.id DayForm.New ] [ text "Neuer Tag" ] ]
+                ((campaign.days |> List.sortBy .title |> List.map (dayView campaign))
+                    ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToDayFormPage campaign.id DayForm.New ]
+                            [ span [ class "icon" ] [ Html.node "ion-icon" [ name "add-circle-sharp" ] [] ]
+                            , span [] [ text "Neuer Tag" ]
+                            ]
+                       ]
                 )
             , div [ class "block" ]
                 (h2 [ classes "title is-5" ] [ text "Alle Angebote" ]
-                    :: (campaign.events |> List.map (eventView campaign))
-                    ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToEventFormPage campaign.id EventForm.New ] [ text "Neues Angebot" ] ]
+                    :: (campaign.events |> List.sortBy .title |> List.map (eventView campaign))
+                    ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToEventFormPage campaign.id EventForm.New ]
+                            [ span [ class "icon" ] [ Html.node "ion-icon" [ name "add-circle-sharp" ] [] ]
+                            , span [] [ text "Neues Angebot" ]
+                            ]
+                       ]
                 )
             , div [ class "block" ]
                 [ h2 [ classes "title is-5" ] [ text "Alle Schüler/innen" ]
-                , campaign.pupils |> pupilUl campaign
+                , campaign.pupils |> List.sortBy (\p -> p.class ++ p.name) |> pupilUl campaign
                 , div [ class "buttons" ]
                     [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToPupilFormPage campaign.id PupilForm.New ]
                         [ span [ class "icon" ] [ Html.node "ion-icon" [ name "add-circle-sharp" ] [] ]

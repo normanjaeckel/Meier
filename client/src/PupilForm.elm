@@ -122,7 +122,10 @@ update msg model =
                     let
                         listOfNames : List String
                         listOfNames =
-                            [ "Anna", "Bert" ]
+                            model.name
+                                |> String.split "\n"
+                                |> List.map String.trim
+                                |> List.filter ((/=) "")
                     in
                     ( model
                     , Loading <|
@@ -321,8 +324,8 @@ viewMultiNew model =
                         [ div [ class "control" ]
                             [ textarea
                                 [ class "textarea"
-                                , placeholder "Namen"
-                                , attribute "aria-label" "Namen"
+                                , placeholder "Namen (mit Zeilenumbrüchen getrennt)"
+                                , attribute "aria-label" "Namen (mit Zeilenumbrüchen getrennt)"
                                 , required True
                                 , onInput <| Name >> FormMsg
                                 , value model.name

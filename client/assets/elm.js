@@ -9227,6 +9227,7 @@ var $author$project$Api$Mutation$deletePupil = function (requiredArgs____) {
 			]),
 		$elm$json$Json$Decode$bool);
 };
+var $elm$core$String$trim = _String_trim;
 var $author$project$Api$Mutation$updatePupil = F3(
 	function (fillInOptionals____, requiredArgs____, object____) {
 		var filledInOptionals____ = fillInOptionals____(
@@ -9312,8 +9313,13 @@ var $author$project$PupilForm$update = F2(
 											A3($author$project$Api$Mutation$AddPupilRequiredArguments, model.as, model.ac, model.E),
 											$author$project$Data$pupilSelectionSet)))));
 					case 1:
-						var listOfNames = _List_fromArray(
-							['Anna', 'Bert']);
+						var listOfNames = A2(
+							$elm$core$List$filter,
+							$elm$core$Basics$neq(''),
+							A2(
+								$elm$core$List$map,
+								$elm$core$String$trim,
+								A2($elm$core$String$split, '\n', model.ac)));
 						return _Utils_Tuple2(
 							model,
 							$author$project$PupilForm$Loading(
@@ -9847,17 +9853,6 @@ var $author$project$Main$update = F2(
 				}
 		}
 	});
-var $author$project$CampaignForm$New = {$: 0};
-var $author$project$Main$SwitchPage = function (a) {
-	return {$: 1, a: a};
-};
-var $author$project$Main$SwitchToCampaign = function (a) {
-	return {$: 1, a: a};
-};
-var $author$project$Main$SwitchToCampaignFormPage = function (a) {
-	return {$: 2, a: a};
-};
-var $elm$html$Html$button = _VirtualDom_node('button');
 var $author$project$CampaignForm$Delete = function (a) {
 	return {$: 2, a: a};
 };
@@ -9868,6 +9863,12 @@ var $author$project$PupilForm$MultiNew = {$: 1};
 var $author$project$DayForm$New = {$: 0};
 var $author$project$EventForm$New = {$: 0};
 var $author$project$PupilForm$New = {$: 0};
+var $author$project$Main$SwitchPage = function (a) {
+	return {$: 1, a: a};
+};
+var $author$project$Main$SwitchToCampaignFormPage = function (a) {
+	return {$: 2, a: a};
+};
 var $author$project$Main$SwitchToDayFormPage = F2(
 	function (a, b) {
 		return {$: 3, a: a, b: b};
@@ -9880,6 +9881,7 @@ var $author$project$Main$SwitchToPupilFormPage = F2(
 	function (a, b) {
 		return {$: 5, a: a, b: b};
 	});
+var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(
@@ -10360,6 +10362,7 @@ var $author$project$Main$pupilUl = F2(
 						pupils))
 				]));
 	});
+var $elm$core$List$sortBy = _List_sortBy;
 var $author$project$Main$campaignView = function (c) {
 	if (c.$ === 1) {
 		return _List_Nil;
@@ -10387,7 +10390,12 @@ var $author$project$Main$campaignView = function (c) {
 					A2(
 						$elm$core$List$map,
 						$author$project$Main$dayView(campaign),
-						campaign.ak),
+						A2(
+							$elm$core$List$sortBy,
+							function ($) {
+								return $.p;
+							},
+							campaign.ak)),
 					_List_fromArray(
 						[
 							A2(
@@ -10401,7 +10409,30 @@ var $author$project$Main$campaignView = function (c) {
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text('Neuer Tag')
+									A2(
+									$elm$html$Html$span,
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('icon')
+										]),
+									_List_fromArray(
+										[
+											A3(
+											$elm$html$Html$node,
+											'ion-icon',
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$name('add-circle-sharp')
+												]),
+											_List_Nil)
+										])),
+									A2(
+									$elm$html$Html$span,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text('Neuer Tag')
+										]))
 								]))
 						]))),
 				A2(
@@ -10426,7 +10457,12 @@ var $author$project$Main$campaignView = function (c) {
 						A2(
 							$elm$core$List$map,
 							$author$project$Main$eventView(campaign),
-							campaign.aA),
+							A2(
+								$elm$core$List$sortBy,
+								function ($) {
+									return $.p;
+								},
+								campaign.aA)),
 						_List_fromArray(
 							[
 								A2(
@@ -10440,7 +10476,30 @@ var $author$project$Main$campaignView = function (c) {
 									]),
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Neues Angebot')
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('icon')
+											]),
+										_List_fromArray(
+											[
+												A3(
+												$elm$html$Html$node,
+												'ion-icon',
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$name('add-circle-sharp')
+													]),
+												_List_Nil)
+											])),
+										A2(
+										$elm$html$Html$span,
+										_List_Nil,
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Neues Angebot')
+											]))
 									]))
 							])))),
 				A2(
@@ -10461,7 +10520,15 @@ var $author$project$Main$campaignView = function (c) {
 							[
 								$elm$html$Html$text('Alle Schüler/innen')
 							])),
-						A2($author$project$Main$pupilUl, campaign, campaign.bq),
+						A2(
+						$author$project$Main$pupilUl,
+						campaign,
+						A2(
+							$elm$core$List$sortBy,
+							function (p) {
+								return _Utils_ap(p.E, p.ac);
+							},
+							campaign.bq)),
 						A2(
 						$elm$html$Html$div,
 						_List_fromArray(
@@ -10694,6 +10761,90 @@ var $author$project$Main$navbar = A2(
 						]))
 				]))
 		]));
+var $author$project$CampaignForm$New = {$: 0};
+var $author$project$Main$SwitchToCampaign = function (a) {
+	return {$: 1, a: a};
+};
+var $author$project$Main$overview = function (campaigns) {
+	return _List_fromArray(
+		[
+			A2(
+			$elm$html$Html$h1,
+			_List_fromArray(
+				[
+					$author$project$Shared$classes('title is-3')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Überblick über alle Kampagnen')
+				])),
+			A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('buttons')
+				]),
+			A2(
+				$elm$core$List$map,
+				function (c) {
+					return A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('button'),
+								$elm$html$Html$Events$onClick(
+								$author$project$Main$SwitchPage(
+									$author$project$Main$SwitchToCampaign(c.j)))
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(c.p)
+							]));
+				},
+				A2(
+					$elm$core$List$sortBy,
+					function ($) {
+						return $.p;
+					},
+					campaigns))),
+			A2(
+			$elm$html$Html$button,
+			_List_fromArray(
+				[
+					$author$project$Shared$classes('button is-primary'),
+					$elm$html$Html$Events$onClick(
+					$author$project$Main$SwitchPage(
+						$author$project$Main$SwitchToCampaignFormPage($author$project$CampaignForm$New)))
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$span,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('icon')
+						]),
+					_List_fromArray(
+						[
+							A3(
+							$elm$html$Html$node,
+							'ion-icon',
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$name('add-circle-sharp')
+								]),
+							_List_Nil)
+						])),
+					A2(
+					$elm$html$Html$span,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Neue Kampagne')
+						]))
+				]))
+		]);
+};
 var $elm$html$Html$p = _VirtualDom_node('p');
 var $author$project$Main$pupilView = function (pup) {
 	return _List_fromArray(
@@ -12032,8 +12183,8 @@ var $author$project$PupilForm$viewMultiNew = function (model) {
 														_List_fromArray(
 															[
 																$elm$html$Html$Attributes$class('textarea'),
-																$elm$html$Html$Attributes$placeholder('Namen'),
-																A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Namen'),
+																$elm$html$Html$Attributes$placeholder('Namen (mit Zeilenumbrüchen getrennt)'),
+																A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Namen (mit Zeilenumbrüchen getrennt)'),
 																$elm$html$Html$Attributes$required(true),
 																$elm$html$Html$Events$onInput(
 																A2($elm$core$Basics$composeR, $author$project$PupilForm$Name, $author$project$PupilForm$FormMsg)),
@@ -12360,60 +12511,10 @@ var $author$project$Main$view = function (model) {
 										return $author$project$Main$campaignView(
 											A2($author$project$Main$getCampaign, cId, model.a));
 									};
-									var overview = _List_fromArray(
-										[
-											A2(
-											$elm$html$Html$h1,
-											_List_fromArray(
-												[
-													$author$project$Shared$classes('title is-3')
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text('Überblick über alle Kampagnen')
-												])),
-											A2(
-											$elm$html$Html$div,
-											_List_fromArray(
-												[
-													$elm$html$Html$Attributes$class('buttons')
-												]),
-											A2(
-												$elm$core$List$map,
-												function (c) {
-													return A2(
-														$elm$html$Html$button,
-														_List_fromArray(
-															[
-																$elm$html$Html$Attributes$class('button'),
-																$elm$html$Html$Events$onClick(
-																$author$project$Main$SwitchPage(
-																	$author$project$Main$SwitchToCampaign(c.j)))
-															]),
-														_List_fromArray(
-															[
-																$elm$html$Html$text(c.p)
-															]));
-												},
-												model.a)),
-											A2(
-											$elm$html$Html$button,
-											_List_fromArray(
-												[
-													$author$project$Shared$classes('button is-primary'),
-													$elm$html$Html$Events$onClick(
-													$author$project$Main$SwitchPage(
-														$author$project$Main$SwitchToCampaignFormPage($author$project$CampaignForm$New)))
-												]),
-											_List_fromArray(
-												[
-													$elm$html$Html$text('Neue Kampagne')
-												]))
-										]);
 									var _v1 = model.b;
 									switch (_v1.$) {
 										case 0:
-											return overview;
+											return $author$project$Main$overview(model.a);
 										case 1:
 											var campaignId = _v1.a;
 											return thisCampaignView(campaignId);
@@ -12423,7 +12524,7 @@ var $author$project$Main$view = function (model) {
 												case 0:
 													var formModel = fp.a;
 													return _Utils_ap(
-														overview,
+														$author$project$Main$overview(model.a),
 														_List_fromArray(
 															[
 																A2(
