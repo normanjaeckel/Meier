@@ -59,6 +59,7 @@ type Event {
     title: String!
     capacity: Int!
     maxSpecialPupils: Int!
+    days: [Day!]!
 }
 
 type Pupil {
