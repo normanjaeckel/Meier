@@ -1,6 +1,5 @@
 module Main exposing (main)
 
-import Api.Object exposing (Pupil(..))
 import Api.Query
 import Browser
 import CampaignForm
@@ -316,7 +315,7 @@ updateCampaignForm model msg formModel =
                 CampaignForm.NewOrUpdated obj ->
                     ( { model
                         | connection = Success
-                        , page = Overview
+                        , page = CampaignPage obj.id
                         , campaigns = model.campaigns |> insertOrUpdateInList obj
                       }
                     , Cmd.none
@@ -551,6 +550,7 @@ view model =
 
                     Success ->
                         let
+                            overview : List (Html Msg)
                             overview =
                                 [ h1 [ classes "title is-3" ] [ text "Überblick über alle Kampagnen" ]
                                 , div [ class "buttons" ]
@@ -642,6 +642,20 @@ campaignView c =
                 [ h2 [ classes "title is-5" ] [ text "Alle Schüler/innen" ]
                 , campaign.pupils |> pupilUl campaign
                 , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToPupilFormPage campaign.id PupilForm.New ] [ text "Neue Schüler/innen" ]
+                ]
+            , div [ class "block" ]
+                [ h2 [ classes "title is-5" ] [ text "Administration" ]
+                , div [ class "buttons" ]
+                    [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToCampaignFormPage (CampaignForm.Edit campaign.id) ]
+                        [ span [ class "icon" ] [ Html.node "ion-icon" [ name "create-sharp" ] [] ]
+                        , span [] [ text "Kampagne bearbeiten" ]
+                        ]
+                    , button [ classes "button is-danger", onClick <| SwitchPage <| SwitchToCampaignFormPage (CampaignForm.Delete campaign.id) ]
+                        [ span [ class "icon" ] [ Html.node "ion-icon" [ name "trash-sharp" ] [] ]
+                        , span []
+                            [ text "Kampagne löschen" ]
+                        ]
+                    ]
                 ]
             ]
 

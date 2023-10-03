@@ -5957,7 +5957,7 @@ var $author$project$Api$Object$Campaign$days = function (object____) {
 };
 var $author$project$Data$Event = F4(
 	function (id, title, capacity, maxSpecialPupils) {
-		return {X: capacity, j: id, aa: maxSpecialPupils, p: title};
+		return {Y: capacity, j: id, ab: maxSpecialPupils, p: title};
 	});
 var $author$project$Api$Object$Event$capacity = A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField, 'Int', 'capacity', _List_Nil, $elm$json$Json$Decode$int);
 var $elm$json$Json$Decode$map4 = _Json_map4;
@@ -6017,7 +6017,7 @@ var $dillonkearns$elm_graphql$Graphql$SelectionSet$map5 = F6(
 	});
 var $author$project$Data$Pupil = F4(
 	function (id, name, _class, isSpecial) {
-		return {Z: _class, j: id, bf: isSpecial, ab: name};
+		return {_: _class, j: id, bf: isSpecial, ac: name};
 	});
 var $author$project$Api$Object$Pupil$class = A4($dillonkearns$elm_graphql$Graphql$Internal$Builder$Object$selectionForField, 'String', 'class', _List_Nil, $elm$json$Json$Decode$string);
 var $elm$json$Json$Decode$bool = _Json_decodeBool;
@@ -6054,7 +6054,7 @@ var $dillonkearns$elm_graphql$Graphql$Document$decoder = function (_v0) {
 var $dillonkearns$elm_graphql$Graphql$Http$queryRequest = F2(
 	function (baseUrl, query) {
 		return {
-			W: baseUrl,
+			X: baseUrl,
 			ah: A2($dillonkearns$elm_graphql$Graphql$Http$Query, $elm$core$Maybe$Nothing, query),
 			P: $dillonkearns$elm_graphql$Graphql$Document$decoder(query),
 			l: _List_Nil,
@@ -7794,7 +7794,7 @@ var $dillonkearns$elm_graphql$Graphql$Http$toReadyRequest = function (_v0) {
 					return $elm$core$Maybe$Just(1);
 				}
 			}(),
-			request.W,
+			request.X,
 			request.G,
 			request.E,
 			querySelectionSet);
@@ -7853,7 +7853,7 @@ var $dillonkearns$elm_graphql$Graphql$Http$toReadyRequest = function (_v0) {
 			l: request.l,
 			z: 'POST',
 			o: request.o,
-			C: A2($dillonkearns$elm_graphql$Graphql$Http$QueryParams$urlWithQueryParams, request.G, request.W)
+			C: A2($dillonkearns$elm_graphql$Graphql$Http$QueryParams$urlWithQueryParams, request.G, request.X)
 		};
 	}
 };
@@ -7958,14 +7958,14 @@ var $author$project$Main$getObjFromCampaign = F4(
 	});
 var $author$project$CampaignForm$Model = F3(
 	function (title, numOfDays, action) {
-		return {ag: action, ai: numOfDays, p: title};
+		return {V: action, ai: numOfDays, p: title};
 	});
 var $author$project$CampaignForm$init = function (action) {
 	return A3($author$project$CampaignForm$Model, '', 2, action);
 };
 var $author$project$DayForm$Model = F3(
 	function (title, campaignId, action) {
-		return {ag: action, as: campaignId, p: title};
+		return {V: action, as: campaignId, p: title};
 	});
 var $author$project$DayForm$init = F2(
 	function (campaignId, action) {
@@ -7973,7 +7973,7 @@ var $author$project$DayForm$init = F2(
 	});
 var $author$project$EventForm$Model = F5(
 	function (title, capacity, maxSpecialPupils, campaignId, action) {
-		return {ag: action, as: campaignId, X: capacity, aa: maxSpecialPupils, p: title};
+		return {V: action, as: campaignId, Y: capacity, ab: maxSpecialPupils, p: title};
 	});
 var $author$project$EventForm$init = F2(
 	function (campaignId, action) {
@@ -7981,7 +7981,7 @@ var $author$project$EventForm$init = F2(
 	});
 var $author$project$PupilForm$Model = F5(
 	function (name, _class, isSpecial, campaignId, action) {
-		return {ag: action, as: campaignId, Z: _class, bf: isSpecial, ab: name};
+		return {V: action, as: campaignId, _: _class, bf: isSpecial, ac: name};
 	});
 var $author$project$PupilForm$init = F2(
 	function (campaignId, action) {
@@ -8203,7 +8203,7 @@ var $dillonkearns$elm_graphql$Graphql$Http$Mutation = function (a) {
 var $dillonkearns$elm_graphql$Graphql$Http$mutationRequest = F2(
 	function (baseUrl, mutationSelectionSet) {
 		return {
-			W: baseUrl,
+			X: baseUrl,
 			ah: $dillonkearns$elm_graphql$Graphql$Http$Mutation(mutationSelectionSet),
 			P: $dillonkearns$elm_graphql$Graphql$Document$decoder(mutationSelectionSet),
 			l: _List_Nil,
@@ -8401,7 +8401,7 @@ var $author$project$Main$updateCampaignForm = F3(
 							{
 								a: A2($author$project$Main$insertOrUpdateInList, obj, model.a),
 								d: $author$project$Main$Success,
-								b: $author$project$Main$Overview
+								b: $author$project$Main$CampaignPage(obj.j)
 							}),
 						$elm$core$Platform$Cmd$none);
 				} else {
@@ -8734,7 +8734,7 @@ var $author$project$Main$updateDayForm = F3(
 	});
 var $author$project$Api$Mutation$AddEventRequiredArguments = F4(
 	function (campaignID, title, capacity, maxSpecialPupils) {
-		return {L: campaignID, X: capacity, aa: maxSpecialPupils, p: title};
+		return {L: campaignID, Y: capacity, ab: maxSpecialPupils, p: title};
 	});
 var $author$project$EventForm$ClosedWithoutChange = {$: 2};
 var $author$project$Api$Mutation$DeleteEventRequiredArguments = function (id) {
@@ -8812,8 +8812,8 @@ var $author$project$Api$Mutation$addEvent = F3(
 							},
 							$author$project$IdScalarCodecs$codecs)),
 						A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required, 'title', requiredArgs____.p, $dillonkearns$elm_graphql$Graphql$Internal$Encode$string),
-						A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required, 'capacity', requiredArgs____.X, $dillonkearns$elm_graphql$Graphql$Internal$Encode$int),
-						A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required, 'maxSpecialPupils', requiredArgs____.aa, $dillonkearns$elm_graphql$Graphql$Internal$Encode$int)
+						A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required, 'capacity', requiredArgs____.Y, $dillonkearns$elm_graphql$Graphql$Internal$Encode$int),
+						A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required, 'maxSpecialPupils', requiredArgs____.ab, $dillonkearns$elm_graphql$Graphql$Internal$Encode$int)
 					])),
 			object____,
 			$elm$core$Basics$identity);
@@ -8841,15 +8841,15 @@ var $author$project$Api$Mutation$deleteEvent = function (requiredArgs____) {
 var $author$project$Api$Mutation$updateEvent = F3(
 	function (fillInOptionals____, requiredArgs____, object____) {
 		var filledInOptionals____ = fillInOptionals____(
-			{X: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Absent, N: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Absent, aa: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Absent, p: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Absent});
+			{Y: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Absent, N: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Absent, ab: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Absent, p: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Absent});
 		var optionalArgs____ = A2(
 			$elm$core$List$filterMap,
 			$elm$core$Basics$identity,
 			_List_fromArray(
 				[
 					A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$optional, 'title', filledInOptionals____.p, $dillonkearns$elm_graphql$Graphql$Internal$Encode$string),
-					A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$optional, 'capacity', filledInOptionals____.X, $dillonkearns$elm_graphql$Graphql$Internal$Encode$int),
-					A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$optional, 'maxSpecialPupils', filledInOptionals____.aa, $dillonkearns$elm_graphql$Graphql$Internal$Encode$int),
+					A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$optional, 'capacity', filledInOptionals____.Y, $dillonkearns$elm_graphql$Graphql$Internal$Encode$int),
+					A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$optional, 'maxSpecialPupils', filledInOptionals____.ab, $dillonkearns$elm_graphql$Graphql$Internal$Encode$int),
 					A3(
 					$dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$optional,
 					'dayIDs',
@@ -8899,12 +8899,12 @@ var $author$project$EventForm$update = F2(
 							var cap = formMsg.a;
 							return _Utils_update(
 								model,
-								{X: cap});
+								{Y: cap});
 						default:
 							var msp = formMsg.a;
 							return _Utils_update(
 								model,
-								{aa: msp});
+								{ab: msp});
 					}
 				}();
 				return _Utils_Tuple2(updatedModel, $author$project$EventForm$None);
@@ -8927,7 +8927,7 @@ var $author$project$EventForm$update = F2(
 										A3(
 											$author$project$Api$Mutation$addEvent,
 											optionalArgs,
-											A4($author$project$Api$Mutation$AddEventRequiredArguments, model.as, model.p, model.X, model.aa),
+											A4($author$project$Api$Mutation$AddEventRequiredArguments, model.as, model.p, model.Y, model.ab),
 											$author$project$Data$eventSelectionSet)))));
 					case 1:
 						var objId = action.a;
@@ -8935,8 +8935,8 @@ var $author$project$EventForm$update = F2(
 							return _Utils_update(
 								args,
 								{
-									X: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present(model.X),
-									aa: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present(model.aa),
+									Y: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present(model.Y),
+									ab: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present(model.ab),
 									p: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present(model.p)
 								});
 						};
@@ -9099,7 +9099,7 @@ var $author$project$Main$updateEventForm = F3(
 	});
 var $author$project$Api$Mutation$AddPupilRequiredArguments = F3(
 	function (campaignID, name, _class) {
-		return {L: campaignID, Z: _class, ab: name};
+		return {L: campaignID, _: _class, ac: name};
 	});
 var $author$project$PupilForm$ClosedWithoutChange = {$: 2};
 var $author$project$Api$Mutation$DeletePupilRequiredArguments = function (id) {
@@ -9167,8 +9167,8 @@ var $author$project$Api$Mutation$addPupil = F3(
 								return $.a5;
 							},
 							$author$project$IdScalarCodecs$codecs)),
-						A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required, 'name', requiredArgs____.ab, $dillonkearns$elm_graphql$Graphql$Internal$Encode$string),
-						A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required, 'class', requiredArgs____.Z, $dillonkearns$elm_graphql$Graphql$Internal$Encode$string)
+						A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required, 'name', requiredArgs____.ac, $dillonkearns$elm_graphql$Graphql$Internal$Encode$string),
+						A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$required, 'class', requiredArgs____._, $dillonkearns$elm_graphql$Graphql$Internal$Encode$string)
 					])),
 			object____,
 			$elm$core$Basics$identity);
@@ -9196,14 +9196,14 @@ var $author$project$Api$Mutation$deletePupil = function (requiredArgs____) {
 var $author$project$Api$Mutation$updatePupil = F3(
 	function (fillInOptionals____, requiredArgs____, object____) {
 		var filledInOptionals____ = fillInOptionals____(
-			{Z: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Absent, ab: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Absent, T: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Absent});
+			{_: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Absent, ac: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Absent, T: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Absent});
 		var optionalArgs____ = A2(
 			$elm$core$List$filterMap,
 			$elm$core$Basics$identity,
 			_List_fromArray(
 				[
-					A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$optional, 'name', filledInOptionals____.ab, $dillonkearns$elm_graphql$Graphql$Internal$Encode$string),
-					A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$optional, 'class', filledInOptionals____.Z, $dillonkearns$elm_graphql$Graphql$Internal$Encode$string),
+					A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$optional, 'name', filledInOptionals____.ac, $dillonkearns$elm_graphql$Graphql$Internal$Encode$string),
+					A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$optional, 'class', filledInOptionals____._, $dillonkearns$elm_graphql$Graphql$Internal$Encode$string),
 					A3($dillonkearns$elm_graphql$Graphql$Internal$Builder$Argument$optional, 'special', filledInOptionals____.T, $dillonkearns$elm_graphql$Graphql$Internal$Encode$bool)
 				]));
 		return A4(
@@ -9238,12 +9238,12 @@ var $author$project$PupilForm$update = F2(
 							var n = formMsg.a;
 							return _Utils_update(
 								model,
-								{ab: n});
+								{ac: n});
 						case 1:
 							var cls = formMsg.a;
 							return _Utils_update(
 								model,
-								{Z: cls});
+								{_: cls});
 						default:
 							var isp = formMsg.a;
 							return _Utils_update(
@@ -9275,7 +9275,7 @@ var $author$project$PupilForm$update = F2(
 										A3(
 											$author$project$Api$Mutation$addPupil,
 											optionalArguments,
-											A3($author$project$Api$Mutation$AddPupilRequiredArguments, model.as, model.ab, model.Z),
+											A3($author$project$Api$Mutation$AddPupilRequiredArguments, model.as, model.ac, model._),
 											$author$project$Data$pupilSelectionSet)))));
 					case 1:
 						var objId = action.a;
@@ -9283,8 +9283,8 @@ var $author$project$PupilForm$update = F2(
 							return _Utils_update(
 								args,
 								{
-									Z: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present(model.Z),
-									ab: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present(model.ab),
+									_: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present(model._),
+									ac: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present(model.ac),
 									T: $dillonkearns$elm_graphql$Graphql$OptionalArgument$Present(model.bf)
 								});
 						};
@@ -9653,7 +9653,7 @@ var $author$project$Main$update = F2(
 										var obj = _v10.a;
 										return _Utils_update(
 											emptyForm,
-											{X: obj.X, aa: obj.aa, p: obj.p});
+											{Y: obj.Y, ab: obj.ab, p: obj.p});
 									} else {
 										return emptyForm;
 									}
@@ -9707,7 +9707,7 @@ var $author$project$Main$update = F2(
 										var obj = _v13.a;
 										return _Utils_update(
 											emptyForm,
-											{Z: obj.Z, bf: obj.bf, ab: obj.ab});
+											{_: obj._, bf: obj.bf, ac: obj.ac});
 									} else {
 										return emptyForm;
 									}
@@ -9725,7 +9725,7 @@ var $author$project$Main$update = F2(
 										var obj = _v14.a;
 										return _Utils_update(
 											emptyForm,
-											{ab: obj.ab});
+											{ac: obj.ac});
 									} else {
 										return emptyForm;
 									}
@@ -9783,6 +9783,12 @@ var $author$project$Main$SwitchToCampaignFormPage = function (a) {
 	return {$: 2, a: a};
 };
 var $elm$html$Html$button = _VirtualDom_node('button');
+var $author$project$CampaignForm$Delete = function (a) {
+	return {$: 2, a: a};
+};
+var $author$project$CampaignForm$Edit = function (a) {
+	return {$: 1, a: a};
+};
 var $author$project$DayForm$New = {$: 0};
 var $author$project$EventForm$New = {$: 0};
 var $author$project$PupilForm$New = {$: 0};
@@ -10050,7 +10056,7 @@ var $author$project$Main$eventView = F2(
 											_List_fromArray(
 												[
 													$elm$html$Html$text(
-													$elm$core$String$fromInt(event.X))
+													$elm$core$String$fromInt(event.Y))
 												]))
 										]))
 								])),
@@ -10089,7 +10095,7 @@ var $author$project$Main$eventView = F2(
 											_List_fromArray(
 												[
 													$elm$html$Html$text(
-													$elm$core$String$fromInt(event.aa))
+													$elm$core$String$fromInt(event.ab))
 												]))
 										]))
 								])),
@@ -10172,7 +10178,7 @@ var $author$project$Main$SwitchToPupil = function (a) {
 };
 var $elm$html$Html$li = _VirtualDom_node('li');
 var $author$project$Main$pupilToStr = function (p) {
-	return p.ab + (' (Klasse ' + (p.Z + ')'));
+	return p.ac + (' (Klasse ' + (p._ + ')'));
 };
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$pupilUl = F2(
@@ -10393,6 +10399,108 @@ var $author$project$Main$campaignView = function (c) {
 							[
 								$elm$html$Html$text('Neue Schüler/innen')
 							]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('block')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h2,
+						_List_fromArray(
+							[
+								$author$project$Shared$classes('title is-5')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Administration')
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('buttons')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$author$project$Shared$classes('button is-primary'),
+										$elm$html$Html$Events$onClick(
+										$author$project$Main$SwitchPage(
+											$author$project$Main$SwitchToCampaignFormPage(
+												$author$project$CampaignForm$Edit(campaign.j))))
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('icon')
+											]),
+										_List_fromArray(
+											[
+												A3(
+												$elm$html$Html$node,
+												'ion-icon',
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$name('create-sharp')
+													]),
+												_List_Nil)
+											])),
+										A2(
+										$elm$html$Html$span,
+										_List_Nil,
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Kampagne bearbeiten')
+											]))
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$author$project$Shared$classes('button is-danger'),
+										$elm$html$Html$Events$onClick(
+										$author$project$Main$SwitchPage(
+											$author$project$Main$SwitchToCampaignFormPage(
+												$author$project$CampaignForm$Delete(campaign.j))))
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('icon')
+											]),
+										_List_fromArray(
+											[
+												A3(
+												$elm$html$Html$node,
+												'ion-icon',
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$name('trash-sharp')
+													]),
+												_List_Nil)
+											])),
+										A2(
+										$elm$html$Html$span,
+										_List_Nil,
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Kampagne löschen')
+											]))
+									]))
+							]))
 					]))
 			]);
 	}
@@ -10566,7 +10674,7 @@ var $author$project$CampaignForm$viewDelete = function (model) {
 									[
 										$author$project$Shared$classes('button is-success'),
 										$elm$html$Html$Events$onClick(
-										$author$project$CampaignForm$SendForm(model.ag))
+										$author$project$CampaignForm$SendForm(model.V))
 									]),
 								_List_fromArray(
 									[
@@ -10642,92 +10750,93 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 	});
 var $elm$html$Html$Attributes$required = $elm$html$Html$Attributes$boolProperty('required');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$CampaignForm$formFields = function (model) {
-	var labelNumOfDays = 'Anzahl der Tage';
-	return _List_fromArray(
-		[
-			A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('field')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('control')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$input,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('input'),
-									$elm$html$Html$Attributes$type_('text'),
-									$elm$html$Html$Attributes$placeholder('Titel'),
-									A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Titel'),
-									$elm$html$Html$Attributes$required(true),
-									$elm$html$Html$Events$onInput($author$project$CampaignForm$Title),
-									$elm$html$Html$Attributes$value(model.p)
-								]),
-							_List_Nil)
-						]))
-				])),
-			A2(
-			$elm$html$Html$div,
-			_List_fromArray(
-				[
-					$elm$html$Html$Attributes$class('field')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('control')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$input,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('input'),
-									$elm$html$Html$Attributes$type_('number'),
-									A2($elm$html$Html$Attributes$attribute, 'aria-label', labelNumOfDays),
-									$elm$html$Html$Attributes$min('1'),
-									$elm$html$Html$Attributes$max('10'),
-									$elm$html$Html$Events$onInput(
-									A2(
-										$elm$core$Basics$composeR,
-										$elm$core$String$toInt,
+var $author$project$CampaignForm$formFields = F2(
+	function (model, withDays) {
+		var labelNumOfDays = 'Anzahl der Tage';
+		return _List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('field')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('control')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('input'),
+										$elm$html$Html$Attributes$type_('text'),
+										$elm$html$Html$Attributes$placeholder('Titel'),
+										A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Titel'),
+										$elm$html$Html$Attributes$required(true),
+										$elm$html$Html$Events$onInput($author$project$CampaignForm$Title),
+										$elm$html$Html$Attributes$value(model.p)
+									]),
+								_List_Nil)
+							]))
+					])),
+				withDays ? A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('field')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('control')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('input'),
+										$elm$html$Html$Attributes$type_('number'),
+										A2($elm$html$Html$Attributes$attribute, 'aria-label', labelNumOfDays),
+										$elm$html$Html$Attributes$min('1'),
+										$elm$html$Html$Attributes$max('10'),
+										$elm$html$Html$Events$onInput(
 										A2(
 											$elm$core$Basics$composeR,
-											$elm$core$Maybe$withDefault(0),
-											$author$project$CampaignForm$NumOfDays))),
-									$elm$html$Html$Attributes$value(
-									$elm$core$String$fromInt(model.ai))
-								]),
-							_List_Nil)
-						])),
-					A2(
-					$elm$html$Html$p,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('help')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text(labelNumOfDays)
-						]))
-				]))
-		]);
-};
+											$elm$core$String$toInt,
+											A2(
+												$elm$core$Basics$composeR,
+												$elm$core$Maybe$withDefault(0),
+												$author$project$CampaignForm$NumOfDays))),
+										$elm$html$Html$Attributes$value(
+										$elm$core$String$fromInt(model.ai))
+									]),
+								_List_Nil)
+							])),
+						A2(
+						$elm$html$Html$p,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('help')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(labelNumOfDays)
+							]))
+					])) : A2($elm$html$Html$div, _List_Nil, _List_Nil)
+			]);
+	});
 var $elm$html$Html$Events$alwaysPreventDefault = function (msg) {
 	return _Utils_Tuple2(msg, true);
 };
@@ -10752,6 +10861,14 @@ var $elm$html$Html$Events$onSubmit = function (msg) {
 };
 var $author$project$CampaignForm$viewNewAndEdit = F2(
 	function (headline, model) {
+		var withDays = function () {
+			var _v0 = model.V;
+			if (!_v0.$) {
+				return true;
+			} else {
+				return false;
+			}
+		}();
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -10781,7 +10898,7 @@ var $author$project$CampaignForm$viewNewAndEdit = F2(
 							_List_fromArray(
 								[
 									$elm$html$Html$Events$onSubmit(
-									$author$project$CampaignForm$SendForm(model.ag))
+									$author$project$CampaignForm$SendForm(model.V))
 								]),
 							_List_fromArray(
 								[
@@ -10823,7 +10940,7 @@ var $author$project$CampaignForm$viewNewAndEdit = F2(
 									A2(
 										$elm$core$List$map,
 										$elm$html$Html$map($author$project$CampaignForm$FormMsg),
-										$author$project$CampaignForm$formFields(model))),
+										A2($author$project$CampaignForm$formFields, model, withDays))),
 									A2(
 									$elm$html$Html$footer,
 									_List_fromArray(
@@ -10861,7 +10978,7 @@ var $author$project$CampaignForm$viewNewAndEdit = F2(
 				]));
 	});
 var $author$project$CampaignForm$view = function (model) {
-	var _v0 = model.ag;
+	var _v0 = model.V;
 	switch (_v0.$) {
 		case 0:
 			return A2($author$project$CampaignForm$viewNewAndEdit, 'Neue Kampagne hinzufügen', model);
@@ -10959,7 +11076,7 @@ var $author$project$DayForm$viewDelete = function (model) {
 									[
 										$author$project$Shared$classes('button is-success'),
 										$elm$html$Html$Events$onClick(
-										$author$project$DayForm$SendForm(model.ag))
+										$author$project$DayForm$SendForm(model.V))
 									]),
 								_List_fromArray(
 									[
@@ -11052,7 +11169,7 @@ var $author$project$DayForm$viewNewAndEdit = F2(
 							_List_fromArray(
 								[
 									$elm$html$Html$Events$onSubmit(
-									$author$project$DayForm$SendForm(model.ag))
+									$author$project$DayForm$SendForm(model.V))
 								]),
 							_List_fromArray(
 								[
@@ -11132,7 +11249,7 @@ var $author$project$DayForm$viewNewAndEdit = F2(
 				]));
 	});
 var $author$project$DayForm$view = function (model) {
-	var _v0 = model.ag;
+	var _v0 = model.V;
 	switch (_v0.$) {
 		case 0:
 			return A2($author$project$DayForm$viewNewAndEdit, 'Neuen Tag hinzufügen', model);
@@ -11230,7 +11347,7 @@ var $author$project$EventForm$viewDelete = function (model) {
 									[
 										$author$project$Shared$classes('button is-success'),
 										$elm$html$Html$Events$onClick(
-										$author$project$EventForm$SendForm(model.ag))
+										$author$project$EventForm$SendForm(model.V))
 									]),
 								_List_fromArray(
 									[
@@ -11334,7 +11451,7 @@ var $author$project$EventForm$formFields = function (model) {
 											$elm$core$Maybe$withDefault(0),
 											$author$project$EventForm$Capacity))),
 									$elm$html$Html$Attributes$value(
-									$elm$core$String$fromInt(model.X))
+									$elm$core$String$fromInt(model.Y))
 								]),
 							_List_Nil)
 						])),
@@ -11383,7 +11500,7 @@ var $author$project$EventForm$formFields = function (model) {
 											$elm$core$Maybe$withDefault(0),
 											$author$project$EventForm$MaxSpecialPupil))),
 									$elm$html$Html$Attributes$value(
-									$elm$core$String$fromInt(model.aa))
+									$elm$core$String$fromInt(model.ab))
 								]),
 							_List_Nil)
 						])),
@@ -11431,7 +11548,7 @@ var $author$project$EventForm$viewNewAndEdit = F2(
 							_List_fromArray(
 								[
 									$elm$html$Html$Events$onSubmit(
-									$author$project$EventForm$SendForm(model.ag))
+									$author$project$EventForm$SendForm(model.V))
 								]),
 							_List_fromArray(
 								[
@@ -11511,7 +11628,7 @@ var $author$project$EventForm$viewNewAndEdit = F2(
 				]));
 	});
 var $author$project$EventForm$view = function (model) {
-	var _v0 = model.ag;
+	var _v0 = model.V;
 	switch (_v0.$) {
 		case 0:
 			return A2($author$project$EventForm$viewNewAndEdit, 'Neues Angebot hinzufügen', model);
@@ -11592,7 +11709,7 @@ var $author$project$PupilForm$viewDelete = function (model) {
 								_List_Nil,
 								_List_fromArray(
 									[
-										$elm$html$Html$text('Wollen Sie den Schüler bzw. die Schülerin ' + (model.ab + ' wirklich löschen?'))
+										$elm$html$Html$text('Wollen Sie den Schüler bzw. die Schülerin ' + (model.ac + ' wirklich löschen?'))
 									]))
 							])),
 						A2(
@@ -11609,7 +11726,7 @@ var $author$project$PupilForm$viewDelete = function (model) {
 									[
 										$author$project$Shared$classes('button is-success'),
 										$elm$html$Html$Events$onClick(
-										$author$project$PupilForm$SendForm(model.ag))
+										$author$project$PupilForm$SendForm(model.V))
 									]),
 								_List_fromArray(
 									[
@@ -11685,7 +11802,7 @@ var $author$project$PupilForm$formFields = function (model) {
 									A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Name'),
 									$elm$html$Html$Attributes$required(true),
 									$elm$html$Html$Events$onInput($author$project$PupilForm$Name),
-									$elm$html$Html$Attributes$value(model.ab)
+									$elm$html$Html$Attributes$value(model.ac)
 								]),
 							_List_Nil)
 						]))
@@ -11716,7 +11833,7 @@ var $author$project$PupilForm$formFields = function (model) {
 									A2($elm$html$Html$Attributes$attribute, 'aria-label', 'Klasse'),
 									$elm$html$Html$Attributes$required(true),
 									$elm$html$Html$Events$onInput($author$project$PupilForm$Class),
-									$elm$html$Html$Attributes$value(model.Z)
+									$elm$html$Html$Attributes$value(model._)
 								]),
 							_List_Nil)
 						]))
@@ -11792,7 +11909,7 @@ var $author$project$PupilForm$viewNewAndEdit = F2(
 							_List_fromArray(
 								[
 									$elm$html$Html$Events$onSubmit(
-									$author$project$PupilForm$SendForm(model.ag))
+									$author$project$PupilForm$SendForm(model.V))
 								]),
 							_List_fromArray(
 								[
@@ -11872,7 +11989,7 @@ var $author$project$PupilForm$viewNewAndEdit = F2(
 				]));
 	});
 var $author$project$PupilForm$view = function (model) {
-	var _v0 = model.ag;
+	var _v0 = model.V;
 	switch (_v0.$) {
 		case 0:
 			return A2($author$project$PupilForm$viewNewAndEdit, 'Neue/n Schüler/in hinzufügen', model);

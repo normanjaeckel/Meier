@@ -178,6 +178,16 @@ view model =
 
 viewNewAndEdit : String -> Model -> Html Msg
 viewNewAndEdit headline model =
+    let
+        withDays : Bool
+        withDays =
+            case model.action of
+                New ->
+                    True
+
+                _ ->
+                    False
+    in
     div [ classes "modal is-active" ]
         [ div [ class "modal-background", onClick CloseForm ] []
         , div [ class "modal-card" ]
@@ -187,7 +197,7 @@ viewNewAndEdit headline model =
                     , button [ class "delete", type_ "button", attribute "aria-label" "close", onClick CloseForm ] []
                     ]
                 , section [ class "modal-card-body" ]
-                    (formFields model |> List.map (Html.map FormMsg))
+                    (formFields model withDays |> List.map (Html.map FormMsg))
                 , footer [ class "modal-card-foot" ]
                     [ button [ classes "button is-success", type_ "submit" ] [ text "Speichern" ]
                     , button [ class "button", type_ "button", onClick CloseForm ] [ text "Abbrechen" ]
@@ -197,8 +207,8 @@ viewNewAndEdit headline model =
         ]
 
 
-formFields : Model -> List (Html FormMsg)
-formFields model =
+formFields : Model -> Bool -> List (Html FormMsg)
+formFields model withDays =
     let
         labelNumOfDays : String
         labelNumOfDays =
@@ -218,21 +228,25 @@ formFields model =
                 []
             ]
         ]
-    , div [ class "field" ]
-        [ div [ class "control" ]
-            [ input
-                [ class "input"
-                , type_ "number"
-                , attribute "aria-label" labelNumOfDays
-                , Html.Attributes.min "1"
-                , Html.Attributes.max "10"
-                , onInput (String.toInt >> Maybe.withDefault 0 >> NumOfDays)
-                , value <| String.fromInt model.numOfDays
+    , if withDays then
+        div [ class "field" ]
+            [ div [ class "control" ]
+                [ input
+                    [ class "input"
+                    , type_ "number"
+                    , attribute "aria-label" labelNumOfDays
+                    , Html.Attributes.min "1"
+                    , Html.Attributes.max "10"
+                    , onInput (String.toInt >> Maybe.withDefault 0 >> NumOfDays)
+                    , value <| String.fromInt model.numOfDays
+                    ]
+                    []
                 ]
-                []
+            , p [ class "help" ] [ text labelNumOfDays ]
             ]
-        , p [ class "help" ] [ text labelNumOfDays ]
-        ]
+
+      else
+        div [] []
     ]
 
 
