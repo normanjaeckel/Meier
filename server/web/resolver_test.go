@@ -38,6 +38,19 @@ func TestUpdateDay(t *testing.T) {
 	}
 }
 
+func TestUpdateCampain(t *testing.T) {
+	resp, err := runQueries([]string{
+		`mutation {addCampaign(days: ["Tag 1"], title: "Herbsttage") {id}}`,
+		`mutation {updateCampaign(id: 1, title: "Herbsttage Neu") {id}}`,
+	})
+	if err != nil {
+		t.Fatalf("runQueries: %v", err)
+	}
+	if resp.Errors != nil {
+		t.Errorf("queries did not succeed: %v", resp.Errors)
+	}
+}
+
 // runQueries runs a list of queries against an empty database and returns the
 // last response.
 func runQueries(queries []string) (*graphql.Response, error) {

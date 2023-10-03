@@ -77,16 +77,11 @@ func (r *resolver) AddCampaign(
 func (r *resolver) UpdateCampaign(
 	args struct {
 		ID    model.ID
-		Title *string
+		Title string
 	},
 ) (model.CampaignResolver, error) {
-	title := ""
-	if args.Title != nil {
-		title = *args.Title
-	}
-
 	err := r.db.Write(func(m model.Model) sticky.Event[model.Model] {
-		return m.CampaignUpdate(int(args.ID), title)
+		return m.CampaignUpdate(int(args.ID), args.Title)
 	})
 	if err != nil {
 		return model.CampaignResolver{}, fmt.Errorf("write: %w", err)
