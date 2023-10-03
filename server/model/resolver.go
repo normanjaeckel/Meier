@@ -160,11 +160,26 @@ type EventResolver struct {
 	Title            string
 	Capacity         int32
 	MaxSpecialPupils int32
+	DayIDs           []int
 }
 
 // Campaign retuns a mayer campaign
 func (e EventResolver) Campaign() (CampaignResolver, error) {
 	return e.m.Campaign(int(e.ID))
+}
+
+// Days returns all days of the event.
+func (e EventResolver) Days() ([]DayResolver, error) {
+	days := make([]DayResolver, len(e.DayIDs))
+	for i, id := range e.DayIDs {
+		day, err := e.m.Day(id)
+		if err != nil {
+			return nil, fmt.Errorf("getting day %d: %w", id, err)
+		}
+
+		days[i] = day
+	}
+	return days, nil
 }
 
 // PupilResolver contains all pupil data.
