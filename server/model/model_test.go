@@ -116,7 +116,7 @@ func TestStandardData(t *testing.T) {
 	{"time":"2023-09-03 12:40:21","type":"day-create","payload":{"id":2,"campaign_id":1,"title":"Zweiter Tag (Mittwoch)"}}
 	{"time":"2023-09-03 12:42:07","type":"event-create","payload":{"id":1,"campaign_id":1,"title":"Kochen","capacity":12,"max_special_pupils":3}}
 	{"time":"2023-09-03 12:43:33","type":"event-create","payload":{"id":2,"campaign_id":1,"title":"Tanzen","capacity":16,"max_special_pupils":1}}
-	{"time":"2023-09-03 12:48:03","type":"pupil-create","payload":{"ids":[1],"campaign_id":1,"names":["Max Mustermann"],"class":"2b","special":false}}
+	{"time":"2023-09-03 12:48:03","type":"pupil-create","payload":{"ids":[1],"campaign_id":1,"names":["Max Mustermann"],"login_tokens":["foo"],"class":"2b","special":false}}
 	{"time":"2023-09-04 07:45:53","type":"assign-pupil","payload":{"pupil_id":1,"day_id":1,"event_id":1}}
 	{"time":"2023-09-04 07:46:22","type":"assign-pupil","payload":{"pupil_id":1,"day_id":2,"event_id":2}}
 	{"time":"2023-09-04 09:25:00","type":"pupil-choice","payload":{"pupil_id":1,"choices":[{"event_id":1,"choice":1},{"event_id":2,"choice":2}]}}

@@ -417,12 +417,12 @@ func (e eventEventDelete) Execute(model Model, time time.Time) Model {
 }
 
 type eventPupilsCreate struct {
-	IDs        []int    `json:"ids"`
-	CampaignID int      `json:"campaign_id"`
-	Names      []string `json:"names"`
-	LoginToken string   `json:"login_token"`
-	Class      string   `json:"class"`
-	Special    bool     `json:"special"`
+	IDs         []int    `json:"ids"`
+	CampaignID  int      `json:"campaign_id"`
+	Names       []string `json:"names"`
+	LoginTokens []string `json:"login_tokens"`
+	Class       string   `json:"class"`
+	Special     bool     `json:"special"`
 }
 
 func (e eventPupilsCreate) Name() string {
@@ -458,8 +458,10 @@ func (e eventPupilsCreate) Validate(model Model) error {
 		return fmt.Errorf("campaign %d does not exist", e.CampaignID)
 	}
 
-	if e.LoginToken == "" {
-		return fmt.Errorf("login token has to be set")
+	for _, loginToken := range e.LoginTokens {
+		if loginToken == "" {
+			return fmt.Errorf("login token has to be set")
+		}
 	}
 
 	return nil
@@ -474,7 +476,7 @@ func (e eventPupilsCreate) Execute(model Model, time time.Time) Model {
 		model.pupils[id] = pupil{
 			campaignID: e.CampaignID,
 			name:       e.Names[i],
-			loginToken: e.LoginToken,
+			loginToken: e.LoginTokens[i],
 			class:      e.Class,
 			special:    e.Special,
 		}
