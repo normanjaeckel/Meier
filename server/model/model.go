@@ -109,7 +109,7 @@ func (m Model) EventCreate(campaignID int, title string, days []int, capacity in
 		ID:               nextID,
 		CampaignID:       campaignID,
 		Title:            title,
-		Days:             days,
+		DayIDs:           days,
 		Capacity:         capacity,
 		MaxSpecialPupils: maxNumOfspecialPupils,
 	}

@@ -270,7 +270,7 @@ type eventEventCreate struct {
 	ID               int    `json:"id"`
 	CampaignID       int    `json:"campaign_id"`
 	Title            string `json:"title"`
-	Days             []int  `json:"days"`
+	DayIDs           []int  `json:"days"`
 	Capacity         int    `json:"capacity"`
 	MaxSpecialPupils int    `json:"max_special_pupils"`
 }
@@ -288,7 +288,7 @@ func (e eventEventCreate) Validate(model Model) error {
 		return fmt.Errorf("event title can not be empty")
 	}
 
-	for _, dayID := range e.Days {
+	for _, dayID := range e.DayIDs {
 		if len(model.days) <= dayID || model.days[dayID].campaignID != e.CampaignID {
 			return fmt.Errorf("day %d is not in same campaign", dayID)
 		}
@@ -311,7 +311,7 @@ func (e eventEventCreate) Execute(model Model, time time.Time) Model {
 		maxSpecialPupils: e.MaxSpecialPupils,
 	}
 
-	for _, dayID := range e.Days {
+	for _, dayID := range e.DayIDs {
 		model.days[dayID].event[e.ID] = []int{}
 	}
 	return model
