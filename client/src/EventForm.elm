@@ -131,6 +131,7 @@ update msg model =
                                 | title = Graphql.OptionalArgument.Present model.title
                                 , capacity = Graphql.OptionalArgument.Present model.capacity
                                 , maxSpecialPupils = Graphql.OptionalArgument.Present model.maxSpecialPupils
+                                , dayIDs = Graphql.OptionalArgument.Present model.selectedDays
                             }
                     in
                     ( model
@@ -189,75 +190,23 @@ view : Model -> Html Msg
 view model =
     case model.action of
         New ->
-            viewNew model
+            viewNewAndEdit "Neues Angebot hinzufügen" model
 
         Edit _ ->
-            viewEdit model
+            viewNewAndEdit "Angebot bearbeiten" model
 
         Delete _ ->
             viewDelete model
 
 
-viewNew : Model -> Html Msg
-viewNew model =
-    let
-        fn : Data.DayId -> Bool -> FormMsg
-        fn dId isChecked =
-            if isChecked then
-                dId :: model.selectedDays |> Days
-
-            else
-                model.selectedDays |> List.filter ((/=) dId) |> Days
-    in
+viewNewAndEdit : String -> Model -> Html Msg
+viewNewAndEdit headline model =
     div [ classes "modal is-active" ]
         [ div [ class "modal-background", onClick CloseForm ] []
         , div [ class "modal-card" ]
             [ form [ onSubmit <| SendForm model.action ]
                 [ header [ class "modal-card-head" ]
-                    [ p [ class "modal-card-title" ] [ text "Neues Angebot hinzufügen" ]
-                    , button [ class "delete", type_ "button", attribute "aria-label" "close", onClick CloseForm ] []
-                    ]
-                , section [ class "modal-card-body" ]
-                    ((formFields model
-                        ++ [ div [ class "field" ]
-                                [ div [ classes "control checkboxesInLine" ]
-                                    (model.allDays
-                                        |> List.map
-                                            (\d ->
-                                                label [ class "checkbox" ]
-                                                    [ input
-                                                        [ class "mr-1"
-                                                        , type_ "checkbox"
-                                                        , onCheck <| fn d.id
-                                                        , checked (model.selectedDays |> List.member d.id)
-                                                        ]
-                                                        []
-                                                    , text d.title
-                                                    ]
-                                            )
-                                    )
-                                ]
-                           ]
-                     )
-                        |> List.map (Html.map FormMsg)
-                    )
-                , footer [ class "modal-card-foot" ]
-                    [ button [ classes "button is-success", type_ "submit" ] [ text "Speichern" ]
-                    , button [ class "button", type_ "button", onClick CloseForm ] [ text "Abbrechen" ]
-                    ]
-                ]
-            ]
-        ]
-
-
-viewEdit : Model -> Html Msg
-viewEdit model =
-    div [ classes "modal is-active" ]
-        [ div [ class "modal-background", onClick CloseForm ] []
-        , div [ class "modal-card" ]
-            [ form [ onSubmit <| SendForm model.action ]
-                [ header [ class "modal-card-head" ]
-                    [ p [ class "modal-card-title" ] [ text "Angebot bearbeiten" ]
+                    [ p [ class "modal-card-title" ] [ text headline ]
                     , button [ class "delete", type_ "button", attribute "aria-label" "close", onClick CloseForm ] []
                     ]
                 , section [ class "modal-card-body" ]
@@ -281,6 +230,14 @@ formFields model =
         labelMaxSpecialPupils : String
         labelMaxSpecialPupils =
             "Maximale Anzahl an besonderen Schüler/innen"
+
+        checkerFn : Data.DayId -> Bool -> FormMsg
+        checkerFn dId isChecked =
+            if isChecked then
+                dId :: model.selectedDays |> Days
+
+            else
+                model.selectedDays |> List.filter ((/=) dId) |> Days
     in
     [ div [ class "field" ]
         [ div [ class "control" ]
@@ -325,6 +282,24 @@ formFields model =
                 []
             ]
         , p [ class "help" ] [ text labelMaxSpecialPupils ]
+        ]
+    , div [ class "field" ]
+        [ div [ classes "control checkboxesInLine" ]
+            (model.allDays
+                |> List.map
+                    (\d ->
+                        label [ class "checkbox" ]
+                            [ input
+                                [ class "mr-1"
+                                , type_ "checkbox"
+                                , onCheck <| checkerFn d.id
+                                , checked (model.selectedDays |> List.member d.id)
+                                ]
+                                []
+                            , text d.title
+                            ]
+                    )
+            )
         ]
     ]
 

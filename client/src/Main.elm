@@ -205,12 +205,18 @@ update msg model =
                                             emptyForm
 
                                 EventForm.Edit objId ->
-                                    case model.campaigns |> getObjFromCampaign campaignId objId .events of
-                                        Just obj ->
-                                            { emptyForm | title = obj.title, capacity = obj.capacity, maxSpecialPupils = obj.maxSpecialPupils }
-
-                                        Nothing ->
-                                            emptyForm
+                                    Maybe.map2
+                                        (\campaign obj ->
+                                            { emptyForm
+                                                | allDays = campaign.days |> List.sortBy .title
+                                                , title = obj.title
+                                                , capacity = obj.capacity
+                                                , maxSpecialPupils = obj.maxSpecialPupils
+                                            }
+                                        )
+                                        (model.campaigns |> getCampaign campaignId)
+                                        (model.campaigns |> getObjFromCampaign campaignId objId .events)
+                                        |> Maybe.withDefault emptyForm
 
                                 EventForm.Delete objId ->
                                     case model.campaigns |> getObjFromCampaign campaignId objId .events of
