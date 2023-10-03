@@ -1,4 +1,4 @@
-module DayForm exposing (Action(..), Effect(..), Model, Msg, init, update, view)
+module DayForm exposing (Action(..), Effect(..), Model, Msg, Obj, ObjId, ReturnValue(..), init, update, view)
 
 import Api.Mutation
 import Data
@@ -9,18 +9,28 @@ import Html.Events exposing (onClick, onInput, onSubmit)
 import Shared exposing (classes)
 
 
+type alias Obj =
+    Data.Day
+
+
+type alias ObjId =
+    Data.DayId
+
+
 
 -- MODEL
 
 
 type alias Model =
     { title : String
+    , campaignId : Data.CampaignId
+    , action : Action
     }
 
 
-init : Model
-init =
-    Model ""
+init : Data.CampaignId -> Action -> Model
+init campaignId action =
+    Model "" campaignId action
 
 
 
@@ -29,11 +39,11 @@ init =
 
 type Msg
     = FormMsg FormMsg
-    | SendDayForm Action
+    | SendForm Action
     | CloseForm
-    | GotNewDay (Result (Graphql.Http.Error Data.Day) Data.Day)
-    | GotUpdatedDay (Result (Graphql.Http.Error Data.Day) Data.Day)
-    | GotDeleteDay Data.DayId (Result (Graphql.Http.Error Bool) Bool)
+    | GotNew (Result (Graphql.Http.Error Obj) Obj)
+    | GotUpdated (Result (Graphql.Http.Error Obj) Obj)
+    | GotDelete ObjId (Result (Graphql.Http.Error Bool) Bool)
 
 
 type FormMsg
@@ -42,19 +52,25 @@ type FormMsg
 
 type Action
     = New
-    | Edit Data.DayId
-    | Delete Data.Day
+    | Edit ObjId
+    | Delete ObjId
 
 
 type Effect
     = None
     | Loading (Cmd Msg)
-    | Done Data.Campaign
+    | ClosedWithoutChange
+    | Done ReturnValue
     | Error String
 
 
-update : Data.Campaign -> Msg -> Model -> ( Model, Effect )
-update campaign msg model =
+type ReturnValue
+    = NewOrUpdated Obj
+    | Deleted ObjId
+
+
+update : Msg -> Model -> ( Model, Effect )
+update msg model =
     case msg of
         FormMsg formMsg ->
             let
@@ -66,93 +82,65 @@ update campaign msg model =
             in
             ( updatedModel, None )
 
-        SendDayForm action ->
+        SendForm action ->
             case action of
                 New ->
                     ( model
                     , Loading <|
                         (Api.Mutation.addDay
                             (Api.Mutation.AddDayRequiredArguments
-                                campaign.id
+                                model.campaignId
                                 model.title
                             )
                             Data.daySelectionSet
                             |> Graphql.Http.mutationRequest Shared.queryUrl
-                            |> Graphql.Http.send GotNewDay
+                            |> Graphql.Http.send GotNew
                         )
                     )
 
-                Edit dayId ->
+                Edit objId ->
                     ( model
                     , Loading <|
                         (Api.Mutation.updateDay
-                            (Api.Mutation.UpdateDayRequiredArguments dayId model.title)
+                            (Api.Mutation.UpdateDayRequiredArguments objId model.title)
                             Data.daySelectionSet
                             |> Graphql.Http.mutationRequest Shared.queryUrl
-                            |> Graphql.Http.send GotUpdatedDay
+                            |> Graphql.Http.send GotUpdated
                         )
                     )
 
-                Delete day ->
+                Delete objId ->
                     ( model
                     , Loading <|
-                        (Api.Mutation.deleteDay (Api.Mutation.DeleteDayRequiredArguments day.id)
+                        (Api.Mutation.deleteDay (Api.Mutation.DeleteDayRequiredArguments objId)
                             |> Graphql.Http.mutationRequest Shared.queryUrl
-                            |> Graphql.Http.send (GotDeleteDay day.id)
+                            |> Graphql.Http.send (GotDelete objId)
                         )
                     )
 
         CloseForm ->
-            ( model, Done campaign )
+            ( model, ClosedWithoutChange )
 
-        GotNewDay res ->
+        GotNew res ->
             case res of
-                Ok day ->
-                    ( model, Done { campaign | days = campaign.days ++ [ day ] } )
+                Ok obj ->
+                    ( model, Done <| NewOrUpdated obj )
 
                 Err err ->
                     ( model, Error (Shared.parseGraphqlError err) )
 
-        GotUpdatedDay res ->
+        GotUpdated res ->
             case res of
-                Ok dayFromServer ->
-                    let
-                        walkToUpdate : List Data.Day -> List Data.Day
-                        walkToUpdate days =
-                            case days of
-                                day :: rest ->
-                                    if day.id == dayFromServer.id then
-                                        dayFromServer :: rest
-
-                                    else
-                                        day :: walkToUpdate rest
-
-                                [] ->
-                                    []
-                    in
-                    ( model, Done { campaign | days = walkToUpdate campaign.days } )
+                Ok obj ->
+                    ( model, Done <| NewOrUpdated obj )
 
                 Err err ->
                     ( model, Error (Shared.parseGraphqlError err) )
 
-        GotDeleteDay dayToBeDeletedId res ->
+        GotDelete objId res ->
             case res of
                 Ok _ ->
-                    let
-                        walkToUpdate : List Data.Day -> List Data.Day
-                        walkToUpdate days =
-                            case days of
-                                day :: rest ->
-                                    if day.id == dayToBeDeletedId then
-                                        rest
-
-                                    else
-                                        day :: walkToUpdate rest
-
-                                [] ->
-                                    []
-                    in
-                    ( model, Done { campaign | days = walkToUpdate campaign.days } )
+                    ( model, Done <| Deleted objId )
 
                 Err err ->
                     ( model, Error (Shared.parseGraphqlError err) )
@@ -162,25 +150,25 @@ update campaign msg model =
 -- VIEW
 
 
-view : Action -> Model -> Html Msg
-view action model =
-    case action of
+view : Model -> Html Msg
+view model =
+    case model.action of
         New ->
-            viewNewAndEdit "Neuen Tag hinzufügen" action model
+            viewNewAndEdit "Neuen Tag hinzufügen" model
 
         Edit _ ->
-            viewNewAndEdit "Tag bearbeiten" action model
+            viewNewAndEdit "Tag bearbeiten" model
 
-        Delete day ->
-            viewDelete day
+        Delete _ ->
+            viewDelete model
 
 
-viewNewAndEdit : String -> Action -> Model -> Html Msg
-viewNewAndEdit headline action model =
+viewNewAndEdit : String -> Model -> Html Msg
+viewNewAndEdit headline model =
     div [ classes "modal is-active" ]
         [ div [ class "modal-background", onClick CloseForm ] []
         , div [ class "modal-card" ]
-            [ form [ onSubmit <| SendDayForm action ]
+            [ form [ onSubmit <| SendForm model.action ]
                 [ header [ class "modal-card-head" ]
                     [ p [ class "modal-card-title" ] [ text headline ]
                     , button [ class "delete", type_ "button", attribute "aria-label" "close", onClick CloseForm ] []
@@ -215,21 +203,21 @@ formFields model =
     ]
 
 
-viewDelete : Data.Day -> Html Msg
-viewDelete day =
+viewDelete : Model -> Html Msg
+viewDelete model =
     div [ classes "modal is-active" ]
         [ div [ class "modal-background", onClick CloseForm ] []
         , div [ class "modal-card" ]
             [ header [ class "modal-card-head" ]
                 [ p [ class "modal-card-title" ] [ text "Tag löschen" ]
-                , button [ class "delete", attribute "aria-label" "close", onClick CloseForm ] []
+                , button [ class "delete", type_ "button", attribute "aria-label" "close", onClick CloseForm ] []
                 ]
             , section [ class "modal-card-body" ]
-                [ p [] [ text <| "Wollen Sie den Tag " ++ day.title ++ " wirklich löschen?" ]
+                [ p [] [ text <| "Wollen Sie den Tag " ++ model.title ++ " wirklich löschen?" ]
                 ]
             , footer [ class "modal-card-foot" ]
-                [ button [ classes "button is-success", onClick <| SendDayForm (Delete day) ] [ text "Löschen" ]
-                , button [ class "button", onClick CloseForm ] [ text "Abbrechen" ]
+                [ button [ classes "button is-success", onClick <| SendForm model.action ] [ text "Löschen" ]
+                , button [ class "button", type_ "button", onClick CloseForm ] [ text "Abbrechen" ]
                 ]
             ]
         ]
