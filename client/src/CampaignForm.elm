@@ -209,11 +209,6 @@ viewNewAndEdit headline model =
 
 formFields : Model -> Bool -> List (Html FormMsg)
 formFields model withDays =
-    let
-        labelNumOfDays : String
-        labelNumOfDays =
-            "Anzahl der Tage"
-    in
     [ div [ class "field" ]
         [ div [ class "control" ]
             [ input
@@ -229,6 +224,11 @@ formFields model withDays =
             ]
         ]
     , if withDays then
+        let
+            labelNumOfDays : String
+            labelNumOfDays =
+                "Anzahl der Tage"
+        in
         div [ class "field" ]
             [ div [ class "control" ]
                 [ input
