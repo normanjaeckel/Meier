@@ -101,6 +101,33 @@ func TestAddPupils(t *testing.T) {
 	}
 }
 
+func TestAddDay(t *testing.T) {
+	resp, err := runQueries([]string{
+		`mutation {addCampaign(days: ["Tag 1", "Tag 2"], title: "Herbst") {id}}`,
+		`mutation {addDay(campaignID: 1, title: "Tag 1a") {id}}`,
+	})
+	if err != nil {
+		t.Fatalf("runQueries: %v", err)
+	}
+	if resp.Errors != nil {
+		t.Errorf("queries did not succeed: %v", resp.Errors)
+	}
+
+	var got struct {
+		Day struct {
+			ID int `json:"id"`
+		} `json:"addDay"`
+	}
+
+	if err := json.Unmarshal(resp.Data, &got); err != nil {
+		t.Fatalf("decoding response: %v", err)
+	}
+
+	if got.Day.ID != 3 {
+		t.Errorf("got id %d, expected 3", got.Day.ID)
+	}
+}
+
 // runQueries runs a list of queries against an empty database and returns the
 // last response.
 func runQueries(queries []string) (*graphql.Response, error) {

@@ -58,7 +58,13 @@ func New(createPassword func(length int) string) Model {
 	if createPassword == nil {
 		createPassword = config.CreatePassword
 	}
-	return Model{createPassword: createPassword}
+	return Model{
+		createPassword: createPassword,
+		campains:       make([]campaign, 1),
+		days:           make([]day, 1),
+		events:         make([]event, 1),
+		pupils:         make([]pupil, 1),
+	}
 }
 
 // CampaignCreate creates a new Mayer campaign.
