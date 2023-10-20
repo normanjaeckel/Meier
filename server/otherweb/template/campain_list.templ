@@ -1,0 +1,61 @@
+package template
+
+import (
+	"strconv"
+	"github.com/normanjaeckel/Meier/server/model"
+)
+
+templ CampainList(campains []model.Campaign) {
+	@layout("Projektgruppenverwaltung") {
+		<h1 class="title is-3">Überblick über alle Kampagnen</h1>
+		<div class="buttons">
+			for _, campain := range campains {
+				<a href={ templ.URL("/campain/" + strconv.Itoa(campain.ID)) } class="button">{ campain.Title }</a>
+			}
+		</div>
+		<button class="button is-primary" onClick={ showCreateCampainModal(true) }>
+			Neue Kampagnen
+		</button>
+		@createCampain()
+	}
+}
+
+script showCreateCampainModal(open bool) {
+    var element = document.getElementById("create-campain-form");
+	if (open) {
+		element.classList.add("is-active");
+	} else {
+		element.classList.remove("is-active");
+	}
+}
+
+templ createCampain() {
+	<div id="create-campain-form" class="modal">
+		<div class="modal-background"></div>
+		<div class="modal-card">
+			<form action="/create_campain" method="post">
+				<header class="modal-card-head">
+					<p class="modal-card-title">Neue Kampagne hinzufügen</p>
+					<button class="delete" type="button" aria-label="close" onClick={ showCreateCampainModal(false) }></button>
+				</header>
+				<section class="modal-card-body">
+					<div class="field">
+						<div class="control">
+							<input name="title" class="input" type="text" placeholder="Titel" aria-label="Titel" required=""/>
+						</div>
+					</div>
+					<div class="field">
+						<div class="control">
+							<input name="day-count" class="input" type="number" aria-label="Anzahl der Tage" min="1" max="10"/>
+						</div>
+						<p class="help">Anzahl der Tage</p>
+					</div>
+				</section>
+				<footer class="modal-card-foot">
+					<button class="button is-success" type="submit">Speichern</button>
+					<button class="button" type="button" onClick={ showCreateCampainModal(false) }>Abbrechen</button>
+				</footer>
+			</form>
+		</div>
+	</div>
+}

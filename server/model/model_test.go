@@ -136,10 +136,7 @@ func TestStandardData(t *testing.T) {
 			t.Errorf("Title == %s, expected Herbstprojektwoche", campaign.Title)
 		}
 
-		days, err := campaign.Days()
-		if err != nil {
-			t.Fatalf("getting days: %v", err)
-		}
+		days := campaign.Days()
 
 		if len(days) != 2 {
 			t.Errorf("got %d days, expected 2", len(days))

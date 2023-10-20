@@ -47,18 +47,18 @@ type CampaignResolver struct {
 }
 
 // Days returns the days.
-func (c CampaignResolver) Days() ([]DayResolver, error) {
+func (c CampaignResolver) Days() []DayResolver {
 	days := make([]DayResolver, len(c.DayIDs))
 	for i, id := range c.DayIDs {
 		day, err := c.m.Day(id)
 		if err != nil {
-			return nil, fmt.Errorf("getting day %d: %w", id, err)
+			continue
 		}
 
 		days[i] = day
 	}
 
-	return days, nil
+	return days
 }
 
 // Events returns the events.

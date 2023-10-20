@@ -9,8 +9,10 @@ import (
 
 	"github.com/normanjaeckel/Meier/server/config"
 	"github.com/normanjaeckel/Meier/server/model"
+	"github.com/normanjaeckel/Meier/server/otherweb"
 	"github.com/normanjaeckel/Meier/server/web"
 	"github.com/ostcar/timer/sticky"
+	"golang.org/x/sync/errgroup"
 )
 
 func main() {
@@ -36,8 +38,23 @@ func run() error {
 		return fmt.Errorf("loading config: %w", err)
 	}
 
-	if err := web.Run(ctx, s, config); err != nil {
-		return fmt.Errorf("running http server: %w", err)
+	gr, ctx := errgroup.WithContext(ctx)
+	gr.Go(func() error {
+		if err := web.Run(ctx, s, config); err != nil {
+			return fmt.Errorf("running http server: %w", err)
+		}
+		return nil
+	})
+
+	gr.Go(func() error {
+		if err := otherweb.Run(ctx, s, config); err != nil {
+			return fmt.Errorf("running other http server: %w", err)
+		}
+		return nil
+	})
+
+	if err := gr.Wait(); err != nil {
+		return err
 	}
 
 	return nil

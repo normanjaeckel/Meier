@@ -1,0 +1,142 @@
+package template
+
+import (
+	"strconv"
+	"github.com/normanjaeckel/Meier/server/model"
+)
+
+templ CampainDetail(campain model.CampaignResolver) {
+	@layout(campain.Title) {
+		<h1 class="title is-3">{ campain.Title }</h1>
+		<div class="block">
+			<div id="day-list">
+				for _, day := range campain.Days() {
+					@CampainDetailDayEntry(day)
+				}
+			</div>
+			<button class="button is-primary" onClick={ campainDetailshowDayInsert(true) }>Neuer Tag</button>
+		</div>
+		<div class="block">
+			<h2 class="title is-5">Alle Angebote</h2>
+			<button class="button is-primary">Neues Angebot</button>
+		</div>
+		<div class="block">
+			<h2 class="title is-5">Alle Schüler/innen</h2>
+			<div class="block">
+				<ul></ul>
+			</div>
+			<button class="button is-primary">Neue Schüler/innen</button>
+		</div>
+		<div class="block">
+			<h2 class="title is-5">Administration</h2>
+			<div class="buttons">
+				<button class="button is-primary">
+					<span class="icon">
+						<ion-icon
+ 							role="img"
+ 							class="md hydrated"
+ 							name="create-sharp"
+						></ion-icon>
+					</span>
+					<span>Kampagne bearbeiten</span>
+				</button>
+				<button class="button is-danger">
+					<span class="icon">
+						<ion-icon
+ 							role="img"
+ 							class="md hydrated"
+ 							name="trash-sharp"
+						></ion-icon>
+					</span>
+					<span>Kampagne löschen</span>
+				</button>
+			</div>
+		</div>
+	}
+	@campainDetailAddDay(campain)
+}
+
+templ CampainDetailDayEntry(day model.DayResolver) {
+	<div class="block">
+		<div class="field is-grouped is-grouped-multiline">
+			<div class="control">
+				<h2 class="title is-5">{ day.Title }</h2>
+			</div>
+			<a title="Bearbeiten">
+				<span class="icon">
+					<ion-icon
+ 						role="img"
+ 						class="md hydrated"
+ 						name="create-outline"
+					></ion-icon>
+				</span>
+			</a>
+			<a title="Löschen">
+				<span class="icon">
+					<ion-icon
+ 						role="img"
+ 						class="md hydrated"
+ 						name="trash-outline"
+					></ion-icon>
+				</span>
+			</a>
+		</div>
+	</div>
+}
+
+script campainDetailshowDayInsert(open bool) {
+    var element = document.getElementById("add-day-form");
+	if (open) {
+		element.classList.add("is-active");
+	} else {
+		element.classList.remove("is-active");
+	}
+}
+
+templ campainDetailAddDay(campain model.CampaignResolver) {
+	<div id="add-day-form" class="modal">
+		<div class="modal-background"></div>
+		<div class="modal-card">
+			<form
+ 				action={ "/campain/" + strconv.Itoa(int(campain.ID)) + "/create_day" }
+ 				method="post"
+ 				hx-post={ "/campain/" + strconv.Itoa(int(campain.ID)) + "/create_day" }
+ 				hx-target="#day-list"
+ 				hx-swap="beforeend"
+ 				_="on htmx:beforeSwap campainDetailshowDayInsert(false)"
+			>
+				<header class="modal-card-head">
+					<p class="modal-card-title">Neuen Tag hinzufügen</p>
+					<button
+ 						class="delete"
+ 						type="button"
+ 						aria-label="close"
+ 						onClick={ campainDetailshowDayInsert(false) }
+					></button>
+				</header>
+				<section class="modal-card-body">
+					<div class="field">
+						<div class="control">
+							<input
+ 								name="title"
+ 								class="input"
+ 								type="text"
+ 								placeholder="Titel"
+ 								aria-label="Titel"
+ 								required=""
+							/>
+						</div>
+					</div>
+				</section>
+				<footer class="modal-card-foot">
+					<button class="button is-success" type="submit">Speichern</button>
+					<button
+ 						class="button"
+ 						type="button"
+ 						onClick={ campainDetailshowDayInsert(false) }
+					>Abbrechen</button>
+				</footer>
+			</form>
+		</div>
+	</div>
+}
