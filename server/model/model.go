@@ -67,6 +67,38 @@ func New(createPassword func(length int) string) Model {
 	}
 }
 
+// Campaign is a representation for an campain for external use
+type Campaign struct {
+	ID    int
+	Title string
+}
+
+// CampaignList returns a list of campaigns
+func (m Model) CampaignList() []Campaign {
+	var campaigns []Campaign
+	for id, c := range m.campains {
+		if m.campainExist(id) {
+			campaigns = append(campaigns, Campaign{
+				ID:    id,
+				Title: c.title,
+			})
+		}
+	}
+	return campaigns
+}
+
+// CampaignDetail returns a list of campaigns
+func (m Model) CampaignDetail(id int) (Campaign, error) {
+	if !m.campainExist(id) {
+		return Campaign{}, fmt.Errorf("campain does not exist")
+	}
+
+	return Campaign{
+		ID:    id,
+		Title: m.campains[id].title,
+	}, nil
+}
+
 // CampaignCreate creates a new Mayer campaign.
 func (m Model) CampaignCreate(title string, days []string) (int, Event) {
 	nextID := nextID(m.campains)
