@@ -4,9 +4,9 @@ import Api.Mutation
 import Data
 import Graphql.Http
 import Graphql.OptionalArgument
-import Html exposing (Html, button, div, footer, form, header, input, p, section, text)
-import Html.Attributes exposing (attribute, class, placeholder, required, type_, value)
-import Html.Events exposing (onClick, onInput, onSubmit)
+import Html exposing (Html, button, div, footer, form, header, input, label, p, section, text)
+import Html.Attributes exposing (attribute, checked, class, placeholder, required, type_, value)
+import Html.Events exposing (onCheck, onClick, onInput, onSubmit)
 import Shared exposing (classes)
 
 
@@ -26,14 +26,16 @@ type alias Model =
     { title : String
     , capacity : Int
     , maxSpecialPupils : Int
+    , selectedDays : List Data.DayId
+    , allDays : List Data.Day
     , campaignId : Data.CampaignId
     , action : Action
     }
 
 
-init : Data.CampaignId -> Action -> Model
-init campaignId action =
-    Model "" 12 2 campaignId action
+init : List Data.Day -> Data.CampaignId -> Action -> Model
+init allDays campaignId action =
+    Model "" 12 2 [] allDays campaignId action
 
 
 
@@ -53,6 +55,7 @@ type FormMsg
     = Title String
     | Capacity Int
     | MaxSpecialPupil Int
+    | Days (List Data.DayId)
 
 
 type Action
@@ -90,6 +93,9 @@ update msg model =
 
                         MaxSpecialPupil msp ->
                             { model | maxSpecialPupils = msp }
+
+                        Days selectedDays ->
+                            { model | selectedDays = selectedDays }
             in
             ( updatedModel, None )
 
@@ -99,7 +105,7 @@ update msg model =
                     let
                         optionalArgs : Api.Mutation.AddEventOptionalArguments -> Api.Mutation.AddEventOptionalArguments
                         optionalArgs args =
-                            args
+                            { args | dayIDs = Graphql.OptionalArgument.Present model.selectedDays }
                     in
                     ( model
                     , Loading <|
@@ -125,6 +131,7 @@ update msg model =
                                 | title = Graphql.OptionalArgument.Present model.title
                                 , capacity = Graphql.OptionalArgument.Present model.capacity
                                 , maxSpecialPupils = Graphql.OptionalArgument.Present model.maxSpecialPupils
+                                , dayIDs = Graphql.OptionalArgument.Present model.selectedDays
                             }
                     in
                     ( model
@@ -223,6 +230,14 @@ formFields model =
         labelMaxSpecialPupils : String
         labelMaxSpecialPupils =
             "Maximale Anzahl an besonderen Schüler/innen"
+
+        checkerFn : Data.DayId -> Bool -> FormMsg
+        checkerFn dId isChecked =
+            if isChecked then
+                dId :: model.selectedDays |> Days
+
+            else
+                model.selectedDays |> List.filter ((/=) dId) |> Days
     in
     [ div [ class "field" ]
         [ div [ class "control" ]
@@ -267,6 +282,24 @@ formFields model =
                 []
             ]
         , p [ class "help" ] [ text labelMaxSpecialPupils ]
+        ]
+    , div [ class "field" ]
+        [ div [ classes "control checkboxesInLine" ]
+            (model.allDays
+                |> List.map
+                    (\d ->
+                        label [ class "checkbox" ]
+                            [ input
+                                [ class "mr-1"
+                                , type_ "checkbox"
+                                , onCheck <| checkerFn d.id
+                                , checked (model.selectedDays |> List.member d.id)
+                                ]
+                                []
+                            , text d.title
+                            ]
+                    )
+            )
         ]
     ]
 

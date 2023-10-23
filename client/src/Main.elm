@@ -48,6 +48,11 @@ init _ =
     )
 
 
+getCampaign : CampaignId -> List Campaign -> Maybe Campaign
+getCampaign campaignId campaigns =
+    campaigns |> List.filter (\c -> c.id == campaignId) |> List.head
+
+
 getObjFromCampaign : CampaignId -> a -> (Campaign -> List { b | id : a }) -> List Campaign -> Maybe { b | id : a }
 getObjFromCampaign campaignId objId getter campaigns =
     campaigns
@@ -133,7 +138,7 @@ update msg model =
                                     emptyForm
 
                                 CampaignForm.Edit objId ->
-                                    case model.campaigns |> List.filter (\c -> c.id == objId) |> List.head of
+                                    case model.campaigns |> getCampaign objId of
                                         Just obj ->
                                             { emptyForm | title = obj.title }
 
@@ -141,7 +146,7 @@ update msg model =
                                             emptyForm
 
                                 CampaignForm.Delete objId ->
-                                    case model.campaigns |> List.filter (\c -> c.id == objId) |> List.head of
+                                    case model.campaigns |> getCampaign objId of
                                         Just obj ->
                                             { emptyForm | title = obj.title }
 
@@ -188,19 +193,30 @@ update msg model =
                             let
                                 emptyForm : EventForm.Model
                                 emptyForm =
-                                    EventForm.init campaignId action
+                                    EventForm.init [] campaignId action
                             in
                             case action of
                                 EventForm.New ->
-                                    emptyForm
-
-                                EventForm.Edit objId ->
-                                    case model.campaigns |> getObjFromCampaign campaignId objId .events of
-                                        Just obj ->
-                                            { emptyForm | title = obj.title, capacity = obj.capacity, maxSpecialPupils = obj.maxSpecialPupils }
+                                    case model.campaigns |> getCampaign campaignId of
+                                        Just campaign ->
+                                            { emptyForm | allDays = campaign.days |> List.sortBy .title }
 
                                         Nothing ->
                                             emptyForm
+
+                                EventForm.Edit objId ->
+                                    Maybe.map2
+                                        (\campaign obj ->
+                                            { emptyForm
+                                                | allDays = campaign.days |> List.sortBy .title
+                                                , title = obj.title
+                                                , capacity = obj.capacity
+                                                , maxSpecialPupils = obj.maxSpecialPupils
+                                            }
+                                        )
+                                        (model.campaigns |> getCampaign campaignId)
+                                        (model.campaigns |> getObjFromCampaign campaignId objId .events)
+                                        |> Maybe.withDefault emptyForm
 
                                 EventForm.Delete objId ->
                                     case model.campaigns |> getObjFromCampaign campaignId objId .events of
@@ -223,6 +239,9 @@ update msg model =
                             in
                             case action of
                                 PupilForm.New ->
+                                    emptyForm
+
+                                PupilForm.MultiNew ->
                                     emptyForm
 
                                 PupilForm.Edit objId ->
@@ -452,11 +471,16 @@ updatePupilForm model msg formModel =
 
         PupilForm.Done returnValue ->
             case returnValue of
-                PupilForm.NewOrUpdated obj ->
+                PupilForm.NewOrUpdated listOfObjs ->
                     let
                         newOrEditObj : Campaign -> Campaign
                         newOrEditObj campaign =
-                            { campaign | pupils = campaign.pupils |> insertOrUpdateInList obj }
+                            let
+                                fn : Pupil -> List Pupil -> List Pupil
+                                fn pupil pupils =
+                                    pupils |> insertOrUpdateInList pupil
+                            in
+                            { campaign | pupils = listOfObjs |> List.foldl fn campaign.pupils }
                     in
                     ( { model
                         | connection = Success
@@ -550,30 +574,13 @@ view model =
 
                     Success ->
                         let
-                            overview : List (Html Msg)
-                            overview =
-                                [ h1 [ classes "title is-3" ] [ text "Überblick über alle Kampagnen" ]
-                                , div [ class "buttons" ]
-                                    (model.campaigns
-                                        |> List.map
-                                            (\c ->
-                                                button
-                                                    [ class "button"
-                                                    , onClick <| SwitchPage <| SwitchToCampaign c.id
-                                                    ]
-                                                    [ text c.title ]
-                                            )
-                                    )
-                                , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToCampaignFormPage CampaignForm.New ] [ text "Neue Kampagne" ]
-                                ]
-
                             thisCampaignView : CampaignId -> List (Html Msg)
                             thisCampaignView cId =
                                 model.campaigns |> getCampaign cId |> campaignView
                         in
                         case model.page of
                             Overview ->
-                                overview
+                                overview model.campaigns
 
                             CampaignPage campaignId ->
                                 thisCampaignView campaignId
@@ -581,7 +588,7 @@ view model =
                             FormPage fp ->
                                 case fp of
                                     CampaignFormPage formModel ->
-                                        overview ++ [ CampaignForm.view formModel |> Html.map (CampaignFormMsg >> FormMsg) ]
+                                        overview model.campaigns ++ [ CampaignForm.view formModel |> Html.map (CampaignFormMsg >> FormMsg) ]
 
                                     DayFormPage formModel ->
                                         thisCampaignView formModel.campaignId
@@ -602,11 +609,6 @@ view model =
         ]
 
 
-getCampaign : CampaignId -> List Campaign -> Maybe Campaign
-getCampaign campaignId campaigns =
-    campaigns |> List.filter (\c -> c.id == campaignId) |> List.head
-
-
 pupilToStr : Pupil -> String
 pupilToStr p =
     p.name ++ " (Klasse " ++ p.class ++ ")"
@@ -621,6 +623,28 @@ navbar =
         ]
 
 
+overview : List Campaign -> List (Html Msg)
+overview campaigns =
+    [ h1 [ classes "title is-3" ] [ text "Überblick über alle Kampagnen" ]
+    , div [ class "buttons" ]
+        (campaigns
+            |> List.sortBy .title
+            |> List.map
+                (\c ->
+                    button
+                        [ class "button"
+                        , onClick <| SwitchPage <| SwitchToCampaign c.id
+                        ]
+                        [ text c.title ]
+                )
+        )
+    , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToCampaignFormPage CampaignForm.New ]
+        [ span [ class "icon" ] [ Html.node "ion-icon" [ name "add-circle-sharp" ] [] ]
+        , span [] [ text "Neue Kampagne" ]
+        ]
+    ]
+
+
 campaignView : Maybe Campaign -> List (Html Msg)
 campaignView c =
     case c of
@@ -630,18 +654,35 @@ campaignView c =
         Just campaign ->
             [ h1 [ classes "title is-3" ] [ text campaign.title ]
             , div [ class "block" ]
-                ((campaign.days |> List.map (dayView campaign))
-                    ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToDayFormPage campaign.id DayForm.New ] [ text "Neuer Tag" ] ]
+                ((campaign.days |> List.sortBy .title |> List.map (dayView campaign))
+                    ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToDayFormPage campaign.id DayForm.New ]
+                            [ span [ class "icon" ] [ Html.node "ion-icon" [ name "add-circle-sharp" ] [] ]
+                            , span [] [ text "Neuer Tag" ]
+                            ]
+                       ]
                 )
             , div [ class "block" ]
                 (h2 [ classes "title is-5" ] [ text "Alle Angebote" ]
-                    :: (campaign.events |> List.map (eventView campaign))
-                    ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToEventFormPage campaign.id EventForm.New ] [ text "Neues Angebot" ] ]
+                    :: (campaign.events |> List.sortBy .title |> List.map (eventView campaign))
+                    ++ [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToEventFormPage campaign.id EventForm.New ]
+                            [ span [ class "icon" ] [ Html.node "ion-icon" [ name "add-circle-sharp" ] [] ]
+                            , span [] [ text "Neues Angebot" ]
+                            ]
+                       ]
                 )
             , div [ class "block" ]
                 [ h2 [ classes "title is-5" ] [ text "Alle Schüler/innen" ]
-                , campaign.pupils |> pupilUl campaign
-                , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToPupilFormPage campaign.id PupilForm.New ] [ text "Neue Schüler/innen" ]
+                , campaign.pupils |> List.sortBy (\p -> p.class ++ p.name) |> pupilUl campaign
+                , div [ class "buttons" ]
+                    [ button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToPupilFormPage campaign.id PupilForm.New ]
+                        [ span [ class "icon" ] [ Html.node "ion-icon" [ name "add-circle-sharp" ] [] ]
+                        , span [] [ text "Neue Schüler/innen" ]
+                        ]
+                    , button [ classes "button is-primary", onClick <| SwitchPage <| SwitchToPupilFormPage campaign.id PupilForm.MultiNew ]
+                        [ span [ class "icon" ] [ Html.node "ion-icon" [ name "add-circle-sharp" ] [] ]
+                        , span [] [ text "Mehrere neue Schüler/innen" ]
+                        ]
+                    ]
                 ]
             , div [ class "block" ]
                 [ h2 [ classes "title is-5" ] [ text "Administration" ]

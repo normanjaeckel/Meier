@@ -244,6 +244,21 @@ deletePupil requiredArgs____ =
     Object.selectionForField "Bool" "deletePupil" [ Argument.required "id" requiredArgs____.id (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId) ] Decode.bool
 
 
+type alias AddPupilsOfClassRequiredArguments =
+    { campaignID : IdScalarCodecs.Id
+    , class : String
+    , names : List String
+    }
+
+
+addPupilsOfClass :
+    AddPupilsOfClassRequiredArguments
+    -> SelectionSet decodesTo Api.Object.Pupil
+    -> SelectionSet (List decodesTo) RootMutation
+addPupilsOfClass requiredArgs____ object____ =
+    Object.selectionForCompositeField "addPupilsOfClass" [ Argument.required "campaignID" requiredArgs____.campaignID (IdScalarCodecs.codecs |> Api.Scalar.unwrapEncoder .codecId), Argument.required "class" requiredArgs____.class Encode.string, Argument.required "names" requiredArgs____.names (Encode.string |> Encode.list) ] object____ (Basics.identity >> Decode.list)
+
+
 type alias AssignPupilRequiredArguments =
     { pupilID : IdScalarCodecs.Id
     , eventID : IdScalarCodecs.Id
