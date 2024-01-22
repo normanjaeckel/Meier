@@ -10,8 +10,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Taskfile (https://taskfile.dev)
-        run: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
+      - name: Install and set up Nix
+        uses: cachix/install-nix-action@v23
+
+      - name: Configure Nix to use the devenv cache provided by Cachix to speed up the installation
+        uses: cachix/cachix-action@v12
+        with:
+          name: devenv
+
+      - name: Install devenv.sh
+        run: nix profile install tarball+https://install.devenv.sh/latest
 
       - name: Install roc
+        shell: devenv shell bash -e {0}
         run: task get-roc
+
+      - name: Build project
+        run: roc --version
