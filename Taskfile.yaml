@@ -2,24 +2,41 @@
 
 version: '3'
 
-includes:
-  client:
-    taskfile: ./client
-    dir: ./client
-
-  server:
-    taskfile: ./server
-    dir: ./server
-
 tasks:
   default:
-    desc: Runs the tasks client:build and server:run.
+    desc: Runs the tasks build, ...
     cmds:
-      - task: client:build
-      - task: server:run
+      - task: format
+      - task: test
+      - task: build
+
+  get-roc:
+    desc: Downloads the latest nightly build of roc and unzips it
+    cmds:
+      - wget https://github.com/roc-lang/roc/releases/download/nightly/roc_nightly-linux_x86_64-latest.tar.gz --output-document roc.tar.gz
+      - tar -xf roc.tar.gz
+      - rm roc.tar.gz
+
+  format:
+    desc: Formats roc files
+    cmds:
+      - roc format main.roc
+      - roc check
+    sources:
+      - main.roc
+
+  test:
+    desc: Runs tests
+    cmds:
+      - roc test
+    sources:
+      - main.roc
 
   build:
-    desc: Runs the tasks client:build and server:build.
+    desc: Builds project without running it
     cmds:
-      - task: client:build
-      - task: server:build
+      - roc build
+    sources:
+      - main.roc
+    generates:
+      - main
