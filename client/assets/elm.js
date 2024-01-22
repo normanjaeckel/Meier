@@ -10752,7 +10752,6 @@ var $elm$html$Html$Attributes$required = $elm$html$Html$Attributes$boolProperty(
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$CampaignForm$formFields = F2(
 	function (model, withDays) {
-		var labelNumOfDays = 'Anzahl der Tage';
 		return _List_fromArray(
 			[
 				A2(
@@ -10786,55 +10785,62 @@ var $author$project$CampaignForm$formFields = F2(
 								_List_Nil)
 							]))
 					])),
-				withDays ? A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('field')
-					]),
-				_List_fromArray(
-					[
-						A2(
+				function () {
+				if (withDays) {
+					var labelNumOfDays = 'Anzahl der Tage';
+					return A2(
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('control')
+								$elm$html$Html$Attributes$class('field')
 							]),
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$input,
+								$elm$html$Html$div,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('input'),
-										$elm$html$Html$Attributes$type_('number'),
-										A2($elm$html$Html$Attributes$attribute, 'aria-label', labelNumOfDays),
-										$elm$html$Html$Attributes$min('1'),
-										$elm$html$Html$Attributes$max('10'),
-										$elm$html$Html$Events$onInput(
-										A2(
-											$elm$core$Basics$composeR,
-											$elm$core$String$toInt,
-											A2(
-												$elm$core$Basics$composeR,
-												$elm$core$Maybe$withDefault(0),
-												$author$project$CampaignForm$NumOfDays))),
-										$elm$html$Html$Attributes$value(
-										$elm$core$String$fromInt(model.ai))
+										$elm$html$Html$Attributes$class('control')
 									]),
-								_List_Nil)
-							])),
-						A2(
-						$elm$html$Html$p,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('help')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(labelNumOfDays)
-							]))
-					])) : A2($elm$html$Html$div, _List_Nil, _List_Nil)
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$input,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('input'),
+												$elm$html$Html$Attributes$type_('number'),
+												A2($elm$html$Html$Attributes$attribute, 'aria-label', labelNumOfDays),
+												$elm$html$Html$Attributes$min('1'),
+												$elm$html$Html$Attributes$max('10'),
+												$elm$html$Html$Events$onInput(
+												A2(
+													$elm$core$Basics$composeR,
+													$elm$core$String$toInt,
+													A2(
+														$elm$core$Basics$composeR,
+														$elm$core$Maybe$withDefault(0),
+														$author$project$CampaignForm$NumOfDays))),
+												$elm$html$Html$Attributes$value(
+												$elm$core$String$fromInt(model.ai))
+											]),
+										_List_Nil)
+									])),
+								A2(
+								$elm$html$Html$p,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('help')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(labelNumOfDays)
+									]))
+							]));
+				} else {
+					return A2($elm$html$Html$div, _List_Nil, _List_Nil);
+				}
+			}()
 			]);
 	});
 var $elm$html$Html$Events$alwaysPreventDefault = function (msg) {
