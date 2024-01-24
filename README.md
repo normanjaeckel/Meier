@@ -10,8 +10,17 @@ time.
 
 ## Usage
 
-Work still in progress ...
+### Get roc
 
+    $ devenv shell
+    $ task get-roc
+    $ exit
+
+### Build and run project
+
+    $ devenv shell
+    $ task build
+    $ ./main
 
 ## License
 
