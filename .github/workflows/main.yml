@@ -26,4 +26,5 @@ jobs:
         run: task get-roc
 
       - name: Build project
+        shell: devenv shell bash -e {0}
         run: roc --version
