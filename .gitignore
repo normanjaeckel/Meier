@@ -3,6 +3,9 @@
 .task/
 private/
 
+# Build
+main
+
 # Devenv and direnv
 .devenv*
 devenv.local.nix
