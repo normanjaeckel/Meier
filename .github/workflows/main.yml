@@ -8,4 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkput@v3
+        uses: actions/checkout@v3
+
+      - name: Install Taskfile (https://taskfile.dev)
+        run: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin
+
+      - name: Install roc
+        run: task get-roc
