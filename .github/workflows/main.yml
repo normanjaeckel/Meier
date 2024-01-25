@@ -16,6 +16,9 @@ jobs:
       - name: Enable Magic Nix Cache
         uses: DeterminateSystems/magic-nix-cache-action@v2
 
+
+      # https://nix.dev/tutorials/nixos/continuous-integration-github-actions
+
       # - name: Configure Nix to use the devenv cache provided by Cachix to speed up the installation
       #   uses: cachix/cachix-action@v12
       #   with:
@@ -32,4 +35,3 @@ jobs:
         shell: devenv shell bash -e {0}
         run: roc check
 
-# https://nix.dev/tutorials/nixos/continuous-integration-github-actions
