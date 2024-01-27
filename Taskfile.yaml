@@ -2,9 +2,14 @@
 
 version: '3'
 
+includes:
+  platform:
+    taskfile: ./platform
+    dir: ./platform
+
 tasks:
   default:
-    desc: Runs the tasks build, ...
+    desc: Runs the tasks format, test and build
     cmds:
       - task: format
       - task: test
@@ -21,22 +26,27 @@ tasks:
     desc: Formats roc files
     cmds:
       - roc format main.roc
-      - roc check
     sources:
       - main.roc
 
   test:
-    desc: Runs tests
+    desc: Runs checks and tests
     cmds:
+      - roc check
       - roc test
     sources:
       - main.roc
 
   build:
     desc: Builds project without running it
+    deps:
+      - test
     cmds:
-      - roc build
+      - rm -f platform/roc.o
+      - roc build --no-link --output platform/roc.o
+      - task: platform:build
+      - rm platform/roc.o
     sources:
       - main.roc
     generates:
-      - main
+      - webserver

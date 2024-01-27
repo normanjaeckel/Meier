@@ -3,6 +3,9 @@
 .task/
 private/
 
+# Build
+webserver
+
 # Devenv and direnv
 .devenv*
 devenv.local.nix
@@ -13,4 +16,3 @@ devenv.local.nix
 
 # Roc
 roc_nightly*
-
