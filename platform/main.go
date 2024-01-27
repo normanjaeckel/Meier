@@ -31,7 +31,6 @@ func main() {
 	request.body = rocStrFromStr("this is the request body, try to make it longer")
 	request.methodEnum = 6
 	request.url = rocStrFromStr("/foo/bar")
-	fmt.Println(request)
 
 	var response C.struct_Response
 	C.roc__mainForHost_1_caller(&request, &model, nil, &response)
@@ -52,9 +51,9 @@ func rocListBytes(rocList C.struct_RocList) []byte {
 
 func rocStrFromStr(str string) C.struct_RocStr {
 	// TODO: 8 only works for 64bit. Use the correct size.
-	// TODO: return a function to deallocate, or does roc do it when the recount get decreased.
 	refCountPtr := roc_alloc(C.ulong(len(str)+8), 8)
-	// TODO: Set the ref counter
+	refCountSlice := unsafe.Slice((*uint)(refCountPtr), 1)
+	refCountSlice[0] = 9223372036854775808 // TODO: calculate this number from the lowest int
 	startPtr := unsafe.Add(refCountPtr, 8)
 
 	var rocStr C.struct_RocStr
