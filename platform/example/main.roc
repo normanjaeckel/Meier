@@ -26,7 +26,7 @@ applyEvents = \model, _ ->
     Str.concat model " world"
 
 handleReadRequest : Request, Model -> Response
-handleReadRequest = \request, _model -> 
+handleReadRequest = \request, _model ->
     body = "Request: $(Inspect.toStr request)" |> Str.toUtf8
 
     {
