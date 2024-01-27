@@ -1,0 +1,19 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks:
+  default:
+    desc: Some description here ...
+    cmds:
+      - echo Hello
+
+  build:
+    desc: Builds the platform
+    preconditions:
+      - sh: test -f roc.o
+        msg: File platform/roc.o does not exist. Run the build task of the main Taskfile first or build the file manually.
+    cmds:
+      - go build -o ../webserver
+    generates:
+      - ../webserver
