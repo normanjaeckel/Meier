@@ -28,9 +28,9 @@ func main() {
 	fmt.Printf("\n\nTest read request:\n")
 
 	var request C.struct_Request
-	// request.body = rocStrFromStr("this is the request body, try to make it longer")
+	request.body = rocStrFromStr("this is the request body, try to make it longer")
 	request.methodEnum = 6
-	// request.url = rocStrFromStr("/foo/bar")
+	request.url = rocStrFromStr("/foo/bar")
 	fmt.Println(request)
 
 	var response C.struct_Response
@@ -51,11 +51,20 @@ func rocListBytes(rocList C.struct_RocList) []byte {
 }
 
 func rocStrFromStr(str string) C.struct_RocStr {
+	// TODO: 8 only works for 64bit. Use the correct size.
+	// TODO: return a function to deallocate, or does roc do it when the recount get decreased.
+	refCountPtr := roc_alloc(C.ulong(len(str)+8), 8)
+	// TODO: Set the ref counter
+	startPtr := unsafe.Add(refCountPtr, 8)
+
 	var rocStr C.struct_RocStr
 	rocStr.len = C.ulong(len(str))
 	rocStr.capacity = rocStr.len
-	ptr := unsafe.StringData(str)
-	rocStr.bytes = (*C.char)(unsafe.Pointer(ptr))
+	rocStr.bytes = (*C.char)(unsafe.Pointer(startPtr))
+
+	dataSlice := unsafe.Slice((*byte)(startPtr), len(str))
+	copy(dataSlice, []byte(str))
+
 	return rocStr
 }
 

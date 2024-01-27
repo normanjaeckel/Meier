@@ -44,4 +44,4 @@ extern void roc__mainForHost_0_caller(void* *model, const struct RocList *events
 extern void roc__mainForHost_1_caller(const struct Request *request, void* *model,  void* something, const struct Response *response );
 
 // handleWriteRequest
-extern void roc__mainForHost_2_caller(const struct Request *Request, void* *model,  void* something, const struct ResponseEvents *responseEvents );
+extern void roc__mainForHost_2_caller(const struct Request *request, void* *model,  void* something, const struct ResponseEvents *responseEvents );
