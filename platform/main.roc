@@ -10,7 +10,7 @@ platform "webserver"
 ProgramForHost : {
     init : Box Model,
     applyEvents : Box Model, List Event -> Box Model,
-    handleReadRequest : Request, Model -> Response,
+    handleReadRequest : Request, Box Model -> Response,
     handleWriteRequest : Request, Model -> (Response, List Event),
 }
 
@@ -18,7 +18,7 @@ mainForHost : ProgramForHost
 mainForHost = { 
     init, 
     applyEvents, 
-    handleReadRequest: main.handleReadRequest, 
+    handleReadRequest: handleReadRequest, 
     handleWriteRequest: main.handleWriteRequest,
 }
 
@@ -31,3 +31,7 @@ applyEvents : Box Model, List Event -> Box Model
 applyEvents = \boxedModel, events ->
     main.applyEvents (Box.unbox boxedModel) events
     |> Box.box
+
+handleReadRequest : Request, Box Model -> Response
+handleReadRequest = \request, boxedModel ->
+    main.handleReadRequest request (Box.unbox boxedModel)

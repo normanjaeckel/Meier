@@ -26,11 +26,16 @@ func main() {
 
 	// Read Request
 	fmt.Printf("\n\nTest read request:\n")
+
 	var request C.struct_Request
+	// request.body = rocStrFromStr("this is the request body, try to make it longer")
+	request.methodEnum = 6
+	// request.url = rocStrFromStr("/foo/bar")
+	fmt.Println(request)
+
 	var response C.struct_Response
 	C.roc__mainForHost_1_caller(&request, &model, nil, &response)
-
-	fmt.Println(response.status, string(rocListBytes(response.body)))
+	fmt.Println(string(rocListBytes(response.body)))
 
 	fmt.Println("done")
 }
@@ -43,6 +48,15 @@ func rocListBytes(rocList C.struct_RocList) []byte {
 	len := rocList.len
 	ptr := (*byte)(unsafe.Pointer(rocList.bytes))
 	return unsafe.Slice(ptr, len)
+}
+
+func rocStrFromStr(str string) C.struct_RocStr {
+	var rocStr C.struct_RocStr
+	rocStr.len = C.ulong(len(str))
+	rocStr.capacity = rocStr.len
+	ptr := unsafe.StringData(str)
+	rocStr.bytes = (*C.char)(unsafe.Pointer(ptr))
+	return rocStr
 }
 
 func rocStrRead(rocStr C.struct_RocStr) string {
@@ -79,4 +93,9 @@ func roc_realloc(ptr unsafe.Pointer, newSize, _ C.ulong, alignment int) unsafe.P
 //export roc_dealloc
 func roc_dealloc(ptr unsafe.Pointer, alignment int) {
 	C.free(ptr)
+}
+
+//export roc_panic
+func roc_panic(msg *C.struct_RocStr, tagID C.uint) {
+	panic(fmt.Sprintf(rocStrRead(*msg)))
 }

@@ -8,13 +8,12 @@ interface Webserver
 
 Event : List U8
 
-# Request is the same as: https://github.com/roc-lang/basic-webserver/blob/main/platform/InternalHttp.roc
+# TODO: Request should be the same as: https://github.com/roc-lang/basic-webserver/blob/main/platform/InternalHttp.roc
 Request : {
     method : [Options, Get, Post, Put, Delete, Head, Trace, Connect, Patch],
     headers : List Header,
     url : Str,
-    body : Body,
-    timeout : [TimeoutMilliseconds U64, NoTimeout],
+    body : Str,
 }
 
 Response : { 
@@ -24,8 +23,3 @@ Response : {
 }
 
 Header : { name : Str, value : List U8 }
-
-Body : [
-    Body { mimeType : Str, body : List U8 },
-    EmptyBody,
-]

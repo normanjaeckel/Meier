@@ -18,11 +18,10 @@ struct Program {
 };
 
 struct Request {
-    unsigned char methodEnum;
+    struct RocStr body;
     struct RocList headers;
     struct RocStr url;
-    unsigned char bodyEnum;
-    unsigned char timeoutEnum;
+    unsigned char methodEnum; 
 };
 
 struct Response {
@@ -42,7 +41,7 @@ extern void roc__mainForHost_1_exposed_generic(const struct Program *program);
 extern void roc__mainForHost_0_caller(void* *model, const struct RocList *events, void* something, void* *newModel );
 
 // handleReadRequest
-extern void roc__mainForHost_1_caller(const struct Request *Request, void* *model,  void* something, const struct Response *response );
+extern void roc__mainForHost_1_caller(const struct Request *request, void* *model,  void* something, const struct Response *response );
 
 // handleWriteRequest
 extern void roc__mainForHost_2_caller(const struct Request *Request, void* *model,  void* something, const struct ResponseEvents *responseEvents );

@@ -26,11 +26,14 @@ applyEvents = \model, _ ->
     Str.concat model " world"
 
 handleReadRequest : Request, Model -> Response
-handleReadRequest = \_request, _model -> {
-    body: "Hello world" |> Str.toUtf8,
-    headers: [],
-    status: 200,
-}
+handleReadRequest = \request, _model -> 
+    body = "Request: $(Inspect.toStr request)" |> Str.toUtf8
+
+    {
+        body: body,
+        headers: [],
+        status: 200,
+    }
 
 handleWriteRequest : Request, Model -> (Response, List Event)
 handleWriteRequest = \_request, _model ->
