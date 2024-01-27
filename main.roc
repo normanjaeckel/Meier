@@ -1,35 +1,51 @@
 app "meier"
     packages {
-        pf: "https://github.com/roc-lang/basic-cli/releases/download/0.7.1/Icc3xJoIixF3hCcfXrDwLCu4wQHtNdPyoJkEbkgIElA.tar.br",
+        pf: "platform/main.roc",
         # json: "https://github.com/lukewilliamboswell/roc-json/releases/download/0.6.0/hJySbEhJV026DlVCHXGOZNOeoOl7468y9F9Buhj0J18.tar.br",
     }
     imports [
-        pf.Stdout,
+        pf.Webserver.{ Event, Request, Response },
         # json.Core.{ Json },
     ]
-    provides [main] to pf
+    provides [main, Model] to pf
 
-# Move these types to the platform
+Program : {
+    init : Model,
+    applyEvents : Model, List Event -> Model,
+    handleReadRequest : Request, Model -> Response,
+    handleWriteRequest : Request, Model -> (Response, List Event),
+}
 
-# Config : Str
-
-# Request : Str
-
-# Response : Str
-
-# Done here
-
+main : Program
 main =
-    Stdout.line ""
+    { init, applyEvents, handleReadRequest, handleWriteRequest }
 
-# Model : Str
+Model : Str
 
-# Event : Str
+init : Model
+init =
+    "Hello"
 
-# createModel : Model
+applyEvents : Model, List Event -> Model
+applyEvents = \model, _ ->
+    Str.concat model ", World!"
 
-# applyEvents : List Event, Model -> Model
+handleReadRequest : Request, Model -> Response
+handleReadRequest = \request, _model ->
+    body = "Request: $(Inspect.toStr request)" |> Str.toUtf8
+    {
+        body: body,
+        headers: [],
+        status: 200,
+    }
 
-# handleReadRequest : Config, Request, Model -> Response
-
-# handleWriteRequest : Config, Request, Model -> (Response, List Event)
+handleWriteRequest : Request, Model -> (Response, List Event)
+handleWriteRequest = \_request, _model ->
+    (
+        {
+            body: "Nothing to write" |> Str.toUtf8,
+            headers: [],
+            status: 500,
+        },
+        [],
+    )
