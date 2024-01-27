@@ -1,4 +1,4 @@
-name: Build ... and run all tests and checks
+name: Build project and run all tests and checks
 
 on:
   - pull_request
