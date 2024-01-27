@@ -2,11 +2,6 @@
 
 version: '3'
 
-includes:
-  platform:
-    taskfile: ./platform
-    dir: ./platform
-
 tasks:
   default:
     desc: Runs the tasks format, test and build
@@ -42,11 +37,19 @@ tasks:
     deps:
       - test
     cmds:
+      - rm -f webserver
       - rm -f platform/roc.o
       - roc build --no-link --output platform/roc.o
-      - task: platform:build
+      - task: build-platform
       - rm platform/roc.o
     sources:
       - main.roc
     generates:
       - webserver
+
+  build-platform:
+    internal: true
+    desc: Builds only the webserver
+    dir: ./platform
+    cmds:
+      - go build -o ../webserver
