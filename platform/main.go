@@ -32,9 +32,18 @@ func main() {
 	request.methodEnum = 6
 	request.url = rocStrFromStr("/foo/bar")
 
+	// TODO: check the refcount of the response and deallocate it if necessary.
 	var response C.struct_Response
 	C.roc__mainForHost_1_caller(&request, &model, nil, &response)
 	fmt.Println(string(rocListBytes(response.body)))
+
+	// Write Request
+	fmt.Printf("\n\nTest write request:\n")
+
+	// TODO: check the refcount of the response and deallocate it if necessary.
+	var responseEvents C.struct_ResponseEvents
+	C.roc__mainForHost_2_caller(&request, &model, nil, &responseEvents)
+	fmt.Println(string(rocListBytes(responseEvents.response.body)))
 
 	fmt.Println("done")
 }
