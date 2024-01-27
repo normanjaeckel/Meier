@@ -17,9 +17,24 @@ struct Program {
     void* applyEvents;
 };
 
-struct Request {};
-struct Response {};
-struct ResponseEvents {};
+struct Request {
+    unsigned char methodEnum;
+    struct RocList headers;
+    struct RocStr url;
+    unsigned char bodyEnum;
+    unsigned char timeoutEnum;
+};
+
+struct Response {
+    unsigned int status;
+    struct RocList headers;
+    struct RocList body;
+};
+
+struct ResponseEvents {
+    struct Response response;
+    struct RocList events;
+};
 
 extern void roc__mainForHost_1_exposed_generic(const struct Program *program);
 

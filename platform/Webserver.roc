@@ -17,7 +17,11 @@ Request : {
     timeout : [TimeoutMilliseconds U64, NoTimeout],
 }
 
-Response : { status : U16, headers : List Header, body : List U8 }
+Response : { 
+    status : U16, 
+    headers : List Header, 
+    body : List U8,
+}
 
 Header : { name : Str, value : List U8 }
 
