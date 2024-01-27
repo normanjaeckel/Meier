@@ -18,10 +18,19 @@ func main() {
 
 	fmt.Println(rocStrRead(*(*C.struct_RocStr)(model)))
 
+	// Call applyEvents
 	var events C.struct_RocList
 	C.roc__mainForHost_0_caller(&model, &events, nil, &model)
 
 	fmt.Println(rocStrRead(*(*C.struct_RocStr)(model)))
+
+	// Read Request
+	fmt.Printf("\n\nTest read request:\n")
+	var request C.struct_Request
+	var response C.struct_Response
+	C.roc__mainForHost_1_caller(&request, &model, nil, &response)
+
+	fmt.Println(response.status, string(rocListBytes(response.body)))
 
 	fmt.Println("done")
 }
@@ -29,6 +38,12 @@ func main() {
 type applyEventsFunc func(model unsafe.Pointer) unsafe.Pointer
 
 const is64Bit = uint64(^uintptr(0)) == ^uint64(0)
+
+func rocListBytes(rocList C.struct_RocList) []byte {
+	len := rocList.len
+	ptr := (*byte)(unsafe.Pointer(rocList.bytes))
+	return unsafe.Slice(ptr, len)
+}
 
 func rocStrRead(rocStr C.struct_RocStr) string {
 	if int(rocStr.capacity) < 0 {
