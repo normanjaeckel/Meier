@@ -18,8 +18,8 @@ mainForHost : ProgramForHost
 mainForHost = { 
     init, 
     applyEvents, 
-    handleReadRequest: handleReadRequest, 
-    handleWriteRequest: handleWriteRequest,
+    handleReadRequest, 
+    handleWriteRequest,
 }
 
 init : Box Model
@@ -37,4 +37,5 @@ handleReadRequest = \request, boxedModel ->
     main.handleReadRequest request (Box.unbox boxedModel)
 
 handleWriteRequest : Request, Box Model -> (Response, List Event)
+handleWriteRequest = \request, boxedModel ->
     main.handleWriteRequest request (Box.unbox boxedModel)
