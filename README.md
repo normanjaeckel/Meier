@@ -10,7 +10,12 @@ time.
 
 ## Usage
 
-### Get roc
+We use [devenv](https://devenv.sh/) for simple setup of the development
+environment. You can also install Roc and Go in any other way and use the
+respective build commands you find in the [Taskfile.yml] and
+[platform/Taskfile.yml].
+
+### Get Roc
 
     $ devenv shell
     $ task get-roc
@@ -20,7 +25,7 @@ time.
 
     $ devenv shell
     $ task build
-    $ ./main
+    $ ./webserver
 
 ## License
 
