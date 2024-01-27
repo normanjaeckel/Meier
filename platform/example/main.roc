@@ -2,7 +2,7 @@ app "basic"
     packages {
         webserver: "../main.roc",
     }
-    imports [webserver.Webserver.{Event, Request, Response}]
+    imports [webserver.Webserver.{ Event, Request, Response }]
     provides [main, Model] to webserver
 
 Program : {
@@ -18,7 +18,7 @@ main : Program
 main = { init, applyEvents, handleReadRequest, handleWriteRequest }
 
 init : Model
-init = 
+init =
     "hello"
 
 applyEvents : Model, List Event -> Model
@@ -26,9 +26,19 @@ applyEvents = \model, _ ->
     Str.concat model " world"
 
 handleReadRequest : Request, Model -> Response
-handleReadRequest = \request, model ->
-    {}
+handleReadRequest = \_request, _model -> {
+    body: "Hello world" |> Str.toUtf8,
+    headers: [],
+    status: 200,
+}
 
 handleWriteRequest : Request, Model -> (Response, List Event)
-handleWriteRequest = \request, model ->
-    ({}, [])
+handleWriteRequest = \_request, _model ->
+    (
+        {
+            body: "Nothing to write" |> Str.toUtf8,
+            headers: [],
+            status: 500,
+        },
+        [],
+    )
