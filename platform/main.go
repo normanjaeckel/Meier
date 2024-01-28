@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 
+	"webserver/database"
 	"webserver/http"
 	"webserver/roc"
 )
@@ -21,11 +22,17 @@ func run() error {
 	ctx, cancel := interruptContext()
 	defer cancel()
 
-	events := [][]byte{
-		[]byte(" world"),
-		[]byte(" and"),
-		[]byte(" other"),
-		[]byte(" friends"),
+	// db := database.FileDB{File: "db.events"}
+
+	eventContent := ` welt
+	wie
+	geht
+	es
+	heute`
+	db := &database.MemoryDB{Content: eventContent}
+	events, err := database.ReadEvents(db)
+	if err != nil {
+		return fmt.Errorf("read events from db: %w", err)
 	}
 
 	r := roc.New(events)
