@@ -13,15 +13,15 @@ jobs:
       - name: Install and set up Nix
         uses: cachix/install-nix-action@v23
 
-      - name: Enable Magic Nix Cache
-        uses: DeterminateSystems/magic-nix-cache-action@v2
-
       # https://nix.dev/tutorials/nixos/continuous-integration-github-actions
 
-      # - name: Configure Nix to use the devenv cache provided by Cachix to speed up the installation
-      #   uses: cachix/cachix-action@v12
-      #   with:
-      #     name: devenv
+      # - name: Enable Magic Nix Cache
+      #   uses: DeterminateSystems/magic-nix-cache-action@v2
+
+      - name: Configure Nix to use the devenv cache provided by Cachix to speed up the installation
+        uses: cachix/cachix-action@v12
+        with:
+          name: devenv
 
       - name: Install devenv.sh
         run: nix profile install tarball+https://install.devenv.sh/latest
