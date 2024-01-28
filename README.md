@@ -1,6 +1,6 @@
 # Meier
 
-![Made with Bulma](https://bulma.io/images/made-with-bulma.png){height:24}
+![Made with Bulma](https://bulma.io/images/made-with-bulma.png){height=24}
 
 Meier is a small tool to match pupils to events/groups according to their
 preferences (green, yellow, red).
