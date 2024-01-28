@@ -29,3 +29,11 @@ respective build commands you find in the [Taskfile.yaml](Taskfile.yaml).
 ## License
 
 MIT
+
+## Credits
+
+<img alt="Made with Bulma" src="https://bulma.io/images/made-with-bulma.png" height=24>
+
+We use the CSS library [Bulma](https://bulma.io/). If you build the binary of
+this project, Bulma's minified CSS file is included. Bulma is release under the
+[MIT license](assets/bulma-0.9.4/bulma/LICENSE).
