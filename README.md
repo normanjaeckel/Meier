@@ -1,7 +1,5 @@
 # Meier
 
-![Made with Bulma](https://bulma.io/images/made-with-bulma.png){height=24}
-
 Meier is a small tool to match pupils to events/groups according to their
 preferences (green, yellow, red).
 
@@ -33,6 +31,8 @@ respective build commands you find in the [Taskfile.yaml](Taskfile.yaml).
 MIT
 
 ## Credits
+
+<img alt="Made with Bulma" src="https://bulma.io/images/made-with-bulma.png" height=24>
 
 We use the CSS library [Bulma](https://bulma.io/). If you build the binary of
 this project, bulma's minified CSS file is included. Bulma is release under the
