@@ -32,7 +32,7 @@ applyEvents = \model, _ ->
 
 handleReadRequest : Request, Model -> Response
 handleReadRequest = \request, _model ->
-    body = "Request: $(Inspect.toStr request)" |> Str.toUtf8
+    body = "Request: $(Inspect.toStr request)"
     {
         body: body,
         headers: [],
@@ -43,7 +43,7 @@ handleWriteRequest : Request, Model -> (Response, List Event)
 handleWriteRequest = \_request, _model ->
     (
         {
-            body: "Nothing to write" |> Str.toUtf8,
+            body: "Nothing to write",
             headers: [],
             status: 500,
         },
