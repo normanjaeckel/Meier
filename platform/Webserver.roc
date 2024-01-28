@@ -13,7 +13,7 @@ Request : {
     method : [Options, Get, Post, Put, Delete, Head, Trace, Connect, Patch],
     headers : List Header,
     url : Str,
-    body : Str,
+    body : List U8,
 }
 
 Response : {
