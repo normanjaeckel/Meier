@@ -2,10 +2,8 @@ platform "webserver"
     requires { Model } { main : _ }
     exposes []
     packages {}
-    imports [Webserver.{Event, Request, Response}]
+    imports [Webserver.{ Event, Request, Response }]
     provides [mainForHost]
-
-
 
 ProgramForHost : {
     init : Box Model,
@@ -15,10 +13,10 @@ ProgramForHost : {
 }
 
 mainForHost : ProgramForHost
-mainForHost = { 
-    init, 
-    applyEvents, 
-    handleReadRequest, 
+mainForHost = {
+    init,
+    applyEvents,
+    handleReadRequest,
     handleWriteRequest,
 }
 

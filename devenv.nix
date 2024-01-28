@@ -3,6 +3,8 @@
 {
   # See full reference at https://devenv.sh/reference/options/
 
+  languages.go.enable = true;
+
   packages = [
     pkgs.git
     pkgs.go-task

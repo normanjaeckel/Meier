@@ -30,7 +30,7 @@ jobs:
         shell: devenv shell bash -e {0}
         run: task get-roc
 
-      - name: Check project
+      - name: Build project
         shell: devenv shell bash -e {0}
-        run: roc check
+        run: task build
 

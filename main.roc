@@ -49,3 +49,5 @@ handleWriteRequest = \_request, _model ->
         },
         [],
     )
+
+expect 42 == 42
