@@ -16,9 +16,9 @@ Request : {
     body : List U8,
 }
 
-Response : { 
-    status : U16, 
-    headers : List Header, 
+Response : {
+    status : U16,
+    headers : List Header,
     body : List U8,
 }
 
