@@ -36,7 +36,7 @@ func run() error {
 	}
 
 	r := roc.New(events)
-	return http.Run(ctx, ":8090", r)
+	return http.Run(ctx, ":8090", r, db)
 }
 
 // interruptContext works like signal.NotifyContext

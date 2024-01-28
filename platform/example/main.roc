@@ -37,9 +37,9 @@ handleWriteRequest : Request, Model -> (Response, List Event)
 handleWriteRequest = \_request, _model ->
     (
         {
-            body: "Nothing to write",
+            body: "wrote something",
             headers: [],
             status: 500,
         },
-        [],
+        [" something"],
     )
