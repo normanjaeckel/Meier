@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 
+	"webserver/database"
 	"webserver/http"
 	"webserver/roc"
 )
@@ -21,8 +22,15 @@ func run() error {
 	ctx, cancel := interruptContext()
 	defer cancel()
 
-	r := roc.New(nil)
-	return http.Run(ctx, ":8090", r)
+	db := database.FileDB{File: "db.events"}
+
+	events, err := database.ReadEvents(db)
+	if err != nil {
+		return fmt.Errorf("read events from db: %w", err)
+	}
+
+	r := roc.New(events)
+	return http.Run(ctx, ":8090", r, db)
 }
 
 // interruptContext works like signal.NotifyContext

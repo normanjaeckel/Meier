@@ -7,14 +7,15 @@ import (
 	"net"
 	"net/http"
 
+	"webserver/database"
 	"webserver/roc"
 )
 
 // Run starts the webserver
-func Run(ctx context.Context, addr string, r *roc.Roc) error {
+func Run(ctx context.Context, addr string, r *roc.Roc, db database.Database) error {
 	srv := &http.Server{
 		Addr:        addr,
-		Handler:     handler(r),
+		Handler:     handler(r, db),
 		BaseContext: func(net.Listener) context.Context { return ctx },
 	}
 
@@ -39,14 +40,16 @@ func Run(ctx context.Context, addr string, r *roc.Roc) error {
 	return <-wait
 }
 
-func handler(roc *roc.Roc) http.Handler {
+func handler(rocApp *roc.Roc, db database.Database) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		method := roc.ReadRequest
-		if isWriteRequest(r.Method) {
-			method = roc.WriteRequest
-		}
+		var response roc.Response
+		var err error
 
-		response, err := method(r)
+		if isWriteRequest(r.Method) {
+			response, err = rocApp.WriteRequest(r, db)
+		} else {
+			response, err = rocApp.ReadRequest(r)
+		}
 		if err != nil {
 			http.Error(w, "Error", 500)
 			return
@@ -54,7 +57,7 @@ func handler(roc *roc.Roc) http.Handler {
 
 		w.WriteHeader(response.Status)
 		// TODO: Set header
-		w.Write(response.Body)
+		w.Write([]byte(response.Body))
 	})
 }
 

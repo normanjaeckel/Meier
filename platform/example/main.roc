@@ -22,26 +22,24 @@ init =
     "hello"
 
 applyEvents : Model, List Event -> Model
-applyEvents = \model, _ ->
-    Str.concat model " world"
+applyEvents = \model, events ->
+    List.walk events (model) \state, event ->
+        Str.concat state event
 
 handleReadRequest : Request, Model -> Response
-handleReadRequest = \request, _model ->
-    body = "Request: $(Inspect.toStr request)" |> Str.toUtf8
-
-    {
-        body: body,
-        headers: [],
-        status: 200,
-    }
+handleReadRequest = \_request, model -> {
+    body: model,
+    headers: [],
+    status: 200,
+}
 
 handleWriteRequest : Request, Model -> (Response, List Event)
 handleWriteRequest = \_request, _model ->
     (
         {
-            body: "Nothing to write" |> Str.toUtf8,
+            body: "wrote something",
             headers: [],
             status: 500,
         },
-        [],
+        [" something"],
     )

@@ -12,6 +12,8 @@ import (
 	"net/http"
 	"sync"
 	"unsafe"
+
+	"webserver/database"
 )
 
 // Roc holds the connection to roc.
@@ -26,15 +28,17 @@ func New(events [][]byte) *Roc {
 	var program C.struct_Program
 	C.roc__mainForHost_1_exposed_generic(&program)
 	model := program.init
+
 	r := Roc{model: model}
-	r.applyEvents(events)
+	rocEvents := convertEvents(events)
+	C.roc__mainForHost_0_caller(&r.model, &rocEvents, nil, &r.model)
 	return &r
 }
 
-func (r *Roc) applyEvents(events [][]byte) {
-	var rocEvents C.struct_RocList
-	// TODO: Convert events to rocEvents
-	C.roc__mainForHost_0_caller(&r.model, &rocEvents, nil, &r.model)
+func setRefCountToTwo(ptr unsafe.Pointer) {
+	refcountPtr := unsafe.Add(ptr, -8)
+	refCountSlice := unsafe.Slice((*uint)(refcountPtr), 1)
+	refCountSlice[0] = 9223372036854775809
 }
 
 // ReadRequest handles a read request.
@@ -49,17 +53,18 @@ func (r *Roc) ReadRequest(request *http.Request) (Response, error) {
 
 	// TODO: check the refcount of the response and deallocate it if necessary.
 	var response C.struct_Response
+	setRefCountToTwo(r.model)
 	C.roc__mainForHost_1_caller(&rocRequest, &r.model, nil, &response)
 
 	return Response{
 		Status: int(response.status),
 		// TODO: Headers: response.headers,
-		Body: rocListBytes(response.body),
+		Body: rocStrRead(response.body),
 	}, nil
 }
 
 // WriteRequest handles a write request.
-func (r *Roc) WriteRequest(request *http.Request) (Response, error) {
+func (r *Roc) WriteRequest(request *http.Request, db database.Database) (Response, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -70,20 +75,60 @@ func (r *Roc) WriteRequest(request *http.Request) (Response, error) {
 
 	// TODO: check the refcount of the response and deallocate it if necessary.
 	var responseEvents C.struct_ResponseEvents
+	setRefCountToTwo(r.model)
 	C.roc__mainForHost_2_caller(&rocRequest, &r.model, nil, &responseEvents)
 
 	response := Response{
 		Status: int(responseEvents.response.status),
 		// TODO: Headers: responseEvents.response.headers,
-		Body: rocListBytes(responseEvents.response.body),
+		Body: rocStrRead(responseEvents.response.body),
 	}
 
-	// TODO: Convert events.
-	// TODO: Write Events
+	goEvents := readEvents(responseEvents.events)
+	db.Append(goEvents)
 
-	r.applyEvents(nil)
+	C.roc__mainForHost_0_caller(&r.model, &responseEvents.events, nil, &r.model)
 
 	return response, nil
+}
+
+func convertEvents(events [][]byte) C.struct_RocList {
+	var str C.struct_RocStr
+	elementSize := int(unsafe.Sizeof(str))
+	fullSize := elementSize*len(events) + 8
+
+	refCountPtr := roc_alloc(C.ulong(fullSize), 8)
+	refCountSlice := unsafe.Slice((*uint)(refCountPtr), 1)
+	refCountSlice[0] = 9223372036854775808
+	startPtr := unsafe.Add(refCountPtr, 8)
+
+	rocStrList := make([]C.struct_RocStr, len(events))
+	for i, event := range events {
+		rocStrList[i] = rocStrFromStr(string(event))
+	}
+
+	dataSlice := unsafe.Slice((*C.struct_RocStr)(startPtr), len(rocStrList))
+	copy(dataSlice, rocStrList)
+
+	var rocList C.struct_RocList
+	rocList.len = C.ulong(len(events))
+	rocList.capacity = rocList.len
+	rocList.bytes = (*C.char)(unsafe.Pointer(startPtr))
+
+	return rocList
+}
+
+func readEvents(rocList C.struct_RocList) [][]byte {
+	len := rocList.len
+	ptr := (*C.struct_RocStr)(unsafe.Pointer(rocList.bytes))
+	dataSlice := unsafe.Slice(ptr, len)
+
+	events := make([][]byte, len)
+	for i, rocEvent := range dataSlice {
+		events[i] = []byte(rocStrRead(rocEvent))
+	}
+
+	return events
 }
 
 func convertRequest(r *http.Request) (C.struct_Request, error) {
@@ -137,7 +182,7 @@ type Header struct {
 type Response struct {
 	Status  int
 	Headers []Header
-	Body    []byte
+	Body    string
 }
 
 const is64Bit = uint64(^uintptr(0)) == ^uint64(0)
