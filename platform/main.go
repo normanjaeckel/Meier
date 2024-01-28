@@ -1,118 +1,45 @@
 package main
 
-/*
-#cgo LDFLAGS: ./roc.o -ldl
-#include "./host.h"
-*/
-import "C"
-
 import (
+	"context"
 	"fmt"
-	"unsafe"
+	"os"
+	"os/signal"
+
+	"webserver/http"
+	"webserver/roc"
 )
 
 func main() {
-	var program C.struct_Program
-	C.roc__mainForHost_1_exposed_generic(&program)
-	model := program.init
-
-	fmt.Println(rocStrRead(*(*C.struct_RocStr)(model)))
-
-	// Call applyEvents
-	var events C.struct_RocList
-	C.roc__mainForHost_0_caller(&model, &events, nil, &model)
-
-	fmt.Println(rocStrRead(*(*C.struct_RocStr)(model)))
-
-	// Read Request
-	fmt.Printf("\n\nTest read request:\n")
-
-	var request C.struct_Request
-	request.body = rocStrFromStr("this is the request body, try to make it longer")
-	request.methodEnum = 6
-	request.url = rocStrFromStr("/foo/bar")
-
-	// TODO: check the refcount of the response and deallocate it if necessary.
-	var response C.struct_Response
-	C.roc__mainForHost_1_caller(&request, &model, nil, &response)
-	fmt.Println(string(rocListBytes(response.body)))
-
-	// Write Request
-	fmt.Printf("\n\nTest write request:\n")
-
-	// TODO: check the refcount of the response and deallocate it if necessary.
-	var responseEvents C.struct_ResponseEvents
-	C.roc__mainForHost_2_caller(&request, &model, nil, &responseEvents)
-	fmt.Println(string(rocListBytes(responseEvents.response.body)))
-
-	fmt.Println("done")
-}
-
-type applyEventsFunc func(model unsafe.Pointer) unsafe.Pointer
-
-const is64Bit = uint64(^uintptr(0)) == ^uint64(0)
-
-func rocListBytes(rocList C.struct_RocList) []byte {
-	len := rocList.len
-	ptr := (*byte)(unsafe.Pointer(rocList.bytes))
-	return unsafe.Slice(ptr, len)
-}
-
-func rocStrFromStr(str string) C.struct_RocStr {
-	// TODO: 8 only works for 64bit. Use the correct size.
-	refCountPtr := roc_alloc(C.ulong(len(str)+8), 8)
-	refCountSlice := unsafe.Slice((*uint)(refCountPtr), 1)
-	refCountSlice[0] = 9223372036854775808 // TODO: calculate this number from the lowest int
-	startPtr := unsafe.Add(refCountPtr, 8)
-
-	var rocStr C.struct_RocStr
-	rocStr.len = C.ulong(len(str))
-	rocStr.capacity = rocStr.len
-	rocStr.bytes = (*C.char)(unsafe.Pointer(startPtr))
-
-	dataSlice := unsafe.Slice((*byte)(startPtr), len(str))
-	copy(dataSlice, []byte(str))
-
-	return rocStr
-}
-
-func rocStrRead(rocStr C.struct_RocStr) string {
-	if int(rocStr.capacity) < 0 {
-		// Small string
-		ptr := (*byte)(unsafe.Pointer(&rocStr))
-
-		byteLen := 12
-		if is64Bit {
-			byteLen = 24
-		}
-
-		shortStr := unsafe.String(ptr, byteLen)
-		len := shortStr[byteLen-1] ^ 128
-		return shortStr[:len]
+	if err := run(); err != nil {
+		fmt.Printf("Error: %v", err)
+		os.Exit(1)
 	}
-
-	// Remove the bit for seamless string
-	len := (uint(rocStr.len) << 1) >> 1
-	ptr := (*byte)(unsafe.Pointer(rocStr.bytes))
-	return unsafe.String(ptr, len)
 }
 
-//export roc_alloc
-func roc_alloc(size C.ulong, alignment int) unsafe.Pointer {
-	return C.malloc(size)
+func run() error {
+	ctx, cancel := interruptContext()
+	defer cancel()
+
+	r := roc.New(nil)
+	return http.Run(ctx, ":8090", r)
 }
 
-//export roc_realloc
-func roc_realloc(ptr unsafe.Pointer, newSize, _ C.ulong, alignment int) unsafe.Pointer {
-	return C.realloc(ptr, newSize)
-}
+// interruptContext works like signal.NotifyContext
+//
+// In only listens on os.Interrupt. If the signal is received two times,
+// os.Exit(1) is called.
+func interruptContext() (context.Context, context.CancelFunc) {
+	ctx, cancel := context.WithCancel(context.Background())
+	go func() {
+		sigint := make(chan os.Signal, 1)
+		signal.Notify(sigint, os.Interrupt)
+		<-sigint
+		cancel()
 
-//export roc_dealloc
-func roc_dealloc(ptr unsafe.Pointer, alignment int) {
-	C.free(ptr)
-}
-
-//export roc_panic
-func roc_panic(msg *C.struct_RocStr, tagID C.uint) {
-	panic(fmt.Sprintf(rocStrRead(*msg)))
+		// If the signal was send for the second time, make a hard cut.
+		<-sigint
+		os.Exit(1)
+	}()
+	return ctx, cancel
 }
