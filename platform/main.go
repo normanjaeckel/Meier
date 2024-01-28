@@ -22,14 +22,8 @@ func run() error {
 	ctx, cancel := interruptContext()
 	defer cancel()
 
-	// db := database.FileDB{File: "db.events"}
+	db := database.FileDB{File: "db.events"}
 
-	eventContent := ` welt
-	wie
-	geht
-	es
-	heute`
-	db := &database.MemoryDB{Content: eventContent}
 	events, err := database.ReadEvents(db)
 	if err != nil {
 		return fmt.Errorf("read events from db: %w", err)
