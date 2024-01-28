@@ -12,7 +12,7 @@ time.
 
 We use [devenv](https://devenv.sh/) for a simple setup of the development
 environment. You can also install Roc and Go in another way and use the
-respective build commands you find in the [Taskfile.yml].
+respective build commands you find in the [Taskfile.yaml](Taskfile.yaml).
 
 ### Get Roc
 
