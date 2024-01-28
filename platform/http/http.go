@@ -54,7 +54,7 @@ func handler(roc *roc.Roc) http.Handler {
 
 		w.WriteHeader(response.Status)
 		// TODO: Set header
-		w.Write(response.Body)
+		w.Write([]byte(response.Body))
 	})
 }
 

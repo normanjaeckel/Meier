@@ -32,9 +32,34 @@ func New(events [][]byte) *Roc {
 }
 
 func (r *Roc) applyEvents(events [][]byte) {
-	var rocEvents C.struct_RocList
-	// TODO: Convert events to rocEvents
+	rocEvents := convertEvents(events)
 	C.roc__mainForHost_0_caller(&r.model, &rocEvents, nil, &r.model)
+}
+
+func convertEvents(events [][]byte) C.struct_RocList {
+	var str C.struct_RocStr
+	elementSize := int(unsafe.Sizeof(str))
+	fullSize := elementSize*len(events) + 8
+
+	refCountPtr := roc_alloc(C.ulong(fullSize), 8)
+	refCountSlice := unsafe.Slice((*uint)(refCountPtr), 1)
+	refCountSlice[0] = 9223372036854775808
+	startPtr := unsafe.Add(refCountPtr, 8)
+
+	rocStrList := make([]C.struct_RocStr, len(events))
+	for i, event := range events {
+		rocStrList[i] = rocStrFromStr(string(event))
+	}
+
+	dataSlice := unsafe.Slice((*C.struct_RocStr)(startPtr), len(rocStrList))
+	copy(dataSlice, rocStrList)
+
+	var rocList C.struct_RocList
+	rocList.len = C.ulong(len(events))
+	rocList.capacity = rocList.len
+	rocList.bytes = (*C.char)(unsafe.Pointer(startPtr))
+
+	return rocList
 }
 
 // ReadRequest handles a read request.
@@ -54,7 +79,7 @@ func (r *Roc) ReadRequest(request *http.Request) (Response, error) {
 	return Response{
 		Status: int(response.status),
 		// TODO: Headers: response.headers,
-		Body: rocListBytes(response.body),
+		Body: rocStrRead(response.body),
 	}, nil
 }
 
@@ -75,7 +100,7 @@ func (r *Roc) WriteRequest(request *http.Request) (Response, error) {
 	response := Response{
 		Status: int(responseEvents.response.status),
 		// TODO: Headers: responseEvents.response.headers,
-		Body: rocListBytes(responseEvents.response.body),
+		Body: rocStrRead(responseEvents.response.body),
 	}
 
 	// TODO: Convert events.
@@ -137,7 +162,7 @@ type Header struct {
 type Response struct {
 	Status  int
 	Headers []Header
-	Body    []byte
+	Body    string
 }
 
 const is64Bit = uint64(^uintptr(0)) == ^uint64(0)

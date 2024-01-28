@@ -21,7 +21,14 @@ func run() error {
 	ctx, cancel := interruptContext()
 	defer cancel()
 
-	r := roc.New(nil)
+	events := [][]byte{
+		[]byte(" world"),
+		[]byte(" and"),
+		[]byte(" other"),
+		[]byte(" friends"),
+	}
+
+	r := roc.New(events)
 	return http.Run(ctx, ":8090", r)
 }
 

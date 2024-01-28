@@ -25,7 +25,7 @@ struct Request {
 };
 
 struct Response {
-    struct RocList body;
+    struct RocStr body;
     struct RocList headers;
     short unsigned int status;
 };
