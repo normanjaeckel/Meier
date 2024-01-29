@@ -58,9 +58,9 @@ struct Header {
 struct Request {
     struct RequestBody body;
     struct RocList headers;
+    struct RequestTimeout timeout;
     struct RocStr url;
     unsigned char methodEnum; 
-    struct RequestTimeout timeout;
 };
 
 struct Response {
