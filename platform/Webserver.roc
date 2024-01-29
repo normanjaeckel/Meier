@@ -3,6 +3,7 @@ interface Webserver
         Event,
         Request,
         Response,
+        Command,
     ]
     imports []
 
@@ -23,3 +24,5 @@ Response : {
 }
 
 Header : { name : Str, value : Str }
+
+Command : [AddEvent Event, PrintThisNumber I64]

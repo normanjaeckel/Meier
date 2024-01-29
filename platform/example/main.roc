@@ -2,14 +2,14 @@ app "basic"
     packages {
         webserver: "../main.roc",
     }
-    imports [webserver.Webserver.{ Event, Request, Response }]
+    imports [webserver.Webserver.{ Event, Request, Response, Command }]
     provides [main, Model] to webserver
 
 Program : {
     init : Model,
     applyEvents : Model, List Event -> Model,
     handleReadRequest : Request, Model -> Response,
-    handleWriteRequest : Request, Model -> (Response, List Event),
+    handleWriteRequest : Request, Model -> (Response, List Command),
 }
 
 Model : Str
@@ -33,7 +33,7 @@ handleReadRequest = \_request, model -> {
     status: 200,
 }
 
-handleWriteRequest : Request, Model -> (Response, List Event)
+handleWriteRequest : Request, Model -> (Response, List Command)
 handleWriteRequest = \_request, _model ->
     (
         {
@@ -41,5 +41,5 @@ handleWriteRequest = \_request, _model ->
             headers: [],
             status: 500,
         },
-        [" something"],
+        [AddEvent ", something", PrintThisNumber 42],
     )

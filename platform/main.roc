@@ -2,14 +2,14 @@ platform "webserver"
     requires { Model } { main : _ }
     exposes []
     packages {}
-    imports [Webserver.{ Event, Request, Response }]
+    imports [Webserver.{ Event, Request, Response, Command }]
     provides [mainForHost]
 
 ProgramForHost : {
     init : Box Model,
     applyEvents : Box Model, List Event -> Box Model,
     handleReadRequest : Request, Box Model -> Response,
-    handleWriteRequest : Request, Box Model -> (Response, List Event),
+    handleWriteRequest : Request, Box Model -> (Response, List Command),
 }
 
 mainForHost : ProgramForHost
@@ -34,6 +34,6 @@ handleReadRequest : Request, Box Model -> Response
 handleReadRequest = \request, boxedModel ->
     main.handleReadRequest request (Box.unbox boxedModel)
 
-handleWriteRequest : Request, Box Model -> (Response, List Event)
+handleWriteRequest : Request, Box Model -> (Response, List Command)
 handleWriteRequest = \request, boxedModel ->
     main.handleWriteRequest request (Box.unbox boxedModel)

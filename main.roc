@@ -5,7 +5,7 @@ app "meier"
         # html: "https://github.com/Hasnep/roc-html/releases/download/v0.2.0/5fqQTpMYIZkigkDa2rfTc92wt-P_lsa76JVXb8Qb3ms.tar.br",
     }
     imports [
-        pf.Webserver.{ Event, Request, Response },
+        pf.Webserver.{ Event, Request, Response, Command },
         # json.Core.{ Json },
         # html.Html,
         "templates/index.html" as index : Str,
@@ -17,7 +17,7 @@ Program : {
     init : Model,
     applyEvents : Model, List Event -> Model,
     handleReadRequest : Request, Model -> Response,
-    handleWriteRequest : Request, Model -> (Response, List Event),
+    handleWriteRequest : Request, Model -> (Response, List Command),
 }
 
 main : Program
@@ -59,7 +59,7 @@ handleAssets = \request ->
         _ ->
             { body: "404 Not Found", headers: [], status: 404 }
 
-handleWriteRequest : Request, Model -> (Response, List Event)
+handleWriteRequest : Request, Model -> (Response, List Command)
 handleWriteRequest = \_request, _model ->
     (
         {
