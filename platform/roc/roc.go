@@ -74,7 +74,7 @@ func (r *Roc) WriteRequest(request *http.Request, db database.Database) (Respons
 	}
 
 	// TODO: check the refcount of the response and deallocate it if necessary.
-	var responseEvents C.struct_ResponseEvents
+	var responseEvents C.struct_ResponseCommands
 	setRefCountToTwo(r.model)
 	C.roc__mainForHost_2_caller(&rocRequest, &r.model, nil, &responseEvents)
 
@@ -84,10 +84,14 @@ func (r *Roc) WriteRequest(request *http.Request, db database.Database) (Respons
 		Body: rocStrRead(responseEvents.response.body),
 	}
 
-	goEvents := readEvents(responseEvents.events)
-	db.Append(goEvents)
+	commands := readCommands(responseEvents.commands)
+	db.Append(commands.events)
+	rocEvents := convertEvents(commands.events)
+	C.roc__mainForHost_0_caller(&r.model, &rocEvents, nil, &r.model)
 
-	C.roc__mainForHost_0_caller(&r.model, &responseEvents.events, nil, &r.model)
+	for _, num := range commands.printNumbers {
+		fmt.Println(num)
+	}
 
 	return response, nil
 }
@@ -118,17 +122,33 @@ func convertEvents(events [][]byte) C.struct_RocList {
 	return rocList
 }
 
-func readEvents(rocList C.struct_RocList) [][]byte {
+type commands struct {
+	events       [][]byte
+	printNumbers []int
+}
+
+func readCommands(rocList C.struct_RocList) commands {
 	len := rocList.len
-	ptr := (*C.struct_RocStr)(unsafe.Pointer(rocList.bytes))
+	ptr := (*C.struct_Command)(unsafe.Pointer(rocList.bytes))
 	dataSlice := unsafe.Slice(ptr, len)
 
-	events := make([][]byte, len)
-	for i, rocEvent := range dataSlice {
-		events[i] = []byte(rocStrRead(rocEvent))
+	var cmds commands
+	for _, cmd := range dataSlice {
+		switch cmd.discriminant {
+		case 0:
+			payload := *(*C.struct_RocStr)(unsafe.Pointer(&cmd.payload))
+			cmds.events = append(cmds.events, []byte(rocStrRead(payload)))
+
+		case 1:
+			payload := *(*C.longlong)(unsafe.Pointer(&cmd.payload))
+			cmds.printNumbers = append(cmds.printNumbers, int(payload))
+
+		default:
+			panic("invalid command")
+		}
 	}
 
-	return events
+	return cmds
 }
 
 func convertRequest(r *http.Request) (C.struct_Request, error) {
