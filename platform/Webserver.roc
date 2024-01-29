@@ -17,7 +17,7 @@ Request : {
     headers : List Header,
     url : Str,
     body : RequestBody,
-    timeout : [TimeoutMilliseconds U64, NoTimeout]
+    timeout : [TimeoutMilliseconds U64, NoTimeout],
 }
 
 Response : {
@@ -31,6 +31,6 @@ Header : { name : Str, value : Str }
 Command : [AddEvent Event, PrintThisNumber I64]
 
 RequestBody : [
-    Body { mimeType: Str, body: List U8},
+    Body { mimeType : Str, body : List U8 },
     EmptyBody,
 ]
