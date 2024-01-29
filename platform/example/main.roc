@@ -39,8 +39,10 @@ handleReadRequest = \request, model ->
             EmptyBody -> "no body"
             Body str -> "Body: $(str.body |> Str.fromUtf8 |> Result.withDefault "invalid utf8")"
 
+    url = request.url
+
     {
-        body: Str.concat allHeaders model |> Str.concat hasBody |> Str.toUtf8,
+        body: Str.concat allHeaders model |> Str.concat hasBody |> Str.concat url |> Str.toUtf8,
         headers: [{ name: "myHeader", value: "myvalue" }],
         status: 200,
     }
