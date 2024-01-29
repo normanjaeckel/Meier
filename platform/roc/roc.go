@@ -57,9 +57,9 @@ func (r *Roc) ReadRequest(request *http.Request) (Response, error) {
 	C.roc__mainForHost_1_caller(&rocRequest, &r.model, nil, &response)
 
 	return Response{
-		Status: int(response.status),
-		// TODO: Headers: response.headers,
-		Body: rocStrRead(response.body),
+		Status:  int(response.status),
+		Headers: toGoHeaders(response.headers),
+		Body:    rocStrRead(response.body),
 	}, nil
 }
 
@@ -79,9 +79,9 @@ func (r *Roc) WriteRequest(request *http.Request, db database.Database) (Respons
 	C.roc__mainForHost_2_caller(&rocRequest, &r.model, nil, &responseEvents)
 
 	response := Response{
-		Status: int(responseEvents.response.status),
-		// TODO: Headers: responseEvents.response.headers,
-		Body: rocStrRead(responseEvents.response.body),
+		Status:  int(responseEvents.response.status),
+		Headers: toGoHeaders(responseEvents.response.headers),
+		Body:    rocStrRead(responseEvents.response.body),
 	}
 
 	commands := readCommands(responseEvents.commands)
@@ -160,11 +160,84 @@ func convertRequest(r *http.Request) (C.struct_Request, error) {
 	}
 	defer r.Body.Close()
 
-	rocRequest.body = rocStrFromStr(string(body))
+	var requestBody C.struct_RequestBody
+	requestBody.discriminant = 1
+	if len(body) > 0 {
+
+		contentType := r.Header.Get("Content-type")
+		if contentType == "" {
+			contentType = "text/plain"
+		}
+
+		requestBody.discriminant = 0
+		var bodyMimetype C.struct_BodyMimeType
+		bodyMimetype.mimeType = rocStrFromStr(contentType)
+		bodyMimetype.body = rocStrFromStr(string(body))
+		requestBody.payload = *(*[48]byte)(unsafe.Pointer(&bodyMimetype))
+	}
+
+	rocRequest.body = requestBody
 	rocRequest.methodEnum = convertMethod(r.Method)
-	// TODO rocRequest.headers = request.Headers
+	rocRequest.headers = toRocHeader(r.Header)
 	rocRequest.url = rocStrFromStr(r.URL.String())
+	// TODO: What is a request timeout?
+	rocRequest.timeout = C.struct_RequestTimeout{discriminant: 0}
 	return rocRequest, nil
+}
+
+func toRocHeader(goHeader http.Header) C.struct_RocList {
+	// This is only the correct len, if each header-name unique. This should be most of the time.
+	headers := make([]C.struct_Header, 0, len(goHeader))
+	for name, valueList := range goHeader {
+		for _, value := range valueList {
+			h := C.struct_Header{
+				name:  rocStrFromStr(name),
+				value: rocStrFromStr(value),
+			}
+			headers = append(headers, h)
+		}
+	}
+
+	var header C.struct_Header
+	elementSize := int(unsafe.Sizeof(header))
+	fullSize := elementSize*len(headers) + 8
+
+	refCountPtr := roc_alloc(C.ulong(fullSize), 8)
+	refCountSlice := unsafe.Slice((*uint)(refCountPtr), 1)
+	refCountSlice[0] = 9223372036854775808
+	startPtr := unsafe.Add(refCountPtr, 8)
+
+	rocStrList := make([]C.struct_Header, len(headers))
+	for i, header := range headers {
+		rocStrList[i] = header
+	}
+
+	dataSlice := unsafe.Slice((*C.struct_Header)(startPtr), len(rocStrList))
+	copy(dataSlice, rocStrList)
+
+	var rocList C.struct_RocList
+	rocList.len = C.ulong(len(headers))
+	rocList.capacity = rocList.len
+	rocList.bytes = (*C.char)(unsafe.Pointer(startPtr))
+
+	return rocList
+}
+
+func toGoHeaders(rocHeaders C.struct_RocList) []Header {
+	len := rocHeaders.len
+	ptr := (*C.struct_Header)(unsafe.Pointer(rocHeaders.bytes))
+	headerList := unsafe.Slice(ptr, len)
+
+	goHeader := make([]Header, len)
+	for i, header := range headerList {
+		goHeader[i] = Header{Name: rocStrRead(header.name), Value: rocStrRead(header.value)}
+	}
+
+	return goHeader
+}
+
+func contentType(r *http.Request, mimetype string) bool {
+	return false
 }
 
 func convertMethod(method string) C.uchar {

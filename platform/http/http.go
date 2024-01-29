@@ -55,8 +55,11 @@ func handler(rocApp *roc.Roc, db database.Database) http.Handler {
 			return
 		}
 
+		for _, header := range response.Headers {
+			w.Header().Add(header.Name, header.Value)
+		}
 		w.WriteHeader(response.Status)
-		// TODO: Set header
+
 		w.Write([]byte(response.Body))
 	})
 }

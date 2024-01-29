@@ -27,11 +27,40 @@ struct Command {
     unsigned char discriminant;
 };
 
-struct Request {
+struct BodyMimeType {
+    struct RocStr mimeType;
     struct RocStr body;
+};
+
+union RequestBodyUnion {
+    struct BodyMimeType body;
+};
+
+struct RequestBody {
+    union RequestBodyUnion payload;
+    unsigned char discriminant;
+};
+
+union RequestTimeoutUnion {
+    long long unsigned int timeoutMilliseconds;
+};
+
+struct RequestTimeout {
+    union RequestTimeoutUnion payload;
+    unsigned char discriminant;
+};
+
+struct Header {
+    struct RocStr name;
+    struct RocStr value;
+};
+
+struct Request {
+    struct RequestBody body;
     struct RocList headers;
     struct RocStr url;
     unsigned char methodEnum; 
+    struct RequestTimeout timeout;
 };
 
 struct Response {

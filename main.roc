@@ -38,7 +38,7 @@ handleReadRequest : Request, Model -> Response
 handleReadRequest = \request, _model ->
     if request.url == "/" then
         {
-            body: index,
+            body: index |> Str.toUtf8,
             headers: [],
             status: 200,
         }
@@ -46,7 +46,7 @@ handleReadRequest = \request, _model ->
         handleAssets request
     else
         {
-            body: "400 Bad Request",
+            body: "400 Bad Request" |> Str.toUtf8,
             headers: [],
             status: 400,
         }
@@ -54,16 +54,16 @@ handleReadRequest = \request, _model ->
 handleAssets = \request ->
     when request.url is
         "/assets/bulma-0.9.4/bulma/css/bulma.min.css" ->
-            { body: bulma, headers: [], status: 200 }
+            { body: bulma |> Str.toUtf8, headers: [], status: 200 }
 
         _ ->
-            { body: "404 Not Found", headers: [], status: 404 }
+            { body: "404 Not Found" |> Str.toUtf8, headers: [], status: 404 }
 
 handleWriteRequest : Request, Model -> (Response, List Command)
 handleWriteRequest = \_request, _model ->
     (
         {
-            body: "Nothing to write",
+            body: "Nothing to write" |> Str.toUtf8,
             headers: [],
             status: 500,
         },

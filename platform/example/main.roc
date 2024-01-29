@@ -27,18 +27,30 @@ applyEvents = \model, events ->
         Str.concat state event
 
 handleReadRequest : Request, Model -> Response
-handleReadRequest = \_request, model -> {
-    body: model,
-    headers: [],
-    status: 200,
-}
+handleReadRequest = \request, model ->
+    allHeaders = List.walk
+        request.headers
+        ""
+        (\state, header ->
+            Str.concat state "$(header.name): $(header.value)\n")
+
+    hasBody =
+        when request.body is
+            EmptyBody -> "no body"
+            Body str -> "Body: $(str.body |> Str.fromUtf8 |> Result.withDefault "invalid utf8")"
+
+    {
+        body: Str.concat allHeaders model |> Str.concat hasBody |> Str.toUtf8,
+        headers: [{ name: "myHeader", value: "myvalue" }],
+        status: 200,
+    }
 
 handleWriteRequest : Request, Model -> (Response, List Command)
 handleWriteRequest = \_request, _model ->
     (
         {
-            body: "wrote something",
-            headers: [],
+            body: "wrote something" |> Str.toUtf8,
+            headers: [{ name: "myHeader", value: "myvalue" }],
             status: 500,
         },
         [AddEvent ", something", PrintThisNumber 42],
