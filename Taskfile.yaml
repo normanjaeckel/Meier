@@ -45,6 +45,7 @@ tasks:
       - rm platform/roc.o
     sources:
       - main.roc
+      - templates/*.html
     generates:
       - webserver
 
