@@ -28,8 +28,8 @@ struct Command {
 };
 
 struct BodyMimeType {
-    struct RocStr mimeType;
     struct RocStr body;
+    struct RocStr mimeType;
 };
 
 union RequestBodyUnion {

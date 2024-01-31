@@ -48,10 +48,14 @@ handleReadRequest = \request, model ->
     }
 
 handleWriteRequest : Request, Model -> (Response, List Command)
-handleWriteRequest = \_request, _model ->
+handleWriteRequest = \request, _model ->
+    body =
+        when request.body is
+            EmptyBody -> "empty body" |> Str.toUtf8
+            Body b -> b.body
     (
         {
-            body: "wrote something" |> Str.toUtf8,
+            body: body,
             headers: [{ name: "myHeader", value: "myvalue" }],
             status: 500,
         },
