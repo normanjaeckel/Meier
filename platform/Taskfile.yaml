@@ -3,7 +3,38 @@
 version: '3'
 
 tasks:
-  default:
-    desc: Some description here ...
+  build-roc:
     cmds:
-      - echo Hello
+      - rm -f roc.o
+      - roc build  example/main.roc --no-link --output roc.o
+    sources:
+      - example/main.roc
+    generates:
+      - roc.o
+
+  build-go:
+    cmds:
+      - rm -f webserver
+      - go build
+    sources:
+      - main.go
+      - "*/*.go"
+      - roc/host.h
+      - roc.o
+    generates:
+      - webserver
+    deps:
+      - build-roc
+
+  build:
+    deps:
+      - build-roc
+      - build-go
+
+  run:
+    sources:
+      - webserver
+    deps:
+      - build-go
+    cmds:
+      - ./webserver
