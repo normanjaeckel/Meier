@@ -8,10 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install and set up Nix
-        uses: cachix/install-nix-action@v23
+        uses: cachix/install-nix-action@v25
 
       # https://nix.dev/tutorials/nixos/continuous-integration-github-actions
 
@@ -19,7 +19,7 @@ jobs:
       #   uses: DeterminateSystems/magic-nix-cache-action@v2
 
       - name: Configure Nix to use the devenv cache provided by Cachix to speed up the installation
-        uses: cachix/cachix-action@v12
+        uses: cachix/cachix-action@v14
         with:
           name: devenv
 
