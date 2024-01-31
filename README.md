@@ -34,6 +34,8 @@ MIT
 
 <img alt="Made with Bulma" src="https://bulma.io/images/made-with-bulma.png" height=24>
 
-We use the CSS library [Bulma](https://bulma.io/). If you build the binary of
-this project, Bulma's minified CSS file is included. Bulma is release under the
-[MIT license](assets/bulma-0.9.4/bulma/LICENSE).
+We use the CSS library [Bulma](https://bulma.io/) and the JS library
+[htmx](https://htmx.org/). If you build the binary of this project, Bulma's
+minified CSS file and htmx' minified JS file are included. Bulma is release
+under the [MIT license](assets/bulma-0.9.4/bulma/LICENSE). htmx is released under
+the [BSD license](assets/htmx-1.9.10/htmx/LICENSE).
