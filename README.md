@@ -37,5 +37,5 @@ MIT
 We use the CSS library [Bulma](https://bulma.io/) and the JS library
 [htmx](https://htmx.org/). If you build the binary of this project, Bulma's
 minified CSS file and htmx' minified JS file are included. Bulma is release
-under the [MIT license](assets/bulma-0.9.4/bulma/LICENSE). htmx is released under
-the [BSD license](assets/htmx-1.9.10/htmx/LICENSE).
+under the [MIT license](Server/assets/bulma/LICENSE). htmx is released under the
+[BSD license](Server/assets/htmx/LICENSE).

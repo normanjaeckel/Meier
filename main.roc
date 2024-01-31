@@ -7,11 +7,10 @@ app "meier"
     imports [
         pf.Webserver.{ Event, Request, Response, Command },
         # json.Core.{ Json },
-        html.Html.{ a, div, p, text },
-        html.Attribute.{ class },
-        "templates/index.html" as index : Str,
-        "assets/bulma-0.9.4/bulma/css/bulma.min.css" as bulma : List U8,
-        "assets/htmx-1.9.10/htmx/js/htmx.min.js" as htmx : List U8,
+        html.Html,
+        Server.Assets,
+        Server.Campaign,
+        Server.Form,
     ]
     provides [main, Model] to pf
 
@@ -39,13 +38,11 @@ applyEvents = \model, _ ->
 handleReadRequest : Request, Model -> Response
 handleReadRequest = \request, model ->
     if request.url == "/" then
-        {
-            body: campaignListView model,
-            headers: [],
-            status: 200,
-        }
+        Server.Campaign.campaignListView model
     else if request.url |> Str.startsWith "/assets" then
-        handleAssets request
+        Server.Assets.serve request.url
+    else if request.url |> Str.startsWith "/openForm" then
+        Server.Form.serve request.url
     else
         {
             body: "400 Bad Request" |> Str.toUtf8,
@@ -53,57 +50,24 @@ handleReadRequest = \request, model ->
             status: 400,
         }
 
-handleAssets = \request ->
+handleWriteRequest : Request, Model -> (Response, List Command)
+handleWriteRequest = \request, model ->
     when request.url is
-        "/assets/bulma-0.9.4/bulma/css/bulma.min.css" ->
-            { body: bulma, headers: [{ name: "Content-Type", value: "text/css" }], status: 200 }
-
-        "/assets/htmx-1.9.10/htmx/js/htmx.min.js" ->
-            { body: htmx, headers: [{ name: "Content-Type", value: "text/javascript" }], status: 200 }
+        "/addNewCampaign" ->
+            Server.Campaign.newCampaign request.body model
 
         _ ->
-            { body: "404 Not Found" |> Str.toUtf8, headers: [], status: 404 }
-
-handleWriteRequest : Request, Model -> (Response, List Command)
-handleWriteRequest = \_request, _model ->
-    (
-        {
-            body: "Nothing to write" |> Str.toUtf8,
-            headers: [],
-            status: 500,
-        },
-        [],
-    )
-
-campaignListView = \model ->
-    campaigns =
-        model
-        |> List.map
-            \campaign -> campaignCard campaign
-        |> Str.joinWith ""
-
-    index
-    |> Str.replaceFirst "{% campaigns %}" campaigns
-    |> Str.toUtf8
-
-campaignCard = \campaign ->
-    node =
-        div [class "column is-one-third"] [
-            div [class "card"] [
-                div [class "card-header"] [
-                    p [class "card-header-title"] [text campaign],
-                ],
-                div [class "card-content"] [
-                    text "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et.",
-                ],
-                div [class "card-footer"] [
-                    a [class "card-footer-item"] [text "Verwalten"],
-                    a [class "card-footer-item"] [text "Einstellungen"],
-                    a [class "card-footer-item"] [text "Löschen"],
-                ],
-            ],
-        ]
-
-    Html.renderWithoutDocType node
+            (
+                {
+                    body: [],
+                    headers: [],
+                    status: 200,
+                },
+                [],
+            )
 
 expect 42 == 42
+
+expect
+    # TODO: Remove this useless test, after https://github.com/Hasnep/roc-html/issues/5 is fixed.
+    Html.renderWithoutDocType (Html.text "") == ""

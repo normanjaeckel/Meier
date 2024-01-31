@@ -5,6 +5,7 @@ private/
 
 # Build
 webserver
+db.events
 
 # Devenv and direnv
 .devenv*
