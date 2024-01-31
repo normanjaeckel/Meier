@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"sync"
 	"unsafe"
 
@@ -343,4 +344,17 @@ func roc_dealloc(ptr unsafe.Pointer, alignment int) {
 //export roc_panic
 func roc_panic(msg *C.struct_RocStr, tagID C.uint) {
 	panic(fmt.Sprintf(rocStrRead(*msg)))
+}
+
+//export roc_dbg
+func roc_dbg(loc *C.struct_RocStr, msg *C.struct_RocStr, src *C.struct_RocStr) {
+	locStr := rocStrRead(*loc)
+	msgStr := rocStrRead(*msg)
+	srcStr := rocStrRead(*src)
+
+	if srcStr == msgStr {
+		fmt.Fprintf(os.Stderr, "[%s] {%s}\n", locStr, msgStr)
+	} else {
+		fmt.Fprintf(os.Stderr, "[%s] {%s} = {%s}\n", locStr, srcStr, msgStr)
+	}
 }

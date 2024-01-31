@@ -40,6 +40,7 @@ handleReadRequest = \request, model ->
             Body str -> "Body: $(str.body |> Str.fromUtf8 |> Result.withDefault "invalid utf8")"
 
     url = request.url
+    dbg url
 
     {
         body: Str.concat allHeaders model |> Str.concat hasBody |> Str.concat url |> Str.toUtf8,
