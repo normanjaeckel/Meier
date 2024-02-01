@@ -52,16 +52,40 @@ handleReadRequest = \request, model ->
 
 handleWriteRequest : Request, Model -> (Response, List Command)
 handleWriteRequest = \request, model ->
-    when request.url is
-        "/addNewCampaign" ->
-            Server.Campaign.newCampaign request.body model
+    responseBody =
+        when request.url is
+            "/addNewCampaign" ->
+                Server.Campaign.newCampaign request.body model
 
-        _ ->
+            _ -> Err NotFound
+
+    when responseBody is
+        Ok (body, commands) ->
             (
                 {
-                    body: [],
+                    body: body |> Str.toUtf8,
                     headers: [],
                     status: 200,
+                },
+                commands,
+            )
+
+        Err BadRequest ->
+            (
+                {
+                    body: "400 Bad Request" |> Str.toUtf8,
+                    headers: [],
+                    status: 400,
+                },
+                [],
+            )
+
+        Err NotFound ->
+            (
+                {
+                    body: "404 Not Found" |> Str.toUtf8,
+                    headers: [],
+                    status: 404,
                 },
                 [],
             )
