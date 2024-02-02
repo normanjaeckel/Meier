@@ -1,8 +1,13 @@
 interface Server.Campaign
-    exposes [campaignListView, newCampaign]
+    exposes [
+        addCampaign,
+        addCampaignEvent,
+        campaignListView,
+    ]
     imports [
         html.Html.{ a, div, p, renderWithoutDocType, text },
-        html.Attribute.{ class },
+        html.Attribute.{ attribute, class },
+        json.Core.{ json },
         "templates/index.html" as index : Str,
 
     ]
@@ -11,24 +16,23 @@ campaignListView = \model ->
     campaigns =
         model
         |> List.map
-            \campaign -> campaignCard campaign
+            \campaign -> campaignCard campaign.title 42 Bool.false
         |> Str.joinWith ""
-
     {
         body: index |> Str.replaceFirst "{% campaigns %}" campaigns |> Str.toUtf8,
         headers: [],
         status: 200,
     }
 
-campaignCard = \campaign ->
+campaignCard = \title, numOfDays, withHxSwapOoB ->
     node =
         div [class "column is-one-third"] [
             div [class "card"] [
                 div [class "card-header"] [
-                    p [class "card-header-title"] [text campaign],
+                    p [class "card-header-title"] [text title],
                 ],
                 div [class "card-content"] [
-                    text "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et.",
+                    text "Anzahl der Tage: $(Num.toStr numOfDays)",
                 ],
                 div [class "card-footer"] [
                     a [class "card-footer-item"] [text "Verwalten"],
@@ -37,24 +41,65 @@ campaignCard = \campaign ->
                 ],
             ],
         ]
+    if withHxSwapOoB then
+        renderWithoutDocType (div [(attribute "hx-swap-oob") "beforebegin:#newCampaignForm"] [node])
+    else
+        renderWithoutDocType node
 
-    renderWithoutDocType node
+addCampaignEvent = \model, event ->
+    decodedEvent : Result { data : { title : Str, numOfDays : U64 } } _
+    decodedEvent = Decode.fromBytes event json
+    when decodedEvent is
+        Ok dc ->
+            campaign = {
+                title: dc.data.title,
+                days: List.repeat { title: "Day" } (Num.toNat dc.data.numOfDays),
+            }
+            model |> List.append campaign
 
-newCampaign = \body, _model ->
+        Err _ -> crash "Oh, no! Invalid database."
+
+addCampaign = \body, _model ->
     when body is
         EmptyBody ->
             Err BadRequest
 
         Body b ->
-            when bodyToFields b.body |> Result.try parseNewCampaignFormFields is
+            when bodyToFields b.body |> Result.try parseAddCampaignFormFields is
                 Err InvalidInput ->
                     Err BadRequest
 
-                Ok { title, numOfDays } ->
-                    Ok ("200 Ok", [AddEvent "Add a new campaign with title $(title) and $(Num.toStr numOfDays) days."])
+                Ok data ->
+                    event =
+                        Encode.toBytes { action: "addCampaign", data } json
 
-parseNewCampaignFormFields : List (List U8, List U8) -> Result { title : Str, numOfDays : U64 } [InvalidInput]
+                    Ok (campaignCard data.title data.numOfDays Bool.true, [AddEvent event])
 
+parseAddCampaignFormFields = \fields ->
+    title =
+        fields
+        |> List.findFirst \(name, _) -> name == "title"
+        |> Result.try \(_, t) -> t |> Str.fromUtf8
+        |> Result.mapErr
+            \e ->
+                when e is
+                    NotFound | BadUtf8 _ _ -> InvalidInput
+
+    numOfDays =
+        fields
+        |> List.findFirst \(name, _) -> name == "numOfDays"
+        |> Result.try \(_, n) -> n |> Str.fromUtf8
+        |> Result.try Str.toU64
+        |> Result.mapErr
+            \e ->
+                when e is
+                    NotFound | BadUtf8 _ _ | InvalidNumStr -> InvalidInput
+
+    when (title, numOfDays) is
+        (Ok t, Ok n) -> Ok { title: t, numOfDays: n }
+        _ -> Err InvalidInput
+
+bodyToFields : List U8 -> Result (List (Str, List U8)) [InvalidInput]
 bodyToFields = \body ->
     body
     |> urlDecode
@@ -66,29 +111,14 @@ bodyToFields = \body ->
                 \elem ->
                     when elem |> splitListU8 '=' is
                         [name, value] ->
-                            Ok (name, value)
+                            when name |> Str.fromUtf8 is
+                                Ok n ->
+                                    Ok (n, value)
+
+                                Err (BadUtf8 _ _) ->
+                                    Err InvalidInput
 
                         _ -> Err InvalidInput
-
-splitListU8 : List U8, U8 -> List (List U8)
-splitListU8 = \list, char ->
-    list
-    |> List.walk
-        ([], [])
-        \(current, result), elem ->
-            if elem == char then
-                ([], result |> List.append current)
-            else
-                (current |> List.append elem, result)
-    |> \(current, result) ->
-        result |> List.append current
-
-expect splitListU8 [] 'a' == [[]]
-expect splitListU8 ['a', 'b', 'c'] 'b' == [['a'], ['c']]
-expect splitListU8 ['a', 'b', 'c'] 'c' == [['a', 'b'], []]
-expect splitListU8 ['a', 'b', 'c'] 'a' == [[], ['b', 'c']]
-expect splitListU8 ['a', 'b', 'b', 'c'] 'b' == [['a'], [], ['c']]
-expect splitListU8 ['a', 'b', 'c', 'b', 'd'] 'b' == [['a'], ['c'], ['d']]
 
 urlDecode : List U8 -> Result (List U8) [InvalidInput]
 urlDecode = \bytes ->
@@ -116,23 +146,33 @@ percentDecodeHelper = \bytes, result ->
                     Ok num ->
                         percentDecodeHelper (rest |> List.dropFirst 2) (result |> List.append num)
 
-                    Err _ ->
-                        Err InvalidInput
+                    Err e ->
+                        when e is
+                            BadUtf8 _ _ | InvalidNumStr -> Err InvalidInput
             else
                 percentDecodeHelper rest (result |> List.append first)
 
-expect
-    got = urlDecode ("foo%20bar" |> Str.toUtf8)
-    got == Ok ("foo bar" |> Str.toUtf8)
+expect urlDecode ("foo%20bar" |> Str.toUtf8) == Ok ("foo bar" |> Str.toUtf8)
+expect urlDecode ("foo+bar" |> Str.toUtf8) == Ok ("foo bar" |> Str.toUtf8)
+expect urlDecode ("foo%" |> Str.toUtf8) == Err InvalidInput
+expect urlDecode ("foo%zz" |> Str.toUtf8) == Err InvalidInput
 
-expect
-    got = urlDecode ("foo+bar" |> Str.toUtf8)
-    got == Ok ("foo bar" |> Str.toUtf8)
+splitListU8 : List U8, U8 -> List (List U8)
+splitListU8 = \list, char ->
+    list
+    |> List.walk
+        ([], [])
+        \(current, result), elem ->
+            if elem == char then
+                ([], result |> List.append current)
+            else
+                (current |> List.append elem, result)
+    |> \(current, result) ->
+        result |> List.append current
 
-expect
-    got = urlDecode ("foo%" |> Str.toUtf8)
-    got == Err InvalidInput
-
-expect
-    got = urlDecode ("foo%zz" |> Str.toUtf8)
-    got == Err InvalidInput
+expect splitListU8 [] 'a' == [[]]
+expect splitListU8 ['a', 'b', 'c'] 'b' == [['a'], ['c']]
+expect splitListU8 ['a', 'b', 'c'] 'c' == [['a', 'b'], []]
+expect splitListU8 ['a', 'b', 'c'] 'a' == [[], ['b', 'c']]
+expect splitListU8 ['a', 'b', 'b', 'c'] 'b' == [['a'], [], ['c']]
+expect splitListU8 ['a', 'b', 'c', 'b', 'd'] 'b' == [['a'], ['c'], ['d']]

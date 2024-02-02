@@ -1,13 +1,12 @@
 app "meier"
     packages {
         pf: "platform/main.roc",
-        # json: "https://github.com/lukewilliamboswell/roc-json/releases/download/...",
-        html: "https://github.com/Hasnep/roc-html/releases/download/v0.2.0/5fqQTpMYIZkigkDa2rfTc92wt-P_lsa76JVXb8Qb3ms.tar.br",
+        html: "https://github.com/Hasnep/roc-html/releases/download/v0.2.1/gvFCxQTb3ytGwm7RQ87BVDMHzo7MNIM2uqY4GBDSP7M.tar.br",
+        json: "https://github.com/lukewilliamboswell/roc-json/releases/download/0.6.1/-7UaQL9fbi0J3P6nS_qlxTdpDkOu_7CUm4MZzAN9ZUQ.tar.br",
     }
     imports [
         pf.Webserver.{ Event, Request, Response, Command },
-        # json.Core.{ Json },
-        html.Html,
+        json.Core.{ json },
         Server.Assets,
         Server.Campaign,
         Server.Form,
@@ -25,15 +24,39 @@ main : Program
 main =
     { init, applyEvents, handleReadRequest, handleWriteRequest }
 
-Model : List Str
+Model : List Campaign
+
+Campaign : {
+    title : Str,
+    days : List Day,
+}
+
+Day : {
+    title : Str,
+}
 
 init : Model
 init =
-    ["Tanztage", "Sportfest", "Frei-Lern-Tage", "Winterwoche"]
+    []
 
 applyEvents : Model, List Event -> Model
-applyEvents = \model, _ ->
-    model
+applyEvents = \model, events ->
+    events
+    |> List.walk
+        model
+        \state, event -> applyEvent state event
+
+applyEvent = \model, event ->
+    decodedEvent = Decode.fromBytes event json
+    when decodedEvent is
+        Ok dc ->
+            when dc.action is
+                "addCampaign" ->
+                    Server.Campaign.addCampaignEvent model event
+
+                _ -> crash "Oh, no! Bad database with unknow event."
+
+        Err _ -> crash "Oh, no!"
 
 handleReadRequest : Request, Model -> Response
 handleReadRequest = \request, model ->
@@ -54,8 +77,8 @@ handleWriteRequest : Request, Model -> (Response, List Command)
 handleWriteRequest = \request, model ->
     responseBody =
         when request.url is
-            "/addNewCampaign" ->
-                Server.Campaign.newCampaign request.body model
+            "/addCampaign" ->
+                Server.Campaign.addCampaign request.body model
 
             _ -> Err NotFound
 
@@ -91,7 +114,3 @@ handleWriteRequest = \request, model ->
             )
 
 expect 42 == 42
-
-expect
-    # TODO: Remove this useless test, after https://github.com/Hasnep/roc-html/issues/5 is fixed.
-    Html.renderWithoutDocType (Html.text "") == ""

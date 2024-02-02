@@ -34,8 +34,10 @@ MIT
 
 <img alt="Made with Bulma" src="https://bulma.io/images/made-with-bulma.png" height=24>
 
-We use the CSS library [Bulma](https://bulma.io/) and the JS library
-[htmx](https://htmx.org/). If you build the binary of this project, Bulma's
-minified CSS file and htmx' minified JS file are included. Bulma is release
-under the [MIT license](Server/assets/bulma/LICENSE). htmx is released under the
-[BSD license](Server/assets/htmx/LICENSE).
+We use the CSS library [Bulma](https://bulma.io/) and the JS libraries
+[htmx](https://htmx.org/) and [_hyperscript](https://hyperscript.org/). If you
+build the binary of this project, Bulma's minified CSS file, htmx' minified JS
+file and _hyperscript's minified JS file are included. Bulma is release under
+the [MIT license](Server/assets/bulma/LICENSE). htmx is released under the [BSD
+license](Server/assets/htmx/LICENSE). _hyperscript is released under the [BSD
+license](Server/assets/_hyperscript/LICENSE).

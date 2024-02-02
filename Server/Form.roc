@@ -16,12 +16,18 @@ ariaLabel =
 
 serve = \url ->
     when url is
-        "/openForm/newCampaign" ->
-            renderedNode =
+        "/openForm/addCampaign" ->
+            formAttributes = [
+                (attribute "hx-post") "/addCampaign",
+                (attribute "hx-disabled-elt") "button",
+                (attribute "hx-target") "closest .modal",
+                (attribute "hx-swap") "delete",
+            ]
+            node =
                 div [class "modal is-active"] [
                     div [class "modal-background", onClickCloseModal] [],
                     div [class "modal-card"] [
-                        form [(attribute "hx-post") "/addNewCampaign", (attribute "hx-disabled-elt") "button"] [
+                        form formAttributes [
                             header [class "modal-card-head"] [
                                 p [class "modal-card-title"] [text "Neue Kampagne hinzufügen"],
                                 button [class "delete", type "button", ariaLabel "close", onClickCloseModal] [],
@@ -65,10 +71,9 @@ serve = \url ->
                         ],
                     ],
                 ]
-                |> renderWithoutDocType
 
             {
-                body: renderedNode |> Str.toUtf8,
+                body: node |> renderWithoutDocType |> Str.toUtf8,
                 headers: [],
                 status: 200,
             }
