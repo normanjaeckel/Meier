@@ -27,29 +27,7 @@
     </section>
     <section class="section">
         <div class="container">
-            <h1 class="title">Alle Kampagnen</h1>
-            <div class="columns is-multiline">
-
-                {% campaigns %}
-
-                <div id="newCampaignForm" class="column is-one-third">
-                    <div class="card">
-                        <div class="card-header">
-                            <p class="card-header-title has-background-primary has-text-white">Neue Kampagne</p>
-                        </div>
-                        <div class="card-content">
-                            <p>Neue Kampagne erstellen und Projekttage und Angebote anlegen.</p>
-                        </div>
-                        <div class="card-footer">
-                            <a class="card-footer-item has-background-primary has-text-white"
-                                hx-get="/openForm/addCampaign" hx-target="#formModal">
-                                Start
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
+            {% content %}
         </div>
     </section>
     <div id="formModal"></div>

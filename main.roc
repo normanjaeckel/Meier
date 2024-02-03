@@ -6,10 +6,12 @@ app "meier"
     }
     imports [
         pf.Webserver.{ Event, Request, Response, Command },
+        html.Html.{ renderWithoutDocType },
         json.Core.{ json },
         Server.Assets,
         Server.Campaign,
         Server.Form,
+        "Server/templates/index.html" as index : Str,
     ]
     provides [main, Model] to pf
 
@@ -27,6 +29,7 @@ main =
 Model : List Campaign
 
 Campaign : {
+    id : U64,
     title : Str,
     days : List Day,
 }
@@ -61,7 +64,8 @@ applyEvent = \model, event ->
 handleReadRequest : Request, Model -> Response
 handleReadRequest = \request, model ->
     if request.url == "/" then
-        Server.Campaign.campaignListView model
+        rootPage model
+        # Server.Campaign.campaignListView model
     else if request.url |> Str.startsWith "/assets" then
         Server.Assets.serve request.url
     else if request.url |> Str.startsWith "/openForm" then
@@ -72,6 +76,14 @@ handleReadRequest = \request, model ->
             headers: [],
             status: 400,
         }
+
+rootPage = \model ->
+    page = index |> Str.replaceFirst "{% content %}" (Server.Campaign.campaignListView model |> renderWithoutDocType)
+    {
+        body: page |> Str.toUtf8,
+        headers: [],
+        status: 200,
+    }
 
 handleWriteRequest : Request, Model -> (Response, List Command)
 handleWriteRequest = \request, model ->

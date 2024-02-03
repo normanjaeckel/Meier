@@ -5,53 +5,81 @@ interface Server.Campaign
         campaignListView,
     ]
     imports [
-        html.Html.{ a, div, p, renderWithoutDocType, text },
-        html.Attribute.{ attribute, class },
+        html.Html.{ a, div, h1, p, renderWithoutDocType, text },
+        html.Attribute.{ attribute, class, id },
         json.Core.{ json },
-        "templates/index.html" as index : Str,
-
     ]
 
 campaignListView = \model ->
     campaigns =
         model
         |> List.map
-            \campaign -> campaignCard campaign.title 42 Bool.false
-        |> Str.joinWith ""
-    {
-        body: index |> Str.replaceFirst "{% campaigns %}" campaigns |> Str.toUtf8,
-        headers: [],
-        status: 200,
-    }
+            \campaign -> campaignCard campaign.id campaign.title (List.len campaign.days)
 
-campaignCard = \title, numOfDays, withHxSwapOoB ->
-    node =
-        div [class "column is-one-third"] [
-            div [class "card"] [
-                div [class "card-header"] [
-                    p [class "card-header-title"] [text title],
-                ],
-                div [class "card-content"] [
-                    text "Anzahl der Tage: $(Num.toStr numOfDays)",
-                ],
-                div [class "card-footer"] [
-                    a [class "card-footer-item"] [text "Verwalten"],
-                    a [class "card-footer-item"] [text "Einstellungen"],
-                    a [class "card-footer-item"] [text "Löschen"],
-                ],
+    campaignsAndAddCampaignCard =
+        campaigns
+        |> List.append
+            (
+                div [id "newCampaignForm", class "column is-one-third"] [
+                    div [class "card"] [
+                        div [class "card-header"] [
+                            p [class "card-header-title has-background-primary has-text-white"] [text "Neue Kampagne"],
+                        ],
+                        div [class "card-content"] [
+                            p [] [text "Neue Kampagne erstellen und Projekttage und Angebote anlegen."],
+                        ],
+                        div [class "card-footer"] [
+                            a
+                                [
+                                    class "card-footer-item has-background-primary has-text-white",
+                                    (attribute "hx-get") "/openForm/addCampaign",
+                                    (attribute "hx-target") "#formModal",
+                                ]
+                                [text "Start"],
+                        ],
+                    ],
+                ]
+            )
+
+    div [] [
+        h1 [class "title"] [text "Alle Kampagnen"],
+        div [class "columns is-multiline"] campaignsAndAddCampaignCard,
+    ]
+
+campaignCard = \objId, title, numOfDays ->
+    div [class "column is-one-third"] [
+        div [class "card"] [
+            div [class "card-header"] [
+                p [class "card-header-title"] [text title],
             ],
-        ]
-    if withHxSwapOoB then
-        renderWithoutDocType (div [(attribute "hx-swap-oob") "beforebegin:#newCampaignForm"] [node])
-    else
-        renderWithoutDocType node
+            div [class "card-content"] [
+                text "Anzahl der Tage: $(Num.toStr numOfDays)",
+            ],
+            div [class "card-footer"] [
+                a [class "card-footer-item"] [text "Verwalten"],
+                a
+                    [
+                        class "card-footer-item",
+                        (attribute "hx-get") "/openForm/editCampaign?id=$(Num.toStr objId)",
+                    ]
+                    [text "Einstellungen"],
+                a [class "card-footer-item"] [text "Löschen"],
+            ],
+        ],
+    ]
+
+campaignCardWithHxSwapOob = \objId, title, numOfDays ->
+    div [(attribute "hx-swap-oob") "beforebegin:#newCampaignForm"] [
+        campaignCard objId title numOfDays,
+    ]
 
 addCampaignEvent = \model, event ->
-    decodedEvent : Result { data : { title : Str, numOfDays : U64 } } _
+    decodedEvent : Result { data : { id : U64, title : Str, numOfDays : U64 } } _
     decodedEvent = Decode.fromBytes event json
     when decodedEvent is
         Ok dc ->
             campaign = {
+                id: dc.data.id,
                 title: dc.data.title,
                 days: List.repeat { title: "Day" } (Num.toNat dc.data.numOfDays),
             }
@@ -69,16 +97,17 @@ addCampaign = \body, _model ->
                 Err InvalidInput ->
                     Err BadRequest
 
-                Ok data ->
+                Ok { title, numOfDays } ->
+                    newObjId = 42
                     event =
-                        Encode.toBytes { action: "addCampaign", data } json
+                        Encode.toBytes { action: "addCampaign", data: { title, numOfDays, id: newObjId } } json
 
-                    Ok (campaignCard data.title data.numOfDays Bool.true, [AddEvent event])
+                    Ok (campaignCardWithHxSwapOob newObjId title numOfDays |> renderWithoutDocType, [AddEvent event])
 
 parseAddCampaignFormFields = \fields ->
     title =
         fields
-        |> List.findFirst \(name, _) -> name == "title"
+        |> List.findFirst \(fieldName, _) -> fieldName == "title"
         |> Result.try \(_, t) -> t |> Str.fromUtf8
         |> Result.mapErr
             \e ->
@@ -87,7 +116,7 @@ parseAddCampaignFormFields = \fields ->
 
     numOfDays =
         fields
-        |> List.findFirst \(name, _) -> name == "numOfDays"
+        |> List.findFirst \(fieldName, _) -> fieldName == "numOfDays"
         |> Result.try \(_, n) -> n |> Str.fromUtf8
         |> Result.try Str.toU64
         |> Result.mapErr
@@ -110,10 +139,10 @@ bodyToFields = \body ->
             |> List.mapTry
                 \elem ->
                     when elem |> splitListU8 '=' is
-                        [name, value] ->
-                            when name |> Str.fromUtf8 is
+                        [elemName, elemValue] ->
+                            when elemName |> Str.fromUtf8 is
                                 Ok n ->
-                                    Ok (n, value)
+                                    Ok (n, elemValue)
 
                                 Err (BadUtf8 _ _) ->
                                     Err InvalidInput

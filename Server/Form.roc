@@ -17,66 +17,7 @@ ariaLabel =
 serve = \url ->
     when url is
         "/openForm/addCampaign" ->
-            formAttributes = [
-                (attribute "hx-post") "/addCampaign",
-                (attribute "hx-disabled-elt") "button",
-                (attribute "hx-target") "closest .modal",
-                (attribute "hx-swap") "delete",
-            ]
-            node =
-                div [class "modal is-active"] [
-                    div [class "modal-background", onClickCloseModal] [],
-                    div [class "modal-card"] [
-                        form formAttributes [
-                            header [class "modal-card-head"] [
-                                p [class "modal-card-title"] [text "Neue Kampagne hinzufügen"],
-                                button [class "delete", type "button", ariaLabel "close", onClickCloseModal] [],
-                            ],
-                            section [class "modal-card-body"] [
-                                div [class "field"] [
-                                    div [class "control"] [
-                                        input
-                                            [
-                                                class "input",
-                                                type "text",
-                                                placeholder "Titel",
-                                                ariaLabel "Titel",
-                                                required "",
-                                                name "title",
-                                            ]
-                                            [],
-                                    ],
-                                ],
-                                div [class "field"] [
-                                    div [class "control"] [
-                                        input
-                                            [
-                                                class "input",
-                                                type "number",
-                                                ariaLabel "Anzahl der Tage",
-                                                min "1",
-                                                max "10",
-                                                name "numOfDays",
-                                                value "2",
-                                            ]
-                                            [],
-                                    ],
-                                    p [class "help"] [text "Anzahl der Tage"],
-                                ],
-                            ],
-                            footer [class "modal-card-foot"] [
-                                button [class "button is-success", type "submit"] [text "Speichern"],
-                                button [class "button", type "button", onClickCloseModal] [text "Abbrechen"],
-                            ],
-                        ],
-                    ],
-                ]
-
-            {
-                body: node |> renderWithoutDocType |> Str.toUtf8,
-                headers: [],
-                status: 200,
-            }
+            addCampaignForm
 
         _ ->
             {
@@ -85,3 +26,64 @@ serve = \url ->
                 status: 400,
             }
 
+addCampaignForm =
+    formAttributes = [
+        (attribute "hx-post") "/addCampaign",
+        (attribute "hx-disabled-elt") "button",
+        (attribute "hx-target") "closest .modal",
+        (attribute "hx-swap") "delete",
+    ]
+    node =
+        div [class "modal is-active"] [
+            div [class "modal-background", onClickCloseModal] [],
+            div [class "modal-card"] [
+                form formAttributes [
+                    header [class "modal-card-head"] [
+                        p [class "modal-card-title"] [text "Neue Kampagne hinzufügen"],
+                        button [class "delete", type "button", ariaLabel "close", onClickCloseModal] [],
+                    ],
+                    section [class "modal-card-body"] [
+                        div [class "field"] [
+                            div [class "control"] [
+                                input
+                                    [
+                                        class "input",
+                                        type "text",
+                                        placeholder "Titel",
+                                        ariaLabel "Titel",
+                                        required "",
+                                        name "title",
+                                    ]
+                                    [],
+                            ],
+                        ],
+                        div [class "field"] [
+                            div [class "control"] [
+                                input
+                                    [
+                                        class "input",
+                                        type "number",
+                                        ariaLabel "Anzahl der Tage",
+                                        min "1",
+                                        max "10",
+                                        name "numOfDays",
+                                        value "2",
+                                    ]
+                                    [],
+                            ],
+                            p [class "help"] [text "Anzahl der Tage"],
+                        ],
+                    ],
+                    footer [class "modal-card-foot"] [
+                        button [class "button is-success", type "submit"] [text "Speichern"],
+                        button [class "button", type "button", onClickCloseModal] [text "Abbrechen"],
+                    ],
+                ],
+            ],
+        ]
+
+    {
+        body: node |> renderWithoutDocType |> Str.toUtf8,
+        headers: [],
+        status: 200,
+    }
