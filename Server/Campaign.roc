@@ -72,13 +72,13 @@ addCampaignEvent = \model, event ->
             campaign = {
                 id: dc.data.id,
                 title: dc.data.title,
-                days: List.repeat { title: "Day" } (Num.toNat dc.data.numOfDays),
+                days: List.repeat { title: "Day" } dc.data.numOfDays,
             }
             model |> List.append campaign
 
         Err _ -> crash "Oh, no! Invalid database."
 
-addCampaign = \body, _model ->
+addCampaign = \body, model ->
     when body is
         EmptyBody ->
             Err BadRequest
@@ -89,7 +89,8 @@ addCampaign = \body, _model ->
                     Err BadRequest
 
                 Ok { title, numOfDays } ->
-                    newObjId = "42"
+                    newObjId = getHighestId model + 1 |> Num.toStr
+
                     event =
                         Encode.toBytes { action: "addCampaign", data: { title, numOfDays, id: newObjId } } json
 
@@ -118,6 +119,13 @@ parseAddCampaignFormFields = \fields ->
     when (title, numOfDays) is
         (Ok t, Ok n) -> Ok { title: t, numOfDays: n }
         _ -> Err InvalidInput
+
+getHighestId = \model ->
+    model
+    |> List.map
+        \campaign -> campaign.id |> Str.toU64 |> Result.withDefault 0
+    |> List.max
+    |> Result.withDefault 0
 
 bodyToFields : List U8 -> Result (List (Str, List U8)) [InvalidInput]
 bodyToFields = \body ->

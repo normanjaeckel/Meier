@@ -1,8 +1,8 @@
 app "meier"
     packages {
         pf: "platform/main.roc",
-        html: "https://github.com/Hasnep/roc-html/releases/download/v0.2.1/gvFCxQTb3ytGwm7RQ87BVDMHzo7MNIM2uqY4GBDSP7M.tar.br",
-        json: "https://github.com/lukewilliamboswell/roc-json/releases/download/0.6.1/-7UaQL9fbi0J3P6nS_qlxTdpDkOu_7CUm4MZzAN9ZUQ.tar.br",
+        html: "https://github.com/Hasnep/roc-html/releases/download/v0.3.0/BWz3TyGqkM8lFZy4Ww5cspdEgEAbCwpC60G5HMafNjA.tar.br",
+        json: "https://github.com/lukewilliamboswell/roc-json/releases/download/0.6.3/_2Dh4Eju2v_tFtZeMq8aZ9qw2outG04NbkmKpFhXS_4.tar.br",
     }
     imports [
         pf.Webserver.{ Event, Request, Response, Command },
@@ -48,7 +48,13 @@ applyEvents = \model, events ->
     |> List.walk
         model
         \state, event -> applyEvent state event
+    |> List.sortWith \a, b ->
+        # We switch a and b to make an inverse sorting
+        Num.compare
+            (b.id |> Str.toU64 |> Result.withDefault 0)
+            (a.id |> Str.toU64 |> Result.withDefault 0)
 
+applyEvent : Model, Event -> Model
 applyEvent = \model, event ->
     decodedEvent = Decode.fromBytes event json
     when decodedEvent is
@@ -71,8 +77,9 @@ handleReadRequest = \request, model ->
                 Ok body -> response200 body
                 Err NotFound -> response404
 
-        _ -> response404
+        _ -> response400
 
+rootPage : Model -> Response
 rootPage = \model ->
     body =
         index
@@ -103,29 +110,30 @@ handleWriteRequest = \request, model ->
         Err NotFound ->
             (response404, [])
 
+response200 : Str -> Response
 response200 = \body ->
     { body: body |> Str.toUtf8, headers: [], status: 200 }
 
+response400 : Response
 response400 =
     { body: "400 Bad Request" |> Str.toUtf8, headers: [], status: 400 }
 
+response404 : Response
 response404 =
     { body: "404 Not Found" |> Str.toUtf8, headers: [], status: 404 }
 
-expect 42 == 42
+# Testing
 
-# Testing helpers
-
-emptyGetRequest = {
+rootRequest = {
     method: Get,
     headers: [],
-    url: "",
+    url: "/",
     body: EmptyBody,
     timeout: NoTimeout,
 }
 
 expect
     model = []
-    request = emptyGetRequest
+    request = rootRequest
     response = handleReadRequest request model
     response.status == 200

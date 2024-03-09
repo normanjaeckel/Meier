@@ -17,3 +17,7 @@ devenv.local.nix
 
 # Roc
 roc_nightly*
+roc/
+
+# IDE
+.vscode/
