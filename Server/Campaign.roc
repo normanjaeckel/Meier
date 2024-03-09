@@ -17,29 +17,18 @@ campaignListView = \model ->
             \campaign -> campaignCard campaign.id campaign.title (List.len campaign.days)
 
     campaignsAndAddCampaignCard =
-        campaigns
-        |> List.append
-            (
-                div [id "newCampaignForm", class "column is-one-third"] [
-                    div [class "card"] [
-                        div [class "card-header"] [
-                            p [class "card-header-title has-background-primary has-text-white"] [text "Neue Kampagne"],
-                        ],
-                        div [class "card-content"] [
-                            p [] [text "Neue Kampagne erstellen und Projekttage und Angebote anlegen."],
-                        ],
-                        div [class "card-footer"] [
-                            a
-                                [
-                                    class "card-footer-item has-background-primary has-text-white",
-                                    (attribute "hx-get") "/openForm/addCampaign",
-                                    (attribute "hx-target") "#formModal",
-                                ]
-                                [text "Start"],
+        [
+            div [id "newCampaignForm", class "column is-one-third"] [
+                div [class "card is-flex"] [
+                    div [class "card-content is-flex-grow-1 has-background-primary is-flex is-align-items-center"] [
+                        p [class "is-size-3 has-text-centered"] [
+                            a [class "has-text-white", (attribute "hx-get") "/openForm/addCampaign", (attribute "hx-target") "#formModal"] [text "Kampagne anlegen"],
                         ],
                     ],
-                ]
-            )
+                ],
+            ],
+        ]
+        |> List.concat campaigns
 
     div [] [
         h1 [class "title"] [text "Alle Kampagnen"],
@@ -48,11 +37,11 @@ campaignListView = \model ->
 
 campaignCard = \objId, title, numOfDays ->
     div [class "column is-one-third"] [
-        div [class "card"] [
+        div [class "card is-flex is-flex-direction-column"] [
             div [class "card-header"] [
                 p [class "card-header-title"] [text title],
             ],
-            div [class "card-content"] [
+            div [class "card-content is-flex-grow-1"] [
                 text "Anzahl der Tage: $(Num.toStr numOfDays)",
             ],
             div [class "card-footer"] [
@@ -60,7 +49,8 @@ campaignCard = \objId, title, numOfDays ->
                 a
                     [
                         class "card-footer-item",
-                        (attribute "hx-get") "/openForm/editCampaign?id=$(Num.toStr objId)",
+                        (attribute "hx-get") "/openForm/editCampaign/$(objId)",
+                        (attribute "hx-target") "#formModal",
                     ]
                     [text "Einstellungen"],
                 a [class "card-footer-item"] [text "Löschen"],
@@ -69,13 +59,14 @@ campaignCard = \objId, title, numOfDays ->
     ]
 
 campaignCardWithHxSwapOob = \objId, title, numOfDays ->
-    div [(attribute "hx-swap-oob") "beforebegin:#newCampaignForm"] [
+    div [(attribute "hx-swap-oob") "afterend:#newCampaignForm"] [
         campaignCard objId title numOfDays,
     ]
 
 addCampaignEvent = \model, event ->
-    decodedEvent : Result { data : { id : U64, title : Str, numOfDays : U64 } } _
+    decodedEvent : Result { data : { id : Str, title : Str, numOfDays : U64 } } _
     decodedEvent = Decode.fromBytes event json
+
     when decodedEvent is
         Ok dc ->
             campaign = {
@@ -98,7 +89,7 @@ addCampaign = \body, _model ->
                     Err BadRequest
 
                 Ok { title, numOfDays } ->
-                    newObjId = 42
+                    newObjId = "42"
                     event =
                         Encode.toBytes { action: "addCampaign", data: { title, numOfDays, id: newObjId } } json
 

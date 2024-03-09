@@ -29,7 +29,7 @@ main =
 Model : List Campaign
 
 Campaign : {
-    id : U64,
+    id : Str,
     title : Str,
     days : List Day,
 }
@@ -57,33 +57,29 @@ applyEvent = \model, event ->
                 "addCampaign" ->
                     Server.Campaign.addCampaignEvent model event
 
-                _ -> crash "Oh, no! Bad database with unknow event."
+                _ -> crash "Oh, no! Bad database with unknown event."
 
-        Err _ -> crash "Oh, no!"
+        Err _ -> crash "Oh, no! Cannot decode event."
 
 handleReadRequest : Request, Model -> Response
 handleReadRequest = \request, model ->
-    if request.url == "/" then
-        rootPage model
-        # Server.Campaign.campaignListView model
-    else if request.url |> Str.startsWith "/assets" then
-        Server.Assets.serve request.url
-    else if request.url |> Str.startsWith "/openForm" then
-        Server.Form.serve request.url
-    else
-        {
-            body: "400 Bad Request" |> Str.toUtf8,
-            headers: [],
-            status: 400,
-        }
+    when request.url |> Str.split "/" is
+        ["", ""] -> rootPage model
+        ["", "assets", .. as subPath] -> Server.Assets.serve subPath
+        ["", "openForm", .. as subPath] ->
+            when Server.Form.serve subPath model is
+                Ok body -> response200 body
+                Err NotFound -> response404
+
+        _ -> response404
 
 rootPage = \model ->
-    page = index |> Str.replaceFirst "{% content %}" (Server.Campaign.campaignListView model |> renderWithoutDocType)
-    {
-        body: page |> Str.toUtf8,
-        headers: [],
-        status: 200,
-    }
+    body =
+        index
+        |> Str.replaceFirst
+            "{% content %}"
+            (Server.Campaign.campaignListView model |> renderWithoutDocType)
+    response200 body
 
 handleWriteRequest : Request, Model -> (Response, List Command)
 handleWriteRequest = \request, model ->
@@ -92,37 +88,44 @@ handleWriteRequest = \request, model ->
             "/addCampaign" ->
                 Server.Campaign.addCampaign request.body model
 
+            "/editCampaign" ->
+                Err NotFound
+
             _ -> Err NotFound
 
     when responseBody is
         Ok (body, commands) ->
-            (
-                {
-                    body: body |> Str.toUtf8,
-                    headers: [],
-                    status: 200,
-                },
-                commands,
-            )
+            (response200 body, commands)
 
         Err BadRequest ->
-            (
-                {
-                    body: "400 Bad Request" |> Str.toUtf8,
-                    headers: [],
-                    status: 400,
-                },
-                [],
-            )
+            (response400, [])
 
         Err NotFound ->
-            (
-                {
-                    body: "404 Not Found" |> Str.toUtf8,
-                    headers: [],
-                    status: 404,
-                },
-                [],
-            )
+            (response404, [])
+
+response200 = \body ->
+    { body: body |> Str.toUtf8, headers: [], status: 200 }
+
+response400 =
+    { body: "400 Bad Request" |> Str.toUtf8, headers: [], status: 400 }
+
+response404 =
+    { body: "404 Not Found" |> Str.toUtf8, headers: [], status: 404 }
 
 expect 42 == 42
+
+# Testing helpers
+
+emptyGetRequest = {
+    method: Get,
+    headers: [],
+    url: "",
+    body: EmptyBody,
+    timeout: NoTimeout,
+}
+
+expect
+    model = []
+    request = emptyGetRequest
+    response = handleReadRequest request model
+    response.status == 200

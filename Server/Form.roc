@@ -14,17 +14,11 @@ onClickCloseModal =
 ariaLabel =
     attribute "aria-label"
 
-serve = \url ->
+serve = \url, model ->
     when url is
-        "/openForm/addCampaign" ->
-            addCampaignForm
-
-        _ ->
-            {
-                body: "400 Bad Request" |> Str.toUtf8,
-                headers: [],
-                status: 400,
-            }
+        ["addCampaign"] -> addCampaignForm
+        ["editCampaign", objId] -> editCampaign objId model
+        _ -> Err NotFound
 
 addCampaignForm =
     formAttributes = [
@@ -81,9 +75,51 @@ addCampaignForm =
                 ],
             ],
         ]
+    Ok (renderWithoutDocType node)
 
-    {
-        body: node |> renderWithoutDocType |> Str.toUtf8,
-        headers: [],
-        status: 200,
-    }
+editCampaign = \objId, model ->
+    model
+    |> List.findFirst
+        \campaign -> campaign.id == objId
+    |> Result.try
+        \campaign ->
+            formAttributes = [
+                (attribute "hx-post") "/editCampaign/$(objId)",
+                (attribute "hx-disabled-elt") "button",
+                (attribute "hx-target") "closest .modal",
+                (attribute "hx-swap") "delete",
+            ]
+            node =
+                div [class "modal is-active"] [
+                    div [class "modal-background", onClickCloseModal] [],
+                    div [class "modal-card"] [
+                        form formAttributes [
+                            header [class "modal-card-head"] [
+                                p [class "modal-card-title"] [text "Einstellungen für Kampagnen"],
+                                button [class "delete", type "button", ariaLabel "close", onClickCloseModal] [],
+                            ],
+                            section [class "modal-card-body"] [
+                                div [class "field"] [
+                                    div [class "control"] [
+                                        input
+                                            [
+                                                class "input",
+                                                type "text",
+                                                placeholder "Titel",
+                                                ariaLabel "Titel",
+                                                required "",
+                                                name "title",
+                                                value campaign.title,
+                                            ]
+                                            [],
+                                    ],
+                                ],
+                            ],
+                            footer [class "modal-card-foot"] [
+                                button [class "button is-success", type "submit"] [text "Speichern"],
+                                button [class "button", type "button", onClickCloseModal] [text "Abbrechen"],
+                            ],
+                        ],
+                    ],
+                ]
+            Ok (renderWithoutDocType node)
