@@ -1,19 +1,21 @@
 app "meier"
     packages {
         pf: "platform/main.roc",
-        # json: "https://github.com/lukewilliamboswell/roc-json/releases/download/...",
-        html: "https://github.com/Hasnep/roc-html/releases/download/v0.2.0/5fqQTpMYIZkigkDa2rfTc92wt-P_lsa76JVXb8Qb3ms.tar.br",
+        html: "vendor/roc-html/src/main.roc", # html: "https://github.com/Hasnep/roc-html/releases/download/v0.3.0/BWz3TyGqkM8lFZy4Ww5cspdEgEAbCwpC60G5HMafNjA.tar.br",
+        json: "vendor/roc-json/package/main.roc", # json: "https://github.com/lukewilliamboswell/roc-json/releases/download/0.6.3/_2Dh4Eju2v_tFtZeMq8aZ9qw2outG04NbkmKpFhXS_4.tar.br",
     }
     imports [
         pf.Webserver.{ Event, Request, Response, Command },
-        # json.Core.{ Json },
-        html.Html.{ a, div, p, text },
-        html.Attribute.{ class },
-        "templates/index.html" as index : Str,
-        "assets/bulma-0.9.4/bulma/css/bulma.min.css" as bulma : List U8,
-        "assets/htmx-1.9.10/htmx/js/htmx.min.js" as htmx : List U8,
+        Server.Assets,
+        Server.Campaign,
+        Server.Root,
+        Server.Modeling,
+        Server.Shared.{ response200, response400, response404 },
+        json.Core.{ json },
     ]
     provides [main, Model] to pf
+
+Model : Server.Modeling.Model
 
 Program : {
     init : Model,
@@ -26,84 +28,72 @@ main : Program
 main =
     { init, applyEvents, handleReadRequest, handleWriteRequest }
 
-Model : List Str
-
 init : Model
 init =
-    ["Tanztage", "Sportfest", "Frei-Lern-Tage", "Winterwoche"]
+    Server.Modeling.init
 
 applyEvents : Model, List Event -> Model
-applyEvents = \model, _ ->
-    model
+applyEvents = \model, events ->
+    events
+    |> List.walk
+        model
+        \state, event -> applyEvent state event
+    |> List.sortWith \a, b ->
+        # We switch a and b to make an inverse sorting
+        Num.compare
+            (b.id |> Str.toU64 |> Result.withDefault 0)
+            (a.id |> Str.toU64 |> Result.withDefault 0)
+
+applyEvent : Model, Event -> Model
+applyEvent = \model, event ->
+    decodedEvent = Decode.fromBytes event json
+    when decodedEvent is
+        Ok dc ->
+            when dc.action |> Str.split "." is
+                ["campaign", .. as subPath] ->
+                    Server.Campaign.applyEvent model subPath dc.data
+
+                _ -> crash "Oh, no! Bad database with unknown event."
+
+        Err _ -> crash "Oh, no! Cannot decode event."
 
 handleReadRequest : Request, Model -> Response
 handleReadRequest = \request, model ->
-    if request.url == "/" then
-        {
-            body: campaignListView model,
-            headers: [],
-            status: 200,
-        }
-    else if request.url |> Str.startsWith "/assets" then
-        handleAssets request
-    else
-        {
-            body: "400 Bad Request" |> Str.toUtf8,
-            headers: [],
-            status: 400,
-        }
-
-handleAssets = \request ->
-    when request.url is
-        "/assets/bulma-0.9.4/bulma/css/bulma.min.css" ->
-            { body: bulma, headers: [{ name: "Content-Type", value: "text/css" }], status: 200 }
-
-        "/assets/htmx-1.9.10/htmx/js/htmx.min.js" ->
-            { body: htmx, headers: [{ name: "Content-Type", value: "text/javascript" }], status: 200 }
-
-        _ ->
-            { body: "404 Not Found" |> Str.toUtf8, headers: [], status: 404 }
+    when request.url |> Str.split "/" is
+        ["", ""] -> Server.Root.page model
+        ["", "campaign", .. as subPath] -> Server.Campaign.readRequest subPath model
+        ["", "assets", .. as subPath] -> Server.Assets.serve subPath
+        _ -> response404
 
 handleWriteRequest : Request, Model -> (Response, List Command)
-handleWriteRequest = \_request, _model ->
-    (
-        {
-            body: "Nothing to write" |> Str.toUtf8,
-            headers: [],
-            status: 500,
-        },
-        [],
-    )
+handleWriteRequest = \request, model ->
+    responseBody =
+        when request.url |> Str.split "/" is
+            ["", "campaign", .. as subPath] -> Server.Campaign.writeRequest subPath request.body model
+            _ -> Err NotFound
 
-campaignListView = \model ->
-    campaigns =
-        model
-        |> List.map
-            \campaign -> campaignCard campaign
-        |> Str.joinWith ""
+    when responseBody is
+        Ok (body, commands) ->
+            (response200 body, commands)
 
-    index
-    |> Str.replaceFirst "{% campaigns %}" campaigns
-    |> Str.toUtf8
+        Err BadRequest ->
+            (response400, [])
 
-campaignCard = \campaign ->
-    node =
-        div [class "column is-one-third"] [
-            div [class "card"] [
-                div [class "card-header"] [
-                    p [class "card-header-title"] [text campaign],
-                ],
-                div [class "card-content"] [
-                    text "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et.",
-                ],
-                div [class "card-footer"] [
-                    a [class "card-footer-item"] [text "Verwalten"],
-                    a [class "card-footer-item"] [text "Einstellungen"],
-                    a [class "card-footer-item"] [text "Löschen"],
-                ],
-            ],
-        ]
+        Err NotFound ->
+            (response404, [])
 
-    Html.renderWithoutDocType node
+# Testing
 
-expect 42 == 42
+rootRequest = {
+    method: Get,
+    headers: [],
+    url: "/",
+    body: EmptyBody,
+    timeout: NoTimeout,
+}
+
+expect
+    model = []
+    request = rootRequest
+    response = handleReadRequest request model
+    response.status == 200

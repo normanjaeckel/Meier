@@ -20,18 +20,20 @@ tasks:
   format:
     desc: Formats roc files
     cmds:
-      - roc format main.roc
+      - roc format main.roc Server/*.roc
     sources:
       - main.roc
+      - Server/*.roc
 
   test:
     desc: Runs checks and tests
     cmds:
-      - roc format --check
+      - roc format --check main.roc Server/*.roc
       - roc check
       - roc test
     sources:
       - main.roc
+      - Server/*.roc
 
   build:
     desc: Builds project without running it
@@ -45,7 +47,8 @@ tasks:
       - rm platform/roc.o
     sources:
       - main.roc
-      - templates/*.html
+      - Server/*.roc
+      - Server/templates/*.html
     generates:
       - webserver
 
@@ -55,3 +58,10 @@ tasks:
     dir: ./platform
     cmds:
       - go build -o ../webserver
+
+  run-server:
+    desc: Runs the webserver
+    deps:
+      - build
+    cmds:
+      - ./webserver

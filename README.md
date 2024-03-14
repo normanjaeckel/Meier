@@ -14,6 +14,10 @@ We use [devenv](https://devenv.sh/) for a simple setup of the development
 environment. You can also install Roc and Go in another way and use the
 respective build commands you find in the [Taskfile.yaml](Taskfile.yaml).
 
+### Get submodules
+
+    $ git submodule update --init
+
 ### Get Roc
 
     $ devenv shell
@@ -34,8 +38,10 @@ MIT
 
 <img alt="Made with Bulma" src="https://bulma.io/images/made-with-bulma.png" height=24>
 
-We use the CSS library [Bulma](https://bulma.io/) and the JS library
-[htmx](https://htmx.org/). If you build the binary of this project, Bulma's
-minified CSS file and htmx' minified JS file are included. Bulma is release
-under the [MIT license](assets/bulma-0.9.4/bulma/LICENSE). htmx is released under
-the [BSD license](assets/htmx-1.9.10/htmx/LICENSE).
+We use the CSS library [Bulma](https://bulma.io/) and the JS libraries
+[htmx](https://htmx.org/) and [_hyperscript](https://hyperscript.org/). If you
+build the binary of this project, Bulma's minified CSS file, htmx' minified JS
+file and _hyperscript's minified JS file are included. Bulma is release under
+the [MIT license](Server/assets/bulma/LICENSE). htmx is released under the [BSD
+license](Server/assets/htmx/LICENSE). _hyperscript is released under the [BSD
+license](Server/assets/_hyperscript/LICENSE).

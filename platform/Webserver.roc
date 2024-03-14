@@ -9,7 +9,7 @@ interface Webserver
     ]
     imports []
 
-Event : Str
+Event : List U8
 
 # Request is the same as: https://github.com/roc-lang/basic-webserver/blob/main/platform/InternalHttp.roc
 Request : {
