@@ -11,11 +11,7 @@ app "meier"
         Server.Root,
         Server.Modeling,
         Server.Shared.{ response200, response400, response404 },
-        # html.Html.{ renderWithoutDocType },
-        # json.Core.{ json },
-        # Server.Campaign,
-        # Server.Form,
-        # "Server/templates/index.html" as index : Str,
+        json.Core.{ json },
     ]
     provides [main, Model] to pf
 
@@ -37,8 +33,29 @@ init =
     Server.Modeling.init
 
 applyEvents : Model, List Event -> Model
-applyEvents = \_model, _events ->
-    crash ""
+applyEvents = \model, events ->
+    events
+    |> List.walk
+        model
+        \state, event -> applyEvent state event
+    |> List.sortWith \a, b ->
+        # We switch a and b to make an inverse sorting
+        Num.compare
+            (b.id |> Str.toU64 |> Result.withDefault 0)
+            (a.id |> Str.toU64 |> Result.withDefault 0)
+
+applyEvent : Model, Event -> Model
+applyEvent = \model, event ->
+    decodedEvent = Decode.fromBytes event json
+    when decodedEvent is
+        Ok dc ->
+            when dc.action |> Str.split "." is
+                ["campaign", .. as subPath] ->
+                    Server.Campaign.applyEvent model subPath dc.data
+
+                _ -> crash "Oh, no! Bad database with unknown event."
+
+        Err _ -> crash "Oh, no! Cannot decode event."
 
 handleReadRequest : Request, Model -> Response
 handleReadRequest = \request, model ->
@@ -46,10 +63,6 @@ handleReadRequest = \request, model ->
         ["", ""] -> Server.Root.page model
         ["", "campaign", .. as subPath] -> Server.Campaign.readRequest subPath model
         ["", "assets", .. as subPath] -> Server.Assets.serve subPath
-        # ["", "openForm", .. as subPath] ->
-        #     when Server.Form.serve subPath model is
-        #         Ok body -> response200 body
-        #         Err NotFound -> response404
         _ -> response404
 
 handleWriteRequest : Request, Model -> (Response, List Command)
@@ -57,13 +70,6 @@ handleWriteRequest = \request, model ->
     responseBody =
         when request.url |> Str.split "/" is
             ["", "campaign", .. as subPath] -> Server.Campaign.writeRequest subPath request.body model
-            # ["", "campaign", objId] ->
-            #     if request.method == Post then
-            #         crash "Not implemented"
-            #     else if request.method == Delete then
-            #         Server.Campaign.deleteCampaign objId model
-            #     else
-            #         Err BadRequest
             _ -> Err NotFound
 
     when responseBody is
@@ -75,53 +81,6 @@ handleWriteRequest = \request, model ->
 
         Err NotFound ->
             (response404, [])
-
-expect
-    42 == 42
-
-# Model : List Campaign
-
-# Campaign : {
-#     id : Str,
-#     title : Str,
-#     days : List Day,
-# }
-
-# Day : {
-#     title : Str,
-# }
-
-# init : Model
-# init =
-#     []
-
-# applyEvents : Model, List Event -> Model
-# applyEvents = \model, events ->
-#     events
-#     |> List.walk
-#         model
-#         \state, event -> applyEvent state event
-#     |> List.sortWith \a, b ->
-#         # We switch a and b to make an inverse sorting
-#         Num.compare
-#             (b.id |> Str.toU64 |> Result.withDefault 0)
-#             (a.id |> Str.toU64 |> Result.withDefault 0)
-
-# applyEvent : Model, Event -> Model
-# applyEvent = \model, event ->
-#     decodedEvent = Decode.fromBytes event json
-#     when decodedEvent is
-#         Ok dc ->
-#             when dc.action is
-#                 "addCampaign" ->
-#                     Server.Campaign.addCampaignEvent model event
-
-#                 "deleteCampaign" ->
-#                     Server.Campaign.deleteCampaignEvent model event
-
-#                 _ -> crash "Oh, no! Bad database with unknown event."
-
-#         Err _ -> crash "Oh, no! Cannot decode event."
 
 # Testing
 
