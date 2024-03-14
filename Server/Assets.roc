@@ -1,14 +1,16 @@
 interface Server.Assets
     exposes [serve]
     imports [
+        pf.Webserver.{ Response },
         "assets/styles.css" as styles : List U8,
         "assets/bulma/bulma.min.css" as bulma : List U8,
         "assets/htmx/htmx.min.js" as htmx : List U8,
         "assets/_hyperscript/_hyperscript.min.js" as hyperscript : List U8,
     ]
 
-serve = \url ->
-    when url is
+serve : List Str -> Response
+serve = \path ->
+    when path is
         ["styles.css"] ->
             { body: styles, headers: [{ name: "Content-Type", value: "text/css" }], status: 200 }
 
