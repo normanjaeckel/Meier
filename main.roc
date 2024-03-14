@@ -2,7 +2,7 @@ app "meier"
     packages {
         pf: "platform/main.roc",
         html: "vendor/roc-html/src/main.roc", # html: "https://github.com/Hasnep/roc-html/releases/download/v0.3.0/BWz3TyGqkM8lFZy4Ww5cspdEgEAbCwpC60G5HMafNjA.tar.br",
-        # json: "https://github.com/lukewilliamboswell/roc-json/releases/download/0.6.3/_2Dh4Eju2v_tFtZeMq8aZ9qw2outG04NbkmKpFhXS_4.tar.br",
+        json: "vendor/roc-json/src/main.roc", # json: "https://github.com/lukewilliamboswell/roc-json/releases/download/0.6.3/_2Dh4Eju2v_tFtZeMq8aZ9qw2outG04NbkmKpFhXS_4.tar.br",
     }
     imports [
         pf.Webserver.{ Event, Request, Response, Command },
@@ -32,7 +32,7 @@ main =
 
 init : Model
 init =
-    Server.Modelling.init
+    Server.Modeling.init
 
 applyEvents : Model, List Event -> Model
 applyEvents = \_model, _events ->
