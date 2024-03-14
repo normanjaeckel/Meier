@@ -3,6 +3,8 @@ interface Server.Campaign
         addCampaign,
         addCampaignEvent,
         campaignListView,
+        deleteCampaign,
+        deleteCampaignEvent,
     ]
     imports [
         html.Html.{ a, div, h1, p, renderWithoutDocType, text },
@@ -36,7 +38,7 @@ campaignListView = \model ->
     ]
 
 campaignCard = \objId, title, numOfDays ->
-    div [class "column is-one-third"] [
+    div [class "campaign column is-one-third"] [
         div [class "card is-flex is-flex-direction-column"] [
             div [class "card-header"] [
                 p [class "card-header-title"] [text title],
@@ -53,7 +55,15 @@ campaignCard = \objId, title, numOfDays ->
                         (attribute "hx-target") "#formModal",
                     ]
                     [text "Einstellungen"],
-                a [class "card-footer-item"] [text "Löschen"],
+                a
+                    [
+                        class "card-footer-item",
+                        (attribute "hx-confirm") "Wollen Sie die Kampagne wirklich löschen?",
+                        (attribute "hx-delete") "/campaign/$(objId)",
+                        (attribute "hx-target") "closest .campaign",
+                        (attribute "hx-swap") "delete",
+                    ]
+                    [text "Löschen"],
             ],
         ],
     ]
@@ -126,6 +136,26 @@ getHighestId = \model ->
         \campaign -> campaign.id |> Str.toU64 |> Result.withDefault 0
     |> List.max
     |> Result.withDefault 0
+
+deleteCampaignEvent = \model, event ->
+    decodedEvent : Result { data : { id : Str } } _
+    decodedEvent = Decode.fromBytes event json
+
+    when decodedEvent is
+        Ok dc ->
+            model |> List.dropIf \campaign -> campaign.id == dc.data.id
+
+        Err _ -> crash "Oh, no! Invalid database."
+
+deleteCampaign = \objId, model ->
+    when model |> List.findFirst \campaign -> campaign.id == objId is
+        Ok _ ->
+            event =
+                Encode.toBytes { action: "deleteCampaign", data: { id: objId } } json
+            Ok ("", [AddEvent event])
+
+        Err NotFound ->
+            Err BadRequest
 
 bodyToFields : List U8 -> Result (List (Str, List U8)) [InvalidInput]
 bodyToFields = \body ->

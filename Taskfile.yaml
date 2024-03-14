@@ -20,20 +20,20 @@ tasks:
   format:
     desc: Formats roc files
     cmds:
-      - roc format main.roc Server/
+      - roc format main.roc server/*.roc
     sources:
       - main.roc
-      - Server/*.roc
+      - server/*.roc
 
   test:
     desc: Runs checks and tests
     cmds:
-      - roc format --check main.roc Server/
+      - roc format --check main.roc server/*.roc
       - roc check
       - roc test
     sources:
       - main.roc
-      - Server/*.roc
+      - server/*.roc
 
   build:
     desc: Builds project without running it
