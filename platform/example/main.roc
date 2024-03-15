@@ -12,38 +12,43 @@ Program : {
     handleWriteRequest : Request, Model -> (Response, List Command),
 }
 
-Model : Str
+Model : List U8
 
 main : Program
 main = { init, applyEvents, handleReadRequest, handleWriteRequest }
 
 init : Model
 init =
-    "hello"
+    "hello" |> Str.toUtf8
 
 applyEvents : Model, List Event -> Model
 applyEvents = \model, events ->
     List.walk events (model) \state, event ->
-        Str.concat state event
+        List.concat state event
 
 handleReadRequest : Request, Model -> Response
 handleReadRequest = \request, model ->
-    allHeaders = List.walk
-        request.headers
-        ""
-        (\state, header ->
-            Str.concat state "$(header.name): $(header.value)\n")
+    allHeaders =
+        List.walk
+            request.headers
+            ""
+            (\state, header ->
+                Str.concat state "$(header.name): $(header.value)\n")
+        |> Str.toUtf8
 
     hasBody =
-        when request.body is
-            EmptyBody -> "no body"
-            Body str -> "Body: $(str.body |> Str.fromUtf8 |> Result.withDefault "invalid utf8")"
+        (
+            when request.body is
+                EmptyBody -> "no body"
+                Body str -> "Body: $(str.body |> Str.fromUtf8 |> Result.withDefault "invalid utf8")"
+        )
+        |> Str.toUtf8
 
-    url = request.url
+    url = request.url |> Str.toUtf8
     dbg url
 
     {
-        body: Str.concat allHeaders model |> Str.concat hasBody |> Str.concat url |> Str.toUtf8,
+        body: List.concat allHeaders model |> List.concat hasBody |> List.concat url,
         headers: [{ name: "myHeader", value: "myvalue" }],
         status: 200,
     }
@@ -60,5 +65,5 @@ handleWriteRequest = \request, _model ->
             headers: [{ name: "myHeader", value: "myvalue" }],
             status: 500,
         },
-        [AddEvent ", something", PrintThisNumber 42],
+        [AddEvent (", something" |> Str.toUtf8), PrintThisNumber 42],
     )
