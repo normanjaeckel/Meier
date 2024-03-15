@@ -46,12 +46,13 @@ applyEvents = \model, events ->
 
 applyEvent : Model, Event -> Model
 applyEvent = \model, event ->
+    decodedEvent : Result { action : Str } _
     decodedEvent = Decode.fromBytes event json
     when decodedEvent is
         Ok dc ->
             when dc.action |> Str.split "." is
                 ["campaign", .. as subPath] ->
-                    Server.Campaign.applyEvent model subPath dc.data
+                    Server.Campaign.applyEvent model subPath event
 
                 _ -> crash "Oh, no! Bad database with unknown event."
 

@@ -20,6 +20,7 @@ applyEvent : Model, List Str, Event -> Model
 applyEvent = \model, path, event ->
     when path is
         ["create"] -> applyCreateEvent model event
+        ["update"] -> applyUpdateEvent model event
         ["delete"] -> applyDeleteEvent model event
         _ -> crash "Oh, no! Invalid database."
 
@@ -36,6 +37,18 @@ applyCreateEvent = \model, event ->
                 days: List.repeat { title: "Day" } dc.data.numOfDays,
             }
             model |> List.append campaign
+
+        Err _ -> crash "Oh, no! Invalid database."
+
+applyUpdateEvent : Model, Event -> Model
+applyUpdateEvent = \model, event ->
+    decodedEvent : Result { data : { id : Str, title : Str } } _
+    decodedEvent = Decode.fromBytes event json
+
+    when decodedEvent is
+        Ok _dc ->
+            # TODO: Use dc and update model.
+            model
 
         Err _ -> crash "Oh, no! Invalid database."
 
@@ -78,7 +91,13 @@ listView = \model ->
                 div [class "card is-flex"] [
                     div [class "card-content is-flex-grow-1 has-background-primary is-flex is-align-items-center"] [
                         p [class "is-size-3 has-text-centered"] [
-                            a [class "has-text-white", (attribute "hx-get") "/campaign/create", (attribute "hx-target") "#formModal"] [text "Kampagne anlegen"],
+                            a
+                                [
+                                    class "has-text-white",
+                                    (attribute "hx-get") "/campaign/create",
+                                    (attribute "hx-target") "#formModal",
+                                ]
+                                [text "Kampagne anlegen"],
                         ],
                     ],
                 ],
@@ -93,7 +112,7 @@ listView = \model ->
 
 campaignCard : Str, Str, U64 -> Node
 campaignCard = \objId, title, numOfDays ->
-    div [id "campaign-$(objId)", class "campaign column is-one-third"] [
+    div [id "campaign-$(objId)", class "column is-one-third"] [
         div [class "card is-flex is-flex-direction-column"] [
             div [class "card-header"] [
                 p [class "card-header-title"] [text title],
@@ -102,7 +121,13 @@ campaignCard = \objId, title, numOfDays ->
                 text "Anzahl der Tage: $(Num.toStr numOfDays)",
             ],
             div [class "card-footer"] [
-                a [class "card-footer-item"] [text "Verwalten"],
+                a
+                    [
+                        class "card-footer-item",
+                        (attribute "hx-get") "/campaign/$(objId)",
+                        (attribute "hx-target") "#main",
+                    ]
+                    [text "Verwalten"],
                 a
                     [
                         class "card-footer-item",
@@ -115,7 +140,7 @@ campaignCard = \objId, title, numOfDays ->
                         class "card-footer-item",
                         (attribute "hx-confirm") "Wollen Sie die Kampagne wirklich löschen?",
                         (attribute "hx-post") "/campaign/$(objId)/delete",
-                        (attribute "hx-target") "closest .campaign",
+                        (attribute "hx-target") "#campaign-$(objId)",
                         (attribute "hx-swap") "delete",
                     ]
                     [text "Löschen"],
