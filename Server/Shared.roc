@@ -1,5 +1,8 @@
 interface Server.Shared
     exposes [
+        addAttribute,
+        ariaExpanded,
+        ariaHidden,
         ariaLabel,
         bodyToFields,
         hyperscript,
@@ -10,8 +13,17 @@ interface Server.Shared
     ]
     imports [
         html.Attribute.{ Attribute, attribute },
+        html.Html.{ Node, element },
         pf.Webserver.{ Response },
     ]
+
+ariaExpanded : Str -> Attribute
+ariaExpanded =
+    attribute "aria-expanded"
+
+ariaHidden : Str -> Attribute
+ariaHidden =
+    attribute "aria-hidden"
 
 ariaLabel : Str -> Attribute
 ariaLabel =
@@ -23,6 +35,19 @@ hyperscript =
 
 onClickCloseModal =
     hyperscript "on click remove the closest .modal"
+
+addAttribute : Node, Attribute -> Node
+addAttribute = \node, attr ->
+    when node is
+        Element tagName _ attrs children ->
+            (element tagName) (attrs |> List.append attr) children
+
+        _ -> node
+
+expect
+    node = (element "div") [] []
+    got = node |> addAttribute (ariaLabel "title")
+    got == (element "div") [ariaLabel "title"] []
 
 response200 : Str -> Response
 response200 = \body ->

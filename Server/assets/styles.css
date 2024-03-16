@@ -2,6 +2,12 @@
     height: 100%;
 }
 
-#newCampaignForm p {
+@media screen and (min-width: 769px) {
+    #createCampaignCard {
+        min-height: 12em;
+    }
+}
+
+#createCampaignCard p {
     width: 100%;
 }
