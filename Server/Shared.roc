@@ -7,6 +7,7 @@ interface Server.Shared
         bodyToFields,
         hyperscript,
         onClickCloseModal,
+        onClickToggleIsActive,
         response200,
         response400,
         response404,
@@ -35,6 +36,9 @@ hyperscript =
 
 onClickCloseModal =
     hyperscript "on click remove the closest .modal"
+
+onClickToggleIsActive =
+    hyperscript "on click toggle .is-active on <.navbar-burger, .navbar-menu/>"
 
 addAttribute : Node, Attribute -> Node
 addAttribute = \node, attr ->

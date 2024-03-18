@@ -6,12 +6,22 @@ interface Server.Campaign
         writeRequest,
     ]
     imports [
-        html.Html.{ Node, a, button, div, h1, header, footer, form, input, p, renderWithoutDocType, section, span, text },
+        html.Html.{ Node, a, button, div, header, footer, form, input, p, renderWithoutDocType, section, span, text },
         html.Attribute.{ attribute, class, id, max, min, name, placeholder, required, role, type, value },
         json.Core.{ json },
         pf.Webserver.{ Command, Event, RequestBody, Response },
         Server.Modeling.{ Model, CampaignID },
-        Server.Shared.{ addAttribute, ariaExpanded, ariaHidden, ariaLabel, bodyToFields, onClickCloseModal, response200, response404 },
+        Server.Shared.{
+            addAttribute,
+            ariaExpanded,
+            ariaHidden,
+            ariaLabel,
+            bodyToFields,
+            onClickCloseModal,
+            onClickToggleIsActive,
+            response200,
+            response404,
+        },
         "templates/index.html" as index : Str,
     ]
 
@@ -76,33 +86,42 @@ readRequest = \path, model, retrieveEntirePage ->
     when path is
         [] ->
             if retrieveEntirePage then
-                listView model |> renderWithoutDocType |> entirePage |> response200
+                index |> response200
             else
-                listView model |> renderWithoutDocType |> response200
+                listView model |> renderWithoutDocType |> addHeroTitle "Alle Kampagnen" |> response200
 
         ["create"] ->
             renderWithoutDocType createCampaignForm |> response200
-
-        [campaignId] ->
-            when detailView campaignId model is
-                Ok node ->
-                    if retrieveEntirePage then
-                        renderWithoutDocType node |> entirePage |> response200
-                    else
-                        renderWithoutDocType node |> response200
-
-                Err KeyNotFound -> response404
 
         [campaignId, "update"] ->
             when updateCampaignForm campaignId model is
                 Ok node -> renderWithoutDocType node |> response200
                 Err KeyNotFound -> response404
 
+        [campaignId, .. as subPageName] ->
+            subPage =
+                when subPageName is
+                    ["events"] -> Events
+                    _ -> Days
+            when detailView campaignId model subPage is
+                Ok node ->
+                    if retrieveEntirePage then
+                        crash "Bad" # renderWithoutDocType node |> entirePage |> response200
+                    else
+                        renderWithoutDocType node |> addHeroTitle "Hier muss der Titel der Kampagne gerendert werden" |> response200
+
+                Err KeyNotFound -> response404
+
         _ -> response404
 
-entirePage : Str -> Str
-entirePage = \node ->
-    index |> Str.replaceFirst "{% content %}" node
+addHeroTitle : Str, Str -> Str
+addHeroTitle = \body, title ->
+    Str.concat
+        body
+        (
+            p [id "hero-title", class "title", (attribute "hx-swap-oob") "true"] [text title]
+            |> renderWithoutDocType
+        )
 
 listView : Model -> Node
 listView = \model ->
@@ -133,10 +152,7 @@ listView = \model ->
         ]
         |> List.concat campaigns
 
-    div [] [
-        h1 [class "title"] [text "Alle Kampagnen"],
-        div [class "columns is-multiline"] campaignsAndCreateCampaignCard,
-    ]
+    div [class "columns is-multiline"] campaignsAndCreateCampaignCard
 
 campaignCard : CampaignID, Str, U64 -> Node
 campaignCard = \campaignId, title, numOfDays ->
@@ -177,15 +193,22 @@ campaignCard = \campaignId, title, numOfDays ->
         ],
     ]
 
-detailView : CampaignID, Model -> Result Node [KeyNotFound]
-detailView = \campaignId, model ->
-    campaign <- model |> Dict.get campaignId |> Result.map
+Subpage : [Days, Events, Classes, Pupils, Assignments]
+
+detailView : CampaignID, Model, Subpage -> Result Node [KeyNotFound]
+detailView = \campaignId, model, subPage ->
+    isActiveOn = \classes, link ->
+        if link == subPage then
+            "$(classes) is-active"
+        else
+            classes
+
+    _campaign <- model |> Dict.get campaignId |> Result.map
 
     div [] [
-        h1 [class "title"] [text campaign.title],
         div [class "navbar"] [
             div [class "navbar-brand"] [
-                a [role "button", class "navbar-burger", ariaLabel "menu", ariaExpanded "false"] [
+                a [role "button", class "navbar-burger", ariaLabel "menu", ariaExpanded "false", onClickToggleIsActive] [
                     span [ariaHidden "true"] [],
                     span [ariaHidden "true"] [],
                     span [ariaHidden "true"] [],
@@ -193,10 +216,23 @@ detailView = \campaignId, model ->
             ],
             div [class "navbar-menu"] [
                 div [class "navbar-start"] [
-                    a [class "navbar-item"] [text "Tage"],
-                    a [class "navbar-item"] [text "Projektgruppen"],
-                    a [class "navbar-item"] [text "Schüler/innen"],
-                    a [class "navbar-item"] [text "Zuweisung"],
+                    a
+                        [
+                            class ("navbar-item is-tab" |> isActiveOn Days),
+                            (attribute "hx-get") "/campaign/$(campaignId)/days",
+                            (attribute "hx-target") "#main",
+                        ]
+                        [text "Tage"],
+                    a
+                        [
+                            class ("navbar-item is-tab" |> isActiveOn Events),
+                            (attribute "hx-get") "/campaign/$(campaignId)/events",
+                            (attribute "hx-target") "#main",
+                        ]
+                        [text "Projektgruppen"],
+                    a [class ("navbar-item is-tab" |> isActiveOn Classes)] [text "Klassen"],
+                    a [class ("navbar-item is-tab" |> isActiveOn Pupils)] [text "Schüler/innen"],
+                    a [class ("navbar-item is-tab" |> isActiveOn Assignments)] [text "Zuweisung"],
                 ],
                 div [class "navbar-end"] [],
             ],
@@ -396,7 +432,6 @@ performUpdateCampaign = \campaignId, body, model ->
                     numOfDays = List.len campaign.days
 
                     respContent =
-                        # div [(attribute "hx-swap-oob") "outerHTML:#campaign-$(campaignId)"] [
                         campaignCard campaignId title numOfDays |> addAttribute ((attribute "hx-swap-oob") "true")
 
                     Ok (renderWithoutDocType respContent, [AddEvent event])
