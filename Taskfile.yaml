@@ -45,6 +45,7 @@ tasks:
     cmds:
       - roc format --check main.roc Server/*.roc
       - roc check
+      - ldd roc_nightly-linux_x86_64-2024-03-20-ad78e04/roc
       - roc test
     sources:
       - main.roc
