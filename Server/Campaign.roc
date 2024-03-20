@@ -6,23 +6,19 @@ interface Server.Campaign
         writeRequest,
     ]
     imports [
-        html.Html.{ Node, a, button, div, header, footer, form, input, p, renderWithoutDocType, section, span, text },
-        html.Attribute.{ attribute, class, id, max, min, name, placeholder, required, role, type, value },
+        html.Html.{ Node, a, button, div, header, footer, form, input, p, renderWithoutDocType, section, text },
+        html.Attribute.{ attribute, class, id, max, min, name, placeholder, required, type, value },
         json.Core.{ json },
         pf.Webserver.{ Command, Event, RequestBody, Response },
         Server.Modeling.{ Model, CampaignID },
         Server.Shared.{
             addAttribute,
-            ariaExpanded,
-            ariaHidden,
             ariaLabel,
             bodyToFields,
             onClickCloseModal,
-            onClickToggleIsActive,
             response200,
             response404,
         },
-        "templates/index.html" as index : Str,
     ]
 
 # Apply Event
@@ -81,14 +77,11 @@ applyDeleteEvent = \model, event ->
 
 # Read
 
-readRequest : List Str, Model, Bool -> Response
-readRequest = \path, model, retrieveEntirePage ->
+readRequest : List Str, Model -> Response
+readRequest = \path, model ->
     when path is
         [] ->
-            if retrieveEntirePage then
-                index |> response200
-            else
-                listView model |> renderWithoutDocType |> addHeroTitle "Alle Kampagnen" |> response200
+            listView model |> renderWithoutDocType |> response200
 
         ["create"] ->
             renderWithoutDocType createCampaignForm |> response200
@@ -105,23 +98,11 @@ readRequest = \path, model, retrieveEntirePage ->
                     _ -> Days
             when detailView campaignId model subPage is
                 Ok node ->
-                    if retrieveEntirePage then
-                        crash "Bad" # renderWithoutDocType node |> entirePage |> response200
-                    else
-                        renderWithoutDocType node |> addHeroTitle "Hier muss der Titel der Kampagne gerendert werden" |> response200
+                    renderWithoutDocType node |> response200
 
                 Err KeyNotFound -> response404
 
         _ -> response404
-
-addHeroTitle : Str, Str -> Str
-addHeroTitle = \body, title ->
-    Str.concat
-        body
-        (
-            p [id "hero-title", class "title", (attribute "hx-swap-oob") "true"] [text title]
-            |> renderWithoutDocType
-        )
 
 listView : Model -> Node
 listView = \model ->
@@ -134,25 +115,38 @@ listView = \model ->
 
     campaignsAndCreateCampaignCard =
         [
-            div [id "createCampaignCard", class "column is-half is-one-third-desktop is-one-quarter-fullhd"] [
-                div [class "card is-flex"] [
-                    div [class "card-content is-flex-grow-1 has-background-primary is-flex is-align-items-center"] [
-                        p [class "is-size-3 has-text-centered"] [
-                            a
-                                [
-                                    class "has-text-white",
-                                    (attribute "hx-get") "/campaign/create",
-                                    (attribute "hx-target") "#formModal",
-                                ]
-                                [text "Kampagne anlegen"],
+            div
+                [
+                    id "createCampaignCard",
+                    class "column is-half is-one-third-desktop is-one-quarter-fullhd",
+                    (attribute "hx-get") "/campaign/create",
+                    (attribute "hx-target") "#formModal",
+                ]
+                [
+                    div [class "card is-flex"] [
+                        div [class "card-content is-flex-grow-1 has-background-primary is-flex is-align-items-center"] [
+                            p [class "is-size-3 has-text-centered"] [
+                                a [class "has-text-white"] [text "Kampagne anlegen"],
+                            ],
                         ],
                     ],
                 ],
-            ],
         ]
         |> List.concat campaigns
 
-    div [class "columns is-multiline"] campaignsAndCreateCampaignCard
+    div [] [
+        section [class "hero is-primary"] [
+            div [class "hero-body"] [
+                p [class "title"] [text "Alle Kampagnen"],
+                p [class "subtitle"] [text "Projektgruppenverteilung"],
+            ],
+        ],
+        section [class "section"] [
+            div [class "container"] [
+                div [class "columns is-multiline"] campaignsAndCreateCampaignCard,
+            ],
+        ],
+    ]
 
 campaignCard : CampaignID, Str, U64 -> Node
 campaignCard = \campaignId, title, numOfDays ->
@@ -169,7 +163,7 @@ campaignCard = \campaignId, title, numOfDays ->
                     [
                         class "card-footer-item",
                         (attribute "hx-get") "/campaign/$(campaignId)",
-                        (attribute "hx-target") "#main",
+                        (attribute "hx-target") "#mainContent",
                         (attribute "hx-push-url") "true",
                     ]
                     [text "Verwalten"],
@@ -196,45 +190,19 @@ campaignCard = \campaignId, title, numOfDays ->
 Subpage : [Days, Events, Classes, Pupils, Assignments]
 
 detailView : CampaignID, Model, Subpage -> Result Node [KeyNotFound]
-detailView = \campaignId, model, subPage ->
-    isActiveOn = \classes, link ->
-        if link == subPage then
-            "$(classes) is-active"
-        else
-            classes
-
-    _campaign <- model |> Dict.get campaignId |> Result.map
+detailView = \campaignId, model, _subPage ->
+    campaign <- model |> Dict.get campaignId |> Result.map
 
     div [] [
-        div [class "navbar"] [
-            div [class "navbar-brand"] [
-                a [role "button", class "navbar-burger", ariaLabel "menu", ariaExpanded "false", onClickToggleIsActive] [
-                    span [ariaHidden "true"] [],
-                    span [ariaHidden "true"] [],
-                    span [ariaHidden "true"] [],
-                ],
+        section [class "hero is-primary"] [
+            div [class "hero-body"] [
+                p [class "title"] [text campaign.title],
+                p [class "subtitle"] [text "Projektgruppenverteilung"],
             ],
-            div [class "navbar-menu"] [
-                div [class "navbar-start"] [
-                    a
-                        [
-                            class ("navbar-item is-tab" |> isActiveOn Days),
-                            (attribute "hx-get") "/campaign/$(campaignId)/days",
-                            (attribute "hx-target") "#main",
-                        ]
-                        [text "Tage"],
-                    a
-                        [
-                            class ("navbar-item is-tab" |> isActiveOn Events),
-                            (attribute "hx-get") "/campaign/$(campaignId)/events",
-                            (attribute "hx-target") "#main",
-                        ]
-                        [text "Projektgruppen"],
-                    a [class ("navbar-item is-tab" |> isActiveOn Classes)] [text "Klassen"],
-                    a [class ("navbar-item is-tab" |> isActiveOn Pupils)] [text "Schüler/innen"],
-                    a [class ("navbar-item is-tab" |> isActiveOn Assignments)] [text "Zuweisung"],
-                ],
-                div [class "navbar-end"] [],
+        ],
+        section [class "section"] [
+            div [class "container"] [
+                text "Foobar",
             ],
         ],
     ]

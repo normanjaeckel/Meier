@@ -11,6 +11,7 @@ app "meier"
         Server.Modeling,
         Server.Shared.{ response200, response400, response404 },
         json.Core.{ json },
+        "Server/templates/index.html" as index : Str,
     ]
     provides [main, Model] to pf
 
@@ -54,17 +55,23 @@ applyEvent = \model, event ->
 
 handleReadRequest : Request, Model -> Response
 handleReadRequest = \request, model ->
-    retrieveEntirePage =
-        if request.headers |> List.contains { name: "Hx-Request", value: "true" } then
-            request.headers |> List.contains { name: "Hx-History-Restore-Request", value: "true" }
-        else
-            Bool.true
+    isHxRequest =
+        (request.headers |> List.contains { name: "Hx-Request", value: "true" })
+        &&
+        !(request.headers |> List.contains { name: "Hx-History-Restore-Request", value: "true" })
 
-    when request.url |> Str.split "/" is
-        ["", ""] -> Server.Campaign.readRequest [] model retrieveEntirePage
-        ["", "campaign", .. as subPath] -> Server.Campaign.readRequest subPath model retrieveEntirePage
-        ["", "assets", .. as subPath] -> Server.Assets.serve subPath
-        _ -> response404
+    if isHxRequest then
+        when request.url |> Str.split "/" is
+            ["", ""] ->
+                # The url / is the same as /campaign.
+                Server.Campaign.readRequest [] model
+
+            ["", "campaign", .. as subPath] -> Server.Campaign.readRequest subPath model
+            _ -> response404
+    else
+        when request.url |> Str.split "/" is
+            ["", "assets", .. as subPath] -> Server.Assets.serve subPath
+            _ -> index |> response200
 
 handleWriteRequest : Request, Model -> (Response, List Command)
 handleWriteRequest = \request, model ->
