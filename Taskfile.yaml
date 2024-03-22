@@ -45,7 +45,6 @@ tasks:
     cmds:
       - roc format --check main.roc Server/*.roc
       - roc check
-      - ldd roc_nightly-linux_x86_64-2024-03-20-ad78e04/roc
       - roc test
     sources:
       - main.roc
@@ -61,6 +60,6 @@ tasks:
   get-roc:
     desc: Downloads the latest nightly build of roc and unzips it
     cmds:
-      - wget https://github.com/roc-lang/roc/releases/download/nightly/roc_nightly-linux_x86_64-latest.tar.gz --output-document roc.tar.gz
+      - wget https://github.com/roc-lang/roc/releases/download/nightly/roc_nightly-linux_x86_64-latest.tar.gz --no-verbose --output-document roc.tar.gz
       - tar -xf roc.tar.gz
       - rm roc.tar.gz
