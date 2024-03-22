@@ -6,12 +6,19 @@ interface Server.Campaign
         writeRequest,
     ]
     imports [
-        html.Html.{ Node, a, button, div, h1, header, footer, form, input, p, renderWithoutDocType, section, text },
+        html.Html.{ Node, a, button, div, header, footer, form, input, p, renderWithoutDocType, section, text },
         html.Attribute.{ attribute, class, id, max, min, name, placeholder, required, type, value },
         json.Core.{ json },
         pf.Webserver.{ Command, Event, RequestBody, Response },
-        Server.Modeling.{ Model },
-        Server.Shared.{ ariaLabel, onClickCloseModal, response200, response404 },
+        Server.Modeling.{ Model, CampaignID },
+        Server.Shared.{
+            addAttribute,
+            ariaLabel,
+            bodyToFields,
+            onClickCloseModal,
+            response200,
+            response404,
+        },
     ]
 
 # Apply Event
@@ -20,33 +27,51 @@ applyEvent : Model, List Str, Event -> Model
 applyEvent = \model, path, event ->
     when path is
         ["create"] -> applyCreateEvent model event
+        ["update"] -> applyUpdateEvent model event
         ["delete"] -> applyDeleteEvent model event
         _ -> crash "Oh, no! Invalid database."
 
 applyCreateEvent : Model, Event -> Model
 applyCreateEvent = \model, event ->
-    decodedEvent : Result { data : { id : Str, title : Str, numOfDays : U64 } } _
+    decodedEvent : Result { data : { id : CampaignID, title : Str, numOfDays : U64 } } _
     decodedEvent = Decode.fromBytes event json
 
     when decodedEvent is
         Ok dc ->
             campaign = {
-                id: dc.data.id,
                 title: dc.data.title,
                 days: List.repeat { title: "Day" } dc.data.numOfDays,
             }
-            model |> List.append campaign
+            model |> Dict.insert dc.data.id campaign
+
+        Err _ -> crash "Oh, no! Invalid database."
+
+applyUpdateEvent : Model, Event -> Model
+applyUpdateEvent = \model, event ->
+    decodedEvent : Result { data : { id : CampaignID, title : Str } } _
+    decodedEvent = Decode.fromBytes event json
+
+    when decodedEvent is
+        Ok dc ->
+            model
+            |> Dict.update
+                dc.data.id
+                \current ->
+                    when current is
+                        Missing -> Missing
+                        Present campaign ->
+                            Present { campaign & title: dc.data.title }
 
         Err _ -> crash "Oh, no! Invalid database."
 
 applyDeleteEvent : Model, Event -> Model
 applyDeleteEvent = \model, event ->
-    decodedEvent : Result { data : { id : Str } } _
+    decodedEvent : Result { data : { id : CampaignID } } _
     decodedEvent = Decode.fromBytes event json
 
     when decodedEvent is
         Ok dc ->
-            model |> List.dropIf \campaign -> campaign.id == dc.data.id
+            model |> Dict.remove dc.data.id
 
         Err _ -> crash "Oh, no! Invalid database."
 
@@ -55,13 +80,27 @@ applyDeleteEvent = \model, event ->
 readRequest : List Str, Model -> Response
 readRequest = \path, model ->
     when path is
-        ["create"] ->
-            renderWithoutDocType addCampaignForm |> response200
+        [] ->
+            listView model |> renderWithoutDocType |> response200
 
-        [objId, "update"] ->
-            when editCampaignForm objId model is
+        ["create"] ->
+            renderWithoutDocType createCampaignForm |> response200
+
+        [campaignId, "update"] ->
+            when updateCampaignForm campaignId model is
                 Ok node -> renderWithoutDocType node |> response200
-                Err NotFound -> response404
+                Err KeyNotFound -> response404
+
+        [campaignId, .. as subPageName] ->
+            subPage =
+                when subPageName is
+                    ["events"] -> Events
+                    _ -> Days
+            when detailView campaignId model subPage is
+                Ok node ->
+                    renderWithoutDocType node |> response200
+
+                Err KeyNotFound -> response404
 
         _ -> response404
 
@@ -69,31 +108,49 @@ listView : Model -> Node
 listView = \model ->
     campaigns =
         model
-        |> List.map
-            \campaign -> campaignCard campaign.id campaign.title (List.len campaign.days)
+        |> Dict.map
+            \campaignId, campaign -> campaignCard campaignId campaign.title (List.len campaign.days)
+        |> Dict.values
+        |> List.reverse
 
-    campaignsAndAddCampaignCard =
+    campaignsAndCreateCampaignCard =
         [
-            div [id "newCampaignForm", class "column is-one-third"] [
-                div [class "card is-flex"] [
-                    div [class "card-content is-flex-grow-1 has-background-primary is-flex is-align-items-center"] [
-                        p [class "is-size-3 has-text-centered"] [
-                            a [class "has-text-white", (attribute "hx-get") "/campaign/create", (attribute "hx-target") "#formModal"] [text "Kampagne anlegen"],
+            div
+                [
+                    id "createCampaignCard",
+                    class "column is-half is-one-third-desktop is-one-quarter-fullhd",
+                    (attribute "hx-get") "/campaign/create",
+                    (attribute "hx-target") "#formModal",
+                ]
+                [
+                    div [class "card is-flex"] [
+                        div [class "card-content is-flex-grow-1 has-background-primary is-flex is-align-items-center"] [
+                            p [class "is-size-3 has-text-centered"] [
+                                a [class "has-text-white"] [text "Kampagne anlegen"],
+                            ],
                         ],
                     ],
                 ],
-            ],
         ]
         |> List.concat campaigns
 
     div [] [
-        h1 [class "title"] [text "Alle Kampagnen"],
-        div [class "columns is-multiline"] campaignsAndAddCampaignCard,
+        section [class "hero is-primary"] [
+            div [class "hero-body"] [
+                p [class "title"] [text "Alle Kampagnen"],
+                p [class "subtitle"] [text "Projektgruppenverteilung"],
+            ],
+        ],
+        section [class "section"] [
+            div [class "container"] [
+                div [class "columns is-multiline"] campaignsAndCreateCampaignCard,
+            ],
+        ],
     ]
 
-campaignCard : Str, Str, U64 -> Node
-campaignCard = \objId, title, numOfDays ->
-    div [class "campaign column is-one-third"] [
+campaignCard : CampaignID, Str, U64 -> Node
+campaignCard = \campaignId, title, numOfDays ->
+    div [id "campaign-$(campaignId)", class "column is-half is-one-third-desktop is-one-quarter-fullhd"] [
         div [class "card is-flex is-flex-direction-column"] [
             div [class "card-header"] [
                 p [class "card-header-title"] [text title],
@@ -102,11 +159,18 @@ campaignCard = \objId, title, numOfDays ->
                 text "Anzahl der Tage: $(Num.toStr numOfDays)",
             ],
             div [class "card-footer"] [
-                a [class "card-footer-item"] [text "Verwalten"],
                 a
                     [
                         class "card-footer-item",
-                        (attribute "hx-get") "/campaign/$(objId)/update",
+                        (attribute "hx-get") "/campaign/$(campaignId)",
+                        (attribute "hx-target") "#mainContent",
+                        (attribute "hx-push-url") "true",
+                    ]
+                    [text "Verwalten"],
+                a
+                    [
+                        class "card-footer-item",
+                        (attribute "hx-get") "/campaign/$(campaignId)/update",
                         (attribute "hx-target") "#formModal",
                     ]
                     [text "Einstellungen"],
@@ -114,8 +178,8 @@ campaignCard = \objId, title, numOfDays ->
                     [
                         class "card-footer-item",
                         (attribute "hx-confirm") "Wollen Sie die Kampagne wirklich löschen?",
-                        (attribute "hx-post") "/campaign/$(objId)/delete",
-                        (attribute "hx-target") "closest .campaign",
+                        (attribute "hx-post") "/campaign/$(campaignId)/delete",
+                        (attribute "hx-target") "#campaign-$(campaignId)",
                         (attribute "hx-swap") "delete",
                     ]
                     [text "Löschen"],
@@ -123,14 +187,35 @@ campaignCard = \objId, title, numOfDays ->
         ],
     ]
 
-addCampaignForm : Node
-addCampaignForm =
+Subpage : [Days, Events, Classes, Pupils, Assignments]
+
+detailView : CampaignID, Model, Subpage -> Result Node [KeyNotFound]
+detailView = \campaignId, model, _subPage ->
+    campaign <- model |> Dict.get campaignId |> Result.map
+
+    div [] [
+        section [class "hero is-primary"] [
+            div [class "hero-body"] [
+                p [class "title"] [text campaign.title],
+                p [class "subtitle"] [text "Projektgruppenverteilung"],
+            ],
+        ],
+        section [class "section"] [
+            div [class "container"] [
+                text "Foobar",
+            ],
+        ],
+    ]
+
+createCampaignForm : Node
+createCampaignForm =
     formAttributes = [
         (attribute "hx-post") "/campaign/create",
         (attribute "hx-disabled-elt") "button",
         (attribute "hx-target") "closest .modal",
         (attribute "hx-swap") "delete",
     ]
+
     div [class "modal is-active"] [
         div [class "modal-background", onClickCloseModal] [],
         div [class "modal-card"] [
@@ -179,55 +264,53 @@ addCampaignForm =
         ],
     ]
 
-editCampaignForm : Str, Model -> Result Node [NotFound]
-editCampaignForm = \objId, model ->
-    model
-    |> List.findFirst
-        \campaign -> campaign.id == objId
-    |> Result.map
-        \campaign ->
-            formAttributes = [
-                (attribute "hx-post") "/campaign/$(objId)/update",
-                (attribute "hx-disabled-elt") "button",
-                (attribute "hx-target") "closest .modal",
-                (attribute "hx-swap") "delete",
-            ]
-            div [class "modal is-active"] [
-                div [class "modal-background", onClickCloseModal] [],
-                div [class "modal-card"] [
-                    form formAttributes [
-                        header [class "modal-card-head"] [
-                            p [class "modal-card-title"] [text "Einstellungen für Kampagnen"],
-                            button [class "delete", type "button", ariaLabel "close", onClickCloseModal] [],
-                        ],
-                        section [class "modal-card-body"] [
-                            div [class "field"] [
-                                div [class "control"] [
-                                    input
-                                        [
-                                            class "input",
-                                            type "text",
-                                            placeholder "Titel",
-                                            ariaLabel "Titel",
-                                            required "",
-                                            name "title",
-                                            value campaign.title,
-                                        ]
-                                        [],
-                                ],
-                            ],
-                        ],
-                        footer [class "modal-card-foot"] [
-                            button [class "button is-success", type "submit"] [text "Speichern"],
-                            button [class "button", type "button", onClickCloseModal] [text "Abbrechen"],
+updateCampaignForm : CampaignID, Model -> Result Node [KeyNotFound]
+updateCampaignForm = \campaignId, model ->
+    campaign <- model |> Dict.get campaignId |> Result.map
+
+    formAttributes = [
+        (attribute "hx-post") "/campaign/$(campaignId)/update",
+        (attribute "hx-disabled-elt") "button",
+        (attribute "hx-target") "closest .modal",
+        (attribute "hx-swap") "delete",
+    ]
+
+    div [class "modal is-active"] [
+        div [class "modal-background", onClickCloseModal] [],
+        div [class "modal-card"] [
+            form formAttributes [
+                header [class "modal-card-head"] [
+                    p [class "modal-card-title"] [text "Einstellungen für Kampagnen"],
+                    button [class "delete", type "button", ariaLabel "close", onClickCloseModal] [],
+                ],
+                section [class "modal-card-body"] [
+                    div [class "field"] [
+                        div [class "control"] [
+                            input
+                                [
+                                    class "input",
+                                    type "text",
+                                    placeholder "Titel",
+                                    ariaLabel "Titel",
+                                    required "",
+                                    name "title",
+                                    value campaign.title,
+                                ]
+                                [],
                         ],
                     ],
                 ],
-            ]
+                footer [class "modal-card-foot"] [
+                    button [class "button is-success", type "submit"] [text "Speichern"],
+                    button [class "button", type "button", onClickCloseModal] [text "Abbrechen"],
+                ],
+            ],
+        ],
+    ]
 
 # Write
 
-writeRequest : List Str, RequestBody, Model -> Result (Str, List Command) [BadRequest, NotFound]
+writeRequest : List Str, RequestBody, Model -> Result (Str, List Command) [BadRequest, KeyNotFound, NotFound]
 writeRequest = \path, body, model ->
     when path is
         ["create"] -> performCreateCampaign body model
@@ -251,10 +334,14 @@ performCreateCampaign = \body, model ->
                 Ok { title, numOfDays } ->
                     newObjId = getHighestId model + 1 |> Num.toStr
 
-                    event =
-                        Encode.toBytes { action: "campaign.create", data: { title, numOfDays, id: newObjId } } json
+                    event = Encode.toBytes
+                        { action: "campaign.create", data: { title, numOfDays, id: newObjId } }
+                        json
 
-                    Ok (campaignCardWithHxSwapOob newObjId title numOfDays |> renderWithoutDocType, [AddEvent event])
+                    respContent =
+                        div [(attribute "hx-swap-oob") "afterend:#createCampaignCard"] [campaignCard newObjId title numOfDays]
+
+                    Ok (renderWithoutDocType respContent, [AddEvent event])
 
 parseCreateCampaignFormFields : List (Str, List U8) -> Result { title : Str, numOfDays : U64 } [InvalidInput]
 parseCreateCampaignFormFields = \fields ->
@@ -284,118 +371,56 @@ parseCreateCampaignFormFields = \fields ->
 getHighestId : Model -> U64
 getHighestId = \model ->
     model
+    |> Dict.keys
     |> List.map
-        \campaign -> campaign.id |> Str.toU64 |> Result.withDefault 0
+        \campaignId -> campaignId |> Str.toU64 |> Result.withDefault 0
     |> List.max
     |> Result.withDefault 0
 
-campaignCardWithHxSwapOob : Str, Str, U64 -> Node
-campaignCardWithHxSwapOob = \objId, title, numOfDays ->
-    div [(attribute "hx-swap-oob") "afterend:#newCampaignForm"] [
-        campaignCard objId title numOfDays,
-    ]
-
 ## Update
 
-performUpdateCampaign : Str, RequestBody, Model -> Result (Str, List Command) [BadRequest, NotFound]
+performUpdateCampaign : CampaignID, RequestBody, Model -> Result (Str, List Command) [KeyNotFound, BadRequest]
+performUpdateCampaign = \campaignId, body, model ->
+    campaign <- model |> Dict.get campaignId |> Result.try
+
+    when body is
+        EmptyBody ->
+            Err BadRequest
+
+        Body b ->
+            when bodyToFields b.body |> Result.try parseUpdateCampaignFormFields is
+                Err InvalidInput ->
+                    Err BadRequest
+
+                Ok { title } ->
+                    event = Encode.toBytes
+                        { action: "campaign.update", data: { title, id: campaignId } }
+                        json
+
+                    numOfDays = List.len campaign.days
+
+                    respContent =
+                        campaignCard campaignId title numOfDays |> addAttribute ((attribute "hx-swap-oob") "true")
+
+                    Ok (renderWithoutDocType respContent, [AddEvent event])
+
+parseUpdateCampaignFormFields : List (Str, List U8) -> Result { title : Str } [InvalidInput]
+parseUpdateCampaignFormFields = \fields ->
+    fields
+    |> List.findFirst \(fieldName, _) -> fieldName == "title"
+    |> Result.try \(_, t) -> t |> Str.fromUtf8
+    |> Result.map \title -> { title }
+    |> Result.mapErr
+        \e ->
+            when e is
+                NotFound | BadUtf8 _ _ -> InvalidInput
 
 ## Delete
 
-performDeleteCampaign : Str, Model -> Result (Str, List Command) [NotFound]
-performDeleteCampaign = \objId, model ->
-    model
-    |> List.findFirst \campaign -> campaign.id == objId
-    |> Result.map
-        \_ ->
-            event =
-                Encode.toBytes { action: "campaign.delete", data: { id: objId } } json
-            ("", [AddEvent event])
-
-# Helpers
-
-bodyToFields : List U8 -> Result (List (Str, List U8)) [InvalidInput]
-bodyToFields = \body ->
-    body
-    |> urlDecode
-    |> Result.try
-        \r ->
-            r
-            |> splitListU8 '&'
-            |> List.mapTry
-                \elem ->
-                    when elem |> splitListU8 '=' is
-                        [elemName, elemValue] ->
-                            when elemName |> Str.fromUtf8 is
-                                Ok n ->
-                                    Ok (n, elemValue)
-
-                                Err (BadUtf8 _ _) ->
-                                    Err InvalidInput
-
-                        _ -> Err InvalidInput
-
-expect
-    got = bodyToFields ("foo=bar&val=baz" |> Str.toUtf8)
-    got == Ok ([("foo", "bar" |> Str.toUtf8), ("val", "baz" |> Str.toUtf8)])
-
-expect
-    got = bodyToFields ("invalid&val=baz" |> Str.toUtf8)
-    got == Err InvalidInput
-
-urlDecode : List U8 -> Result (List U8) [InvalidInput]
-urlDecode = \bytes ->
-    bytes
-    |> List.map
-        \char -> if char == '+' then ' ' else char
-    |> percentDecode
-
-percentDecode : List U8 -> Result (List U8) [InvalidInput]
-percentDecode = \bytes ->
-    percentDecodeHelper bytes (List.withCapacity (List.len bytes))
-
-percentDecodeHelper : List U8, List U8 -> Result (List U8) [InvalidInput]
-percentDecodeHelper = \bytes, result ->
-    when bytes is
-        [] -> Ok result
-        [first, .. as rest] ->
-            if first == '%' then
-                hex =
-                    rest
-                    |> List.takeFirst 2
-                    |> Str.fromUtf8
-                    |> Result.try
-                        \s -> "0x$(s)" |> Str.toU8
-                when hex is
-                    Ok num ->
-                        percentDecodeHelper (rest |> List.dropFirst 2) (result |> List.append num)
-
-                    Err e ->
-                        when e is
-                            BadUtf8 _ _ | InvalidNumStr -> Err InvalidInput
-            else
-                percentDecodeHelper rest (result |> List.append first)
-
-expect urlDecode ("foo%20bar" |> Str.toUtf8) == Ok ("foo bar" |> Str.toUtf8)
-expect urlDecode ("foo+bar" |> Str.toUtf8) == Ok ("foo bar" |> Str.toUtf8)
-expect urlDecode ("foo%" |> Str.toUtf8) == Err InvalidInput
-expect urlDecode ("foo%zz" |> Str.toUtf8) == Err InvalidInput
-
-splitListU8 : List U8, U8 -> List (List U8)
-splitListU8 = \list, char ->
-    list
-    |> List.walk
-        ([], [])
-        \(current, result), elem ->
-            if elem == char then
-                ([], result |> List.append current)
-            else
-                (current |> List.append elem, result)
-    |> \(current, result) ->
-        result |> List.append current
-
-expect splitListU8 [] 'a' == [[]]
-expect splitListU8 ['a', 'b', 'c'] 'b' == [['a'], ['c']]
-expect splitListU8 ['a', 'b', 'c'] 'c' == [['a', 'b'], []]
-expect splitListU8 ['a', 'b', 'c'] 'a' == [[], ['b', 'c']]
-expect splitListU8 ['a', 'b', 'b', 'c'] 'b' == [['a'], [], ['c']]
-expect splitListU8 ['a', 'b', 'c', 'b', 'd'] 'b' == [['a'], ['c'], ['d']]
+performDeleteCampaign : CampaignID, Model -> Result (Str, List Command) [KeyNotFound]
+performDeleteCampaign = \campaignId, model ->
+    if model |> Dict.contains campaignId then
+        event = Encode.toBytes { action: "campaign.delete", data: { id: campaignId } } json
+        Ok ("", [AddEvent event])
+    else
+        Err KeyNotFound

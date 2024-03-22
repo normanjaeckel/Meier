@@ -1,11 +1,12 @@
 interface Server.Modeling
-    exposes [Model, init]
+    exposes [CampaignID, Model, init]
     imports []
 
-Model : List Campaign
+Model : Dict CampaignID Campaign
+
+CampaignID : Str
 
 Campaign : {
-    id : Str,
     title : Str,
     days : List Day,
 }
@@ -16,4 +17,4 @@ Day : {
 
 init : Model
 init =
-    []
+    Dict.empty {}
