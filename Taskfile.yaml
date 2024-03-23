@@ -52,3 +52,4 @@ tasks:
       - wget https://github.com/roc-lang/roc/releases/download/nightly/roc_nightly-linux_x86_64-latest.tar.gz --no-verbose --output-document roc.tar.gz
       - tar -xf roc.tar.gz
       - rm roc.tar.gz
+      - mv "$(pwd)/$(find . -type d -iname 'roc_nightly*' | head -n 1)" roc-dir
