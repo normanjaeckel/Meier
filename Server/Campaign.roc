@@ -97,7 +97,7 @@ campaignCard = \campaignId, title, numOfDays ->
     div [id "campaign-$(campaignId)", class "column is-half is-one-third-desktop is-one-quarter-fullhd"] [
         div [class "card is-flex is-flex-direction-column"] [
             div [class "card-header"] [
-                p [class "card-header-title"] [text title],
+                p [class "card-header-title has-background-primary-light"] [text title],
             ],
             div [class "card-content is-flex-grow-1"] [
                 text "Anzahl der Tage: $(Num.toStr numOfDays)",
@@ -146,7 +146,74 @@ detailView = \campaignId, model, _subPage ->
         ],
         section [class "section"] [
             div [class "container"] [
-                text "Foobar",
+                div [class "columns is-multiline"] [
+                    div [class "column is-half is-one-third-desktop is-one-quarter-fullhd"] [
+                        div [class "card"] [
+                            div [class "card-header"] [p [class "card-header-title has-background-primary-light"] [text "Tage"]],
+                            div [class "card-content"] [text "content"],
+                            div [class "card-footer"] [
+                                a
+                                    [
+                                        class "card-footer-item",
+                                    ]
+                                    [text "Verwalten"],
+                            ],
+                        ],
+                    ],
+                    div [class "column is-half is-one-third-desktop is-one-quarter-fullhd"] [
+                        div [class "card"] [
+                            div [class "card-header"] [p [class "card-header-title has-background-primary-light"] [text "Angebote"]],
+                            div [class "card-content"] [text "content"],
+                            div [class "card-footer"] [
+                                a
+                                    [
+                                        class "card-footer-item",
+                                    ]
+                                    [text "Verwalten"],
+                            ],
+                        ],
+                    ],
+                    div [class "column is-half is-one-third-desktop is-one-quarter-fullhd"] [
+                        div [class "card"] [
+                            div [class "card-header"] [p [class "card-header-title has-background-primary-light"] [text "Klassen"]],
+                            div [class "card-content"] [text "content"],
+                            div [class "card-footer"] [
+                                a
+                                    [
+                                        class "card-footer-item",
+                                    ]
+                                    [text "Verwalten"],
+                            ],
+                        ],
+                    ],
+                    div [class "column is-half is-one-third-desktop is-one-quarter-fullhd"] [
+                        div [class "card"] [
+                            div [class "card-header"] [p [class "card-header-title has-background-primary-light"] [text "Schüler/innen"]],
+                            div [class "card-content"] [text "content"],
+                            div [class "card-footer"] [
+                                a
+                                    [
+                                        class "card-footer-item",
+                                    ]
+                                    [text "Verwalten"],
+                            ],
+                        ],
+                    ],
+                    div [class "column is-half is-one-third-desktop is-one-quarter-fullhd"] [
+                        div [class "card"] [
+                            div [class "card-header"] [p [class "card-header-title has-background-primary-light"] [text "Zurordnung"]],
+                            div [class "card-content"] [text "content"],
+                            div [class "card-footer"] [
+                                a
+                                    [
+                                        class "card-footer-item",
+                                    ]
+                                    [text "Verwalten"],
+                            ],
+                        ],
+                    ],
+
+                ],
             ],
         ],
     ]
