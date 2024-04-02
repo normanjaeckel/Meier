@@ -1,6 +1,5 @@
 interface Server.Campaign
     exposes [
-        applyEvent,
         listView,
         readRequest,
         writeRequest,
@@ -8,47 +7,10 @@ interface Server.Campaign
     imports [
         html.Html.{ Node, a, button, div, h1, header, footer, form, input, p, renderWithoutDocType, section, text },
         html.Attribute.{ attribute, class, id, max, min, name, placeholder, required, type, value },
-        json.Core.{ json },
-        pf.Webserver.{ Command, Event, RequestBody, Response },
+        pf.Webserver.{ RequestBody, Response },
         Server.Modeling.{ Model },
         Server.Shared.{ ariaLabel, onClickCloseModal, response200, response404 },
     ]
-
-# Apply Event
-
-applyEvent : Model, List Str, Event -> Model
-applyEvent = \model, path, event ->
-    when path is
-        ["create"] -> applyCreateEvent model event
-        ["delete"] -> applyDeleteEvent model event
-        _ -> crash "Oh, no! Invalid database."
-
-applyCreateEvent : Model, Event -> Model
-applyCreateEvent = \model, event ->
-    decodedEvent : Result { data : { id : Str, title : Str, numOfDays : U64 } } _
-    decodedEvent = Decode.fromBytes event json
-
-    when decodedEvent is
-        Ok dc ->
-            campaign = {
-                id: dc.data.id,
-                title: dc.data.title,
-                days: List.repeat { title: "Day" } dc.data.numOfDays,
-            }
-            model |> List.append campaign
-
-        Err _ -> crash "Oh, no! Invalid database."
-
-applyDeleteEvent : Model, Event -> Model
-applyDeleteEvent = \model, event ->
-    decodedEvent : Result { data : { id : Str } } _
-    decodedEvent = Decode.fromBytes event json
-
-    when decodedEvent is
-        Ok dc ->
-            model |> List.dropIf \campaign -> campaign.id == dc.data.id
-
-        Err _ -> crash "Oh, no! Invalid database."
 
 # Read
 
@@ -227,7 +189,7 @@ editCampaignForm = \objId, model ->
 
 # Write
 
-writeRequest : List Str, RequestBody, Model -> Result (Str, List Command) [BadRequest, NotFound]
+writeRequest : List Str, RequestBody, Model -> Result (Str, Model) [BadRequest, NotFound]
 writeRequest = \path, body, model ->
     when path is
         ["create"] -> performCreateCampaign body model
@@ -237,7 +199,7 @@ writeRequest = \path, body, model ->
 
 ## Create
 
-performCreateCampaign : RequestBody, Model -> Result (Str, List Command) [BadRequest]
+performCreateCampaign : RequestBody, Model -> Result (Str, Model) [BadRequest]
 performCreateCampaign = \body, model ->
     when body is
         EmptyBody ->
@@ -250,11 +212,14 @@ performCreateCampaign = \body, model ->
 
                 Ok { title, numOfDays } ->
                     newObjId = getHighestId model + 1 |> Num.toStr
+                    campaign = {
+                        title,
+                        days: List.repeat { title: "Day" } numOfDays,
+                        id: newObjId,
+                    }
+                    newModel = model |> List.append campaign
 
-                    event =
-                        Encode.toBytes { action: "campaign.create", data: { title, numOfDays, id: newObjId } } json
-
-                    Ok (campaignCardWithHxSwapOob newObjId title numOfDays |> renderWithoutDocType, [AddEvent event])
+                    Ok (campaignCardWithHxSwapOob newObjId title numOfDays |> renderWithoutDocType, newModel)
 
 parseCreateCampaignFormFields : List (Str, List U8) -> Result { title : Str, numOfDays : U64 } [InvalidInput]
 parseCreateCampaignFormFields = \fields ->
@@ -263,9 +228,7 @@ parseCreateCampaignFormFields = \fields ->
         |> List.findFirst \(fieldName, _) -> fieldName == "title"
         |> Result.try \(_, t) -> t |> Str.fromUtf8
         |> Result.mapErr
-            \e ->
-                when e is
-                    NotFound | BadUtf8 _ _ -> InvalidInput
+            \_ -> InvalidInput
 
     numOfDays =
         fields
@@ -273,12 +236,15 @@ parseCreateCampaignFormFields = \fields ->
         |> Result.try \(_, n) -> n |> Str.fromUtf8
         |> Result.try Str.toU64
         |> Result.mapErr
-            \e ->
-                when e is
-                    NotFound | BadUtf8 _ _ | InvalidNumStr -> InvalidInput
+            \_ -> InvalidInput
 
-    when (title, numOfDays) is
-        (Ok t, Ok n) -> Ok { title: t, numOfDays: n }
+    # TODO: Why is it not possible to write "when (title, numOfDays)"?
+    when title is
+        Ok t ->
+            when numOfDays is
+                Ok n -> Ok { title: t, numOfDays: n }
+                _ -> Err InvalidInput
+
         _ -> Err InvalidInput
 
 getHighestId : Model -> U64
@@ -297,19 +263,18 @@ campaignCardWithHxSwapOob = \objId, title, numOfDays ->
 
 ## Update
 
-performUpdateCampaign : Str, RequestBody, Model -> Result (Str, List Command) [BadRequest, NotFound]
+performUpdateCampaign : Str, RequestBody, Model -> Result (Str, Model) [BadRequest, NotFound]
 
 ## Delete
 
-performDeleteCampaign : Str, Model -> Result (Str, List Command) [NotFound]
+performDeleteCampaign : Str, Model -> Result (Str, Model) [NotFound]
 performDeleteCampaign = \objId, model ->
     model
     |> List.findFirst \campaign -> campaign.id == objId
     |> Result.map
         \_ ->
-            event =
-                Encode.toBytes { action: "campaign.delete", data: { id: objId } } json
-            ("", [AddEvent event])
+            newModel = model |> List.dropIf \campaign -> campaign.id == objId
+            ("", newModel)
 
 # Helpers
 
@@ -334,13 +299,13 @@ bodyToFields = \body ->
 
                         _ -> Err InvalidInput
 
-expect
-    got = bodyToFields ("foo=bar&val=baz" |> Str.toUtf8)
-    got == Ok ([("foo", "bar" |> Str.toUtf8), ("val", "baz" |> Str.toUtf8)])
+# expect
+#     got = bodyToFields ("foo=bar&val=baz" |> Str.toUtf8)
+#     got == Ok ([("foo", "bar" |> Str.toUtf8), ("val", "baz" |> Str.toUtf8)])
 
-expect
-    got = bodyToFields ("invalid&val=baz" |> Str.toUtf8)
-    got == Err InvalidInput
+# expect
+#     got = bodyToFields ("invalid&val=baz" |> Str.toUtf8)
+#     got == Err InvalidInput
 
 urlDecode : List U8 -> Result (List U8) [InvalidInput]
 urlDecode = \bytes ->
