@@ -280,13 +280,8 @@ performCreateCampaign = \body, model ->
                     campaign = {
                         title,
                         days: List.repeat { title: "Day" } numOfDays,
-                        id: newObjId,
                     }
-                    newModel = model |> List.append campaign
-
-                    event = Encode.toBytes
-                        { action: "campaign.create", data: { title, numOfDays, id: newObjId } }
-                        json
+                    newModel = model |> Dict.insert newObjId campaign
 
                     respContent =
                         div [(attribute "hx-swap-oob") "afterend:#createCampaignCard"] [campaignCard newObjId title numOfDays]
@@ -344,7 +339,12 @@ performUpdateCampaign = \campaignId, body, model ->
                     Err BadRequest
 
                 Ok { title } ->
-                    newModel = model |> Dict.update campaign (Present { title, id: campaignId })
+                    newModel =
+                        model
+                        |> Dict.update campaignId \current ->
+                            when current is
+                                Missing -> Missing
+                                Present old -> Present { old & title: title }
 
                     numOfDays = List.len campaign.days
 
@@ -366,11 +366,10 @@ parseUpdateCampaignFormFields = \fields ->
 
 ## Delete
 
-performDeleteCampaign : Str, Model -> Result (Str, Model) [NotFound]
-performDeleteCampaign = \objId, model ->
-    model
-    |> List.findFirst \campaign -> campaign.id == objId
-    |> Result.map
-        \_ ->
-            newModel = model |> List.dropIf \campaign -> campaign.id == objId
-            ("", newModel)
+performDeleteCampaign : CampaignID, Model -> Result (Str, Model) [KeyNotFound]
+performDeleteCampaign = \campaignId, model ->
+    if model |> Dict.contains campaignId then
+        newModel = model |> Dict.remove campaignId
+        Ok ("", newModel)
+    else
+        Err KeyNotFound
