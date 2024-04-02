@@ -7,9 +7,9 @@ app "meier"
         pf.Webserver.{ Request, Response },
         Server.Assets,
         Server.Campaign,
-        Server.Root,
         Server.Modeling,
         Server.Shared.{ response200, response400, response404 },
+        "Server/templates/index.html" as index : Str,
     ]
     provides [main, Model] to pf
 
@@ -31,11 +31,23 @@ init =
 
 handleReadRequest : Request, Model -> Response
 handleReadRequest = \request, model ->
-    when request.url |> Str.split "/" is
-        ["", ""] -> Server.Root.page model
-        ["", "campaign", .. as subPath] -> Server.Campaign.readRequest subPath model
-        ["", "assets", .. as subPath] -> Server.Assets.serve subPath
-        _ -> response404
+    isHxRequest =
+        (request.headers |> List.contains { name: "Hx-Request", value: "true" })
+        &&
+        !(request.headers |> List.contains { name: "Hx-History-Restore-Request", value: "true" })
+
+    if isHxRequest then
+        when request.url |> Str.split "/" is
+            ["", ""] ->
+                # The url / is the same as /campaign.
+                Server.Campaign.readRequest [] model
+
+            ["", "campaign", .. as subPath] -> Server.Campaign.readRequest subPath model
+            _ -> response404
+    else
+        when request.url |> Str.split "/" is
+            ["", "assets", .. as subPath] -> Server.Assets.serve subPath
+            _ -> index |> response200
 
 handleWriteRequest : Request, Model -> (Response, Model)
 handleWriteRequest = \request, model ->
@@ -51,7 +63,7 @@ handleWriteRequest = \request, model ->
         Err BadRequest ->
             (response400, model)
 
-        Err NotFound ->
+        Err NotFound | Err KeyNotFound ->
             (response404, model)
 
 # Testing
@@ -65,7 +77,7 @@ rootRequest = {
 }
 
 expect
-    model = []
+    model = init
     request = rootRequest
     response = handleReadRequest request model
     response.status == 200

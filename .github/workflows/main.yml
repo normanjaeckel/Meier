@@ -12,27 +12,49 @@ jobs:
         with:
           submodules: true
 
-      - name: Install and set up Nix
-        uses: cachix/install-nix-action@v25
-
       # https://nix.dev/tutorials/nixos/continuous-integration-github-actions
 
-      # - name: Enable Magic Nix Cache
-      #   uses: DeterminateSystems/magic-nix-cache-action@v2
+      # - name: Install and set up Nix
+      #   uses: cachix/install-nix-action@v25
+      #   with:
+      #     nix_path: nixpkgs=channel:nixpkgs-unstable
 
-      - name: Configure Nix to use the devenv cache provided by Cachix to speed up the installation
-        uses: cachix/cachix-action@v14
-        with:
-          name: devenv
+      # # - name: Enable Magic Nix Cache
+      # #   uses: DeterminateSystems/magic-nix-cache-action@v2
 
-      - name: Install devenv.sh
-        run: nix profile install tarball+https://install.devenv.sh/latest
+      # - name: Configure Nix to use the devenv cache provided by Cachix to speed up the installation
+      #   uses: cachix/cachix-action@v14
+      #   with:
+      #     name: devenv
 
-      - name: Install roc
-        shell: devenv shell bash -e {0}
-        run: task get-roc
+      # - name: Install devenv.sh
+      #   # run: nix profile install tarball+https://install.devenv.sh/latest
+      #   run: nix-env -if https://install.devenv.sh/latest
+
+      # - name: Install roc
+      #   run: devenv shell task get-roc
+
+      # - name: Run tests
+      #   shell: devenv shell bash -- -e {0}
+      #   run: task test
+
+      # - name: Build project
+      #   run: devenv shell task build
+
+      - name: Download roc
+        run: wget https://github.com/roc-lang/roc/releases/download/nightly/roc_nightly-linux_x86_64-latest.tar.gz --no-verbose --output-document roc.tar.gz && tar -xf roc.tar.gz
+
+      - name: Rename roc dir
+        run: mv "$(pwd)/$(find . -type d -iname 'roc_nightly*' | head -n 1)" $(pwd)/roc-dir
+
+      - name: Add roc to PATH
+        run: echo "PATH=roc-dir:$PATH" >> "$GITHUB_ENV"
+
+      - name: Download Task
+        run: wget https://github.com/go-task/task/releases/download/v3.35.1/task_linux_386.tar.gz --no-verbose && tar -xf task_linux_386.tar.gz
+
+      - name: Run tests
+        run: ./task test
 
       - name: Build project
-        shell: devenv shell bash -e {0}
-        run: task build
-
+        run: ./task build
