@@ -47,7 +47,7 @@ handleReadRequest = \request, model ->
     else
         when request.url |> Str.split "/" is
             ["", "assets", .. as subPath] -> Server.Assets.serve subPath
-            _ -> index |> response200
+            _ -> index |> Str.replaceFirst "{% contentPath %}" request.url |> response200
 
 handleWriteRequest : Request, Model -> (Response, Model)
 handleWriteRequest = \request, model ->

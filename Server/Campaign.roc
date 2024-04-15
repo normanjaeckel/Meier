@@ -5,7 +5,7 @@ interface Server.Campaign
         writeRequest,
     ]
     imports [
-        html.Html.{ Node, a, button, div, header, footer, form, input, p, renderWithoutDocType, section, text },
+        html.Html.{ Node, a, button, div, header, footer, form, input, li, p, renderWithoutDocType, section, text, ul },
         html.Attribute.{ attribute, class, id, max, min, name, placeholder, required, type, value },
         pf.Webserver.{ RequestBody, Response },
         Server.Modeling.{ Model, CampaignID },
@@ -32,6 +32,11 @@ readRequest = \path, model ->
 
         [campaignId, "update"] ->
             when updateCampaignForm campaignId model is
+                Ok node -> renderWithoutDocType node |> response200
+                Err KeyNotFound -> response404
+
+        [campaignId, "days"] ->
+            when updateDaysForm campaignId model is
                 Ok node -> renderWithoutDocType node |> response200
                 Err KeyNotFound -> response404
 
@@ -97,7 +102,7 @@ campaignCard = \campaignId, title, numOfDays ->
     div [id "campaign-$(campaignId)", class "column is-half is-one-third-desktop is-one-quarter-fullhd"] [
         div [class "card is-flex is-flex-direction-column"] [
             div [class "card-header"] [
-                p [class "card-header-title has-background-primary-light"] [text title],
+                p [class "card-header-title"] [text title],
             ],
             div [class "card-content is-flex-grow-1"] [
                 text "Anzahl der Tage: $(Num.toStr numOfDays)",
@@ -146,10 +151,26 @@ detailView = \campaignId, model, _subPage ->
         ],
         section [class "section"] [
             div [class "container"] [
+                breadcrumb campaign.title,
                 div [class "columns is-multiline"] [
                     div [class "column is-half is-one-third-desktop is-one-quarter-fullhd"] [
                         div [class "card"] [
-                            div [class "card-header"] [p [class "card-header-title has-background-primary-light"] [text "Tage"]],
+                            div [class "card-header"] [p [class "card-header-title"] [text "Tage"]],
+                            div [class "card-content"] [text "content"],
+                            div [class "card-footer"] [
+                                a
+                                    [
+                                        class "card-footer-item",
+                                        (attribute "hx-get") "/campaign/$(campaignId)/days",
+                                        (attribute "hx-target") "#formModal",
+                                    ]
+                                    [text "Verwalten"],
+                            ],
+                        ],
+                    ],
+                    div [class "column is-half is-one-third-desktop is-one-quarter-fullhd"] [
+                        div [class "card"] [
+                            div [class "card-header"] [p [class "card-header-title"] [text "Angebote"]],
                             div [class "card-content"] [text "content"],
                             div [class "card-footer"] [
                                 a
@@ -162,7 +183,7 @@ detailView = \campaignId, model, _subPage ->
                     ],
                     div [class "column is-half is-one-third-desktop is-one-quarter-fullhd"] [
                         div [class "card"] [
-                            div [class "card-header"] [p [class "card-header-title has-background-primary-light"] [text "Angebote"]],
+                            div [class "card-header"] [p [class "card-header-title"] [text "Klassen"]],
                             div [class "card-content"] [text "content"],
                             div [class "card-footer"] [
                                 a
@@ -175,7 +196,7 @@ detailView = \campaignId, model, _subPage ->
                     ],
                     div [class "column is-half is-one-third-desktop is-one-quarter-fullhd"] [
                         div [class "card"] [
-                            div [class "card-header"] [p [class "card-header-title has-background-primary-light"] [text "Klassen"]],
+                            div [class "card-header"] [p [class "card-header-title"] [text "Schüler/innen"]],
                             div [class "card-content"] [text "content"],
                             div [class "card-footer"] [
                                 a
@@ -188,20 +209,7 @@ detailView = \campaignId, model, _subPage ->
                     ],
                     div [class "column is-half is-one-third-desktop is-one-quarter-fullhd"] [
                         div [class "card"] [
-                            div [class "card-header"] [p [class "card-header-title has-background-primary-light"] [text "Schüler/innen"]],
-                            div [class "card-content"] [text "content"],
-                            div [class "card-footer"] [
-                                a
-                                    [
-                                        class "card-footer-item",
-                                    ]
-                                    [text "Verwalten"],
-                            ],
-                        ],
-                    ],
-                    div [class "column is-half is-one-third-desktop is-one-quarter-fullhd"] [
-                        div [class "card"] [
-                            div [class "card-header"] [p [class "card-header-title has-background-primary-light"] [text "Zurordnung"]],
+                            div [class "card-header"] [p [class "card-header-title"] [text "Zurordnung"]],
                             div [class "card-content"] [text "content"],
                             div [class "card-footer"] [
                                 a
@@ -215,6 +223,24 @@ detailView = \campaignId, model, _subPage ->
 
                 ],
             ],
+        ],
+    ]
+
+breadcrumb : Str -> Node
+breadcrumb = \title ->
+    div [class "breadcrumb has-dot-separator", ariaLabel "breadcrumbs"] [
+        ul [] [
+            li [] [
+                a
+                    [
+                        (attribute "hx-get") "/",
+                        (attribute "hx-target") "#mainContent",
+                        (attribute "hx-push-url") "true",
+
+                    ]
+                    [text "Start"],
+            ],
+            li [class "is-active"] [a [] [text title]],
         ],
     ]
 
@@ -291,7 +317,7 @@ updateCampaignForm = \campaignId, model ->
         div [class "modal-card"] [
             form formAttributes [
                 header [class "modal-card-head"] [
-                    p [class "modal-card-title"] [text "Einstellungen für Kampagnen"],
+                    p [class "modal-card-title"] [text "Einstellungen für Kampagne"],
                     button [class "delete", type "button", ariaLabel "close", onClickCloseModal] [],
                 ],
                 section [class "modal-card-body"] [
@@ -312,8 +338,47 @@ updateCampaignForm = \campaignId, model ->
                     ],
                 ],
                 footer [class "modal-card-foot"] [
-                    button [class "button is-success", type "submit"] [text "Speichern"],
-                    button [class "button", type "button", onClickCloseModal] [text "Abbrechen"],
+                    div [class "buttons"] [
+                        button [class "button is-success", type "submit"] [text "Speichern"],
+                        button [class "button", type "button", onClickCloseModal] [text "Abbrechen"],
+                    ],
+                ],
+            ],
+        ],
+    ]
+
+updateDaysForm : CampaignID, Model -> Result Node [KeyNotFound]
+updateDaysForm = \campaignId, model ->
+    campaign <- model |> Dict.get campaignId |> Result.map
+
+    formAttributes = [
+        (attribute "hx-post") "/campaign/$(campaignId)/days",
+        (attribute "hx-disabled-elt") "button",
+        (attribute "hx-target") "closest .modal",
+        (attribute "hx-swap") "delete",
+    ]
+
+    div [class "modal is-active"] [
+        div [class "modal-background", onClickCloseModal] [],
+        div [class "modal-card"] [
+            form formAttributes [
+                header [class "modal-card-head"] [
+                    p [class "modal-card-title"] [text "$(campaign.title) · Tage"],
+                    button [class "delete", type "button", ariaLabel "close", onClickCloseModal] [],
+                ],
+                section
+                    [class "modal-card-body"]
+                    (
+                        campaign.days
+                        |> List.map
+                            \d -> p [] [text d.title]
+
+                    ),
+                footer [class "modal-card-foot"] [
+                    div [class "buttons"] [
+                        button [class "button is-success", type "submit"] [text "Speichern"],
+                        button [class "button", type "button", onClickCloseModal] [text "Abbrechen"],
+                    ],
                 ],
             ],
         ],
@@ -362,6 +427,7 @@ parseCreateCampaignFormFields = \fields ->
         |> List.findFirst \(fieldName, _) -> fieldName == "title"
         |> Result.try \(_, t) -> t |> Str.fromUtf8
         |> Result.mapErr
+            # TODO
             \_ -> InvalidInput
 
     numOfDays =
@@ -370,6 +436,7 @@ parseCreateCampaignFormFields = \fields ->
         |> Result.try \(_, n) -> n |> Str.fromUtf8
         |> Result.try Str.toU64
         |> Result.mapErr
+            # TODO
             \_ -> InvalidInput
 
     # TODO: Why is it not possible to write "when (title, numOfDays)"?
@@ -418,7 +485,7 @@ performUpdateCampaign = \campaignId, body, model ->
                     respContent =
                         campaignCard campaignId title numOfDays |> addAttribute ((attribute "hx-swap-oob") "true")
 
-                    Ok (renderWithoutDocType respContent, newModel)
+                    Ok (renderWithoutDocType respContent, [AddEvent event])
 
 parseUpdateCampaignFormFields : List (Str, List U8) -> Result { title : Str } [InvalidInput]
 parseUpdateCampaignFormFields = \fields ->
@@ -433,10 +500,10 @@ parseUpdateCampaignFormFields = \fields ->
 
 ## Delete
 
-performDeleteCampaign : CampaignID, Model -> Result (Str, Model) [KeyNotFound]
+performDeleteCampaign : CampaignID, Model -> Result (Str, List Command) [KeyNotFound]
 performDeleteCampaign = \campaignId, model ->
     if model |> Dict.contains campaignId then
-        newModel = model |> Dict.remove campaignId
-        Ok ("", newModel)
+        event = Encode.toBytes { action: "campaign.delete", data: { id: campaignId } } json
+        Ok ("", [AddEvent event])
     else
         Err KeyNotFound
