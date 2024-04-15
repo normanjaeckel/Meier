@@ -427,8 +427,9 @@ parseCreateCampaignFormFields = \fields ->
         |> List.findFirst \(fieldName, _) -> fieldName == "title"
         |> Result.try \(_, t) -> t |> Str.fromUtf8
         |> Result.mapErr
-            # TODO
-            \_ -> InvalidInput
+            \e ->
+                when e is
+                    NotFound | BadUtf8 _ _ -> InvalidInput
 
     numOfDays =
         fields
@@ -436,10 +437,15 @@ parseCreateCampaignFormFields = \fields ->
         |> Result.try \(_, n) -> n |> Str.fromUtf8
         |> Result.try Str.toU64
         |> Result.mapErr
-            # TODO
-            \_ -> InvalidInput
+            \e ->
+                when e is
+                    NotFound | BadUtf8 _ _ | InvalidNumStr -> InvalidInput
 
     # TODO: Why is it not possible to write "when (title, numOfDays)"?
+    # when (title, numOfDays) is
+    #     (Ok t, Ok n) -> Ok { title: t, numOfDays: n }
+    #     _ -> Err InvalidInput
+
     when title is
         Ok t ->
             when numOfDays is
@@ -485,7 +491,7 @@ performUpdateCampaign = \campaignId, body, model ->
                     respContent =
                         campaignCard campaignId title numOfDays |> addAttribute ((attribute "hx-swap-oob") "true")
 
-                    Ok (renderWithoutDocType respContent, [AddEvent event])
+                    Ok (renderWithoutDocType respContent, newModel)
 
 parseUpdateCampaignFormFields : List (Str, List U8) -> Result { title : Str } [InvalidInput]
 parseUpdateCampaignFormFields = \fields ->
@@ -500,10 +506,10 @@ parseUpdateCampaignFormFields = \fields ->
 
 ## Delete
 
-performDeleteCampaign : CampaignID, Model -> Result (Str, List Command) [KeyNotFound]
+performDeleteCampaign : CampaignID, Model -> Result (Str, Model) [KeyNotFound]
 performDeleteCampaign = \campaignId, model ->
     if model |> Dict.contains campaignId then
-        event = Encode.toBytes { action: "campaign.delete", data: { id: campaignId } } json
-        Ok ("", [AddEvent event])
+        newModel = model |> Dict.remove campaignId
+        Ok ("", newModel)
     else
         Err KeyNotFound
