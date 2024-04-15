@@ -441,17 +441,8 @@ parseCreateCampaignFormFields = \fields ->
                 when e is
                     NotFound | BadUtf8 _ _ | InvalidNumStr -> InvalidInput
 
-    # TODO: Why is it not possible to write "when (title, numOfDays)"?
-    # when (title, numOfDays) is
-    #     (Ok t, Ok n) -> Ok { title: t, numOfDays: n }
-    #     _ -> Err InvalidInput
-
-    when title is
-        Ok t ->
-            when numOfDays is
-                Ok n -> Ok { title: t, numOfDays: n }
-                _ -> Err InvalidInput
-
+    when (title, numOfDays) is
+        (Ok t, Ok n) -> Ok { title: t, numOfDays: n }
         _ -> Err InvalidInput
 
 getHighestId : Model -> U64
