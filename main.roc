@@ -1,16 +1,14 @@
 app "meier"
     packages {
-        pf: "platform/main.roc",
+        pf: "https://oshahn.de/BTMaAYUoV_nQAliSkaBH1RY16JOPWjw_Gm0oF7C5FJA.tar.br",
         html: "vendor/roc-html/src/main.roc", # html: "https://github.com/Hasnep/roc-html/releases/download/v0.3.0/BWz3TyGqkM8lFZy4Ww5cspdEgEAbCwpC60G5HMafNjA.tar.br",
-        json: "vendor/roc-json/package/main.roc", # json: "https://github.com/lukewilliamboswell/roc-json/releases/download/0.6.3/_2Dh4Eju2v_tFtZeMq8aZ9qw2outG04NbkmKpFhXS_4.tar.br",
     }
     imports [
-        pf.Webserver.{ Event, Request, Response, Command },
+        pf.Webserver.{ Request, Response },
         Server.Assets,
         Server.Campaign,
         Server.Modeling,
         Server.Shared.{ response200, response400, response404 },
-        json.Core.{ json },
         "Server/templates/index.html" as index : Str,
     ]
     provides [main, Model] to pf
@@ -19,39 +17,17 @@ Model : Server.Modeling.Model
 
 Program : {
     init : Model,
-    applyEvents : Model, List Event -> Model,
     handleReadRequest : Request, Model -> Response,
-    handleWriteRequest : Request, Model -> (Response, List Command),
+    handleWriteRequest : Request, Model -> (Response, Model),
 }
 
 main : Program
 main =
-    { init, applyEvents, handleReadRequest, handleWriteRequest }
+    { init, handleReadRequest, handleWriteRequest }
 
 init : Model
 init =
     Server.Modeling.init
-
-applyEvents : Model, List Event -> Model
-applyEvents = \model, events ->
-    events
-    |> List.walk
-        model
-        \state, event -> applyEvent state event
-
-applyEvent : Model, Event -> Model
-applyEvent = \model, event ->
-    decodedEvent : Result { action : Str } _
-    decodedEvent = Decode.fromBytes event json
-    when decodedEvent is
-        Ok dc ->
-            when dc.action |> Str.split "." is
-                ["campaign", .. as subPath] ->
-                    Server.Campaign.applyEvent model subPath event
-
-                _ -> crash "Oh, no! Bad database with unknown event."
-
-        Err _ -> crash "Oh, no! Cannot decode event."
 
 handleReadRequest : Request, Model -> Response
 handleReadRequest = \request, model ->
@@ -73,7 +49,7 @@ handleReadRequest = \request, model ->
             ["", "assets", .. as subPath] -> Server.Assets.serve subPath
             _ -> index |> response200
 
-handleWriteRequest : Request, Model -> (Response, List Command)
+handleWriteRequest : Request, Model -> (Response, Model)
 handleWriteRequest = \request, model ->
     responseBody =
         when request.url |> Str.split "/" is
@@ -81,14 +57,14 @@ handleWriteRequest = \request, model ->
             _ -> Err NotFound
 
     when responseBody is
-        Ok (body, commands) ->
-            (response200 body, commands)
+        Ok (body, newModel) ->
+            (response200 body, newModel)
 
         Err BadRequest ->
-            (response400, [])
+            (response400, model)
 
         Err NotFound | Err KeyNotFound ->
-            (response404, [])
+            (response404, model)
 
 # Testing
 

@@ -1,6 +1,5 @@
 interface Server.Campaign
     exposes [
-        applyEvent,
         listView,
         readRequest,
         writeRequest,
@@ -8,8 +7,7 @@ interface Server.Campaign
     imports [
         html.Html.{ Node, a, button, div, header, footer, form, input, p, renderWithoutDocType, section, text },
         html.Attribute.{ attribute, class, id, max, min, name, placeholder, required, type, value },
-        json.Core.{ json },
-        pf.Webserver.{ Command, Event, RequestBody, Response },
+        pf.Webserver.{ RequestBody, Response },
         Server.Modeling.{ Model, CampaignID },
         Server.Shared.{
             addAttribute,
@@ -20,60 +18,6 @@ interface Server.Campaign
             response404,
         },
     ]
-
-# Apply Event
-
-applyEvent : Model, List Str, Event -> Model
-applyEvent = \model, path, event ->
-    when path is
-        ["create"] -> applyCreateEvent model event
-        ["update"] -> applyUpdateEvent model event
-        ["delete"] -> applyDeleteEvent model event
-        _ -> crash "Oh, no! Invalid database."
-
-applyCreateEvent : Model, Event -> Model
-applyCreateEvent = \model, event ->
-    decodedEvent : Result { data : { id : CampaignID, title : Str, numOfDays : U64 } } _
-    decodedEvent = Decode.fromBytes event json
-
-    when decodedEvent is
-        Ok dc ->
-            campaign = {
-                title: dc.data.title,
-                days: List.repeat { title: "Day" } dc.data.numOfDays,
-            }
-            model |> Dict.insert dc.data.id campaign
-
-        Err _ -> crash "Oh, no! Invalid database."
-
-applyUpdateEvent : Model, Event -> Model
-applyUpdateEvent = \model, event ->
-    decodedEvent : Result { data : { id : CampaignID, title : Str } } _
-    decodedEvent = Decode.fromBytes event json
-
-    when decodedEvent is
-        Ok dc ->
-            model
-            |> Dict.update
-                dc.data.id
-                \current ->
-                    when current is
-                        Missing -> Missing
-                        Present campaign ->
-                            Present { campaign & title: dc.data.title }
-
-        Err _ -> crash "Oh, no! Invalid database."
-
-applyDeleteEvent : Model, Event -> Model
-applyDeleteEvent = \model, event ->
-    decodedEvent : Result { data : { id : CampaignID } } _
-    decodedEvent = Decode.fromBytes event json
-
-    when decodedEvent is
-        Ok dc ->
-            model |> Dict.remove dc.data.id
-
-        Err _ -> crash "Oh, no! Invalid database."
 
 # Read
 
@@ -310,7 +254,7 @@ updateCampaignForm = \campaignId, model ->
 
 # Write
 
-writeRequest : List Str, RequestBody, Model -> Result (Str, List Command) [BadRequest, KeyNotFound, NotFound]
+writeRequest : List Str, RequestBody, Model -> Result (Str, Model) [BadRequest, KeyNotFound, NotFound]
 writeRequest = \path, body, model ->
     when path is
         ["create"] -> performCreateCampaign body model
@@ -320,7 +264,7 @@ writeRequest = \path, body, model ->
 
 ## Create
 
-performCreateCampaign : RequestBody, Model -> Result (Str, List Command) [BadRequest]
+performCreateCampaign : RequestBody, Model -> Result (Str, Model) [BadRequest]
 performCreateCampaign = \body, model ->
     when body is
         EmptyBody ->
@@ -333,15 +277,16 @@ performCreateCampaign = \body, model ->
 
                 Ok { title, numOfDays } ->
                     newObjId = getHighestId model + 1 |> Num.toStr
-
-                    event = Encode.toBytes
-                        { action: "campaign.create", data: { title, numOfDays, id: newObjId } }
-                        json
+                    campaign = {
+                        title,
+                        days: List.repeat { title: "Day" } numOfDays,
+                    }
+                    newModel = model |> Dict.insert newObjId campaign
 
                     respContent =
                         div [(attribute "hx-swap-oob") "afterend:#createCampaignCard"] [campaignCard newObjId title numOfDays]
 
-                    Ok (renderWithoutDocType respContent, [AddEvent event])
+                    Ok (renderWithoutDocType respContent, newModel)
 
 parseCreateCampaignFormFields : List (Str, List U8) -> Result { title : Str, numOfDays : U64 } [InvalidInput]
 parseCreateCampaignFormFields = \fields ->
@@ -350,9 +295,7 @@ parseCreateCampaignFormFields = \fields ->
         |> List.findFirst \(fieldName, _) -> fieldName == "title"
         |> Result.try \(_, t) -> t |> Str.fromUtf8
         |> Result.mapErr
-            \e ->
-                when e is
-                    NotFound | BadUtf8 _ _ -> InvalidInput
+            \_ -> InvalidInput
 
     numOfDays =
         fields
@@ -360,12 +303,15 @@ parseCreateCampaignFormFields = \fields ->
         |> Result.try \(_, n) -> n |> Str.fromUtf8
         |> Result.try Str.toU64
         |> Result.mapErr
-            \e ->
-                when e is
-                    NotFound | BadUtf8 _ _ | InvalidNumStr -> InvalidInput
+            \_ -> InvalidInput
 
-    when (title, numOfDays) is
-        (Ok t, Ok n) -> Ok { title: t, numOfDays: n }
+    # TODO: Why is it not possible to write "when (title, numOfDays)"?
+    when title is
+        Ok t ->
+            when numOfDays is
+                Ok n -> Ok { title: t, numOfDays: n }
+                _ -> Err InvalidInput
+
         _ -> Err InvalidInput
 
 getHighestId : Model -> U64
@@ -379,7 +325,7 @@ getHighestId = \model ->
 
 ## Update
 
-performUpdateCampaign : CampaignID, RequestBody, Model -> Result (Str, List Command) [KeyNotFound, BadRequest]
+performUpdateCampaign : CampaignID, RequestBody, Model -> Result (Str, Model) [KeyNotFound, BadRequest]
 performUpdateCampaign = \campaignId, body, model ->
     campaign <- model |> Dict.get campaignId |> Result.try
 
@@ -393,16 +339,19 @@ performUpdateCampaign = \campaignId, body, model ->
                     Err BadRequest
 
                 Ok { title } ->
-                    event = Encode.toBytes
-                        { action: "campaign.update", data: { title, id: campaignId } }
-                        json
+                    newModel =
+                        model
+                        |> Dict.update campaignId \current ->
+                            when current is
+                                Missing -> Missing
+                                Present old -> Present { old & title: title }
 
                     numOfDays = List.len campaign.days
 
                     respContent =
                         campaignCard campaignId title numOfDays |> addAttribute ((attribute "hx-swap-oob") "true")
 
-                    Ok (renderWithoutDocType respContent, [AddEvent event])
+                    Ok (renderWithoutDocType respContent, newModel)
 
 parseUpdateCampaignFormFields : List (Str, List U8) -> Result { title : Str } [InvalidInput]
 parseUpdateCampaignFormFields = \fields ->
@@ -417,10 +366,10 @@ parseUpdateCampaignFormFields = \fields ->
 
 ## Delete
 
-performDeleteCampaign : CampaignID, Model -> Result (Str, List Command) [KeyNotFound]
+performDeleteCampaign : CampaignID, Model -> Result (Str, Model) [KeyNotFound]
 performDeleteCampaign = \campaignId, model ->
     if model |> Dict.contains campaignId then
-        event = Encode.toBytes { action: "campaign.delete", data: { id: campaignId } } json
-        Ok ("", [AddEvent event])
+        newModel = model |> Dict.remove campaignId
+        Ok ("", newModel)
     else
         Err KeyNotFound

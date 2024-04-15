@@ -13,24 +13,13 @@ tasks:
   build:
     desc: Builds project without running it
     cmds:
-      - rm -f webserver
-      - rm -f platform/roc.o
-      - roc build --no-link --output platform/roc.o
-      - task: build-platform
-      - rm platform/roc.o
+      - roc build
     sources:
       - main.roc
       - Server/*.roc
       - Server/templates/*.html
     generates:
-      - webserver
-
-  build-platform:
-    internal: true
-    desc: Builds only the webserver
-    dir: ./platform
-    cmds:
-      - go build -o ../webserver
+      - main
 
   format:
     desc: Formats roc files
